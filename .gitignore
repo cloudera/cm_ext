@@ -1,6 +1,16 @@
 *.class
 
+# Eclipse files
+.classpath
+.project
+
+# Emacs backup files
+*~
+
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Maven build dir
+target
