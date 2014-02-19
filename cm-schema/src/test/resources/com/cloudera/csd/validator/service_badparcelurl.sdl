@@ -1,0 +1,14 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parcel" : {
+    "repoUrl" : "hdd",
+    "requiredTags" : ["req"]
+  }
+}

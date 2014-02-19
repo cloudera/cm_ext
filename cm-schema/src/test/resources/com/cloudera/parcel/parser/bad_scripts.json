@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+
+  "name": "CDH",
+  "version": "5.0.0",
+  "setActiveSymlink": true,
+
+  "depends": "foo >= 1.0",
+  "replaces": "bar",
+  "conflicts": "baz < 3.0",
+
+  "provides": [
+    "cdh",
+    "impala",
+    "solr"
+  ],
+
+  "scripts": {
+    "foo": "foo.sh"
+  },
+
+  "packages": [
+    { "name"   : "hadoop",
+      "version": "2.2.0+cdh5.0.0+609-0.cdh5b2.p0.386~precise-cdh5.0.0"
+    },
+    { "name"   : "hadoop-client",
+      "version": "2.2.0+cdh5.0.0+609-0.cdh5b2.p0.386~precise-cdh5.0.0"
+    },
+    { "name"   : "hadoop-hdfs",
+      "version": "2.2.0+cdh5.0.0+609-0.cdh5b2.p0.386~precise-cdh5.0.0"
+    }
+  ],
+
+  "components": [
+    { "name"       : "hadoop",
+      "version"    : "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version": "2.2.0+cdh5.0.0+609"
+    },
+    { "name"       : "hadoop-hdfs",
+      "version"    : "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version": "2.2.0+cdh5.0.0+609"
+    }
+  ],
+
+  "users": {
+    "hdfs": {
+      "longname"    : "Hadoop HDFS",
+      "home"        : "/var/lib/hadoop-hdfs",
+      "shell"       : "/bin/bash",
+      "extra_groups": [ "hadoop" ]
+    },
+    "impala": {
+      "longname"    : "Impala",
+      "home"        : "/var/run/impala",
+      "shell"       : "/bin/bash",
+      "extra_groups": [ "hive", "hdfs" ]
+    }
+  },
+
+  "groups": [
+    "hadoop"
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "hdfsDirs" : [
+     {
+       "name" : "CreateHomeDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "hdfsDirDescriptor" : {
+         "type" : "path",
+         "path" : "/echo",
+         "description" : "Home directory used by Echo service."
+       },
+       "permissions" : "0700"
+     },
+     {
+       "name" : "CreateParamDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "hdfsDirDescriptor" : {
+         "type" : "parameter",
+         "parameterName" : "service_var1",
+         "dirDescription" : "Home directory used by Echo service."
+       },
+       "permissions" : "0700"
+     }
+   ],
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    },
+    {
+      "name" : "service_var2",
+      "label" : "Service Var2 Label",
+      "description" : "Service Var2 Description",
+      "required" : "true",
+      "type" : "long",
+      "unit" : "megabytes",
+      "default" : 20 ,
+      "minValue" : 1
+    }
+  ],
+  "parcel" : {
+    "repoUrl" : "http://mywebsite.com",
+    "requiredTags" : [ "req" ],
+    "optionalTags" : [ "opt" ]
+  },
+  "gateway" : {
+    "alternatives" : {
+      "name" : "echo-conf",
+      "priority" : 50,
+      "linkRoot" : "/etc/echo"
+    },
+    "scriptRunner" : {
+      "program" : "scripts/cc.sh",
+      "args" : [
+        "arg1",
+        "arg2"
+      ],
+      "environmentVariables" : {
+        "ENV1" : "Hello",
+        "ENV2" : "Hi"
+      }
+    },
+    "parameters" : [
+      {
+        "name" : "client_var1",
+        "label" : "Client Var1 Label",
+        "description" : "Client Var1 Description",
+        "configName" : "client.var1.config",
+        "type" : "string"
+      },
+      {
+        "name" : "client_var2",
+        "label" : "Client Var2 Label",
+        "description" : "Client Var2 Description",
+        "required" : "true",
+        "type" : "long",
+        "default" : 1
+      }
+    ],
+    "configWriter" : {
+      "generators" : [
+        {
+          "filename" : "echo_client.xml",
+          "configFormat" : "hadoop_xml",
+          "excludedParams" : ["client_var2"]
+        },
+        {
+          "filename" : "echo_client.properties",
+          "configFormat" : "properties",
+          "includedParams" : ["service_var1", "client_var1", "client_var2"]
+        }
+      ]
+    }
+  }
+}

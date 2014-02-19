@@ -1,0 +1,20 @@
+{
+  "name" : "ECHO",
+  "label" : "the label",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+   "hdfsDirs" : [
+     {
+       "name" : "CreateHomeDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "/echo",
+       "permissions" : "1888"
+     }
+   ]
+}

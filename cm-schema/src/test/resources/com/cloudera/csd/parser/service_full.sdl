@@ -1,0 +1,401 @@
+/**
+ * This is a comment for this CSD.
+ */
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "maxInstances" : 1,
+  "compatibility" : {
+    "generation" : 2,
+    "cdhVersion" : {
+      "min" : 4,
+      "max" : 5
+    }
+  },
+  "serviceInit" : {
+    "preStartSteps" : [
+      { "commandName" : "CreateHomeDirCommand" }
+    ],
+    "postStartSteps" : [
+      { "commandName" : "CreateParamDirCommand", "failureAllowed" : true }
+    ]
+  },
+  "inExpressWizard" : true,
+  "rolesWithExternalLinks" : ["ECHO_MASTER_SERVER"],
+  "hdfsDirs" : [
+     {
+       "name" : "CreateHomeDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "hdfsDirDescriptor" : { 
+         "type" : "path", 
+         "path" : "/echo",
+         "description" : "Home directory used by Echo service."
+       },
+       "permissions" : "0700"
+     },
+     {
+       "name" : "CreateParamDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "hdfsDirDescriptor" : { 
+         "type" : "parameter", 
+         "parameterName" : "service_var1",
+         "dirDescription" : "Home directory used by Echo service."
+       },
+       "permissions" : "0700"
+     }
+   ],
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    },
+    {
+      "name" : "service_var2",
+      "label" : "Service Var2 Label",
+      "description" : "Service Var2 Description",
+      "required" : "true",
+      "type" : "long", 
+      "unit" : "megabytes",
+      "default" : 20 , 
+      "minValue" : 1
+    }
+  ],
+  "parcel" : {
+    "repoUrl" : "http://mywebsite.com",
+    "requiredTags" : [ "req" ],
+    "optionalTags" : [ "opt" ]
+  },
+  "serviceDependencies" : [
+    {"name" : "ZOOKEEPER"}, 
+    {"name" : "HDFS", "required" : "true"}
+  ],
+  "gateway" : {
+    "alternatives" : {
+      "name" : "echo-conf",
+      "priority" : 50,
+      "linkRoot" : "/etc/echo"
+    },
+    "scriptRunner" : {
+      "program" : "scripts/cc.sh",
+      "args" : [
+        "arg1",
+        "arg2"
+      ],
+      "environmentVariables" : {
+        "ENV1" : "Hello",
+        "ENV2" : "Hi"
+      }
+    },
+    "parameters" : [
+      {
+        "name" : "client_var1",
+        "label" : "Client Var1 Label",
+        "description" : "Client Var1 Description",
+        "configName" : "client.var1.config",
+        "type" : "string"
+      },
+      {
+        "name" : "client_var2",
+        "label" : "Client Var2 Label",
+        "description" : "Client Var2 Description",
+        "required" : "true",
+        "type" : "long",
+        "default" : 1
+      }
+    ],
+    "configWriter" : {
+      "generators" : [
+        {
+          "filename" : "echo_client.xml",
+          "configFormat" : "hadoop_xml",
+          "excludedParams" : ["client_var2"]
+        },
+        {
+          "filename" : "echo_client.properties",
+          "configFormat" : "properties",
+          "includedParams" : ["service_var1", "client_var1", "client_var2"]
+        }
+      ]
+    }
+  },
+  "commands" : [
+    {
+      "name" : "service_cmd1",
+      "label" : "Service Cmd1 Label",
+      "description" : "Service Cmd1 Help",
+      "roleName" : "ECHO_WEBSERVER",
+      "roleCommand" : "role_cmd1",
+      "runMode" : "all"
+    },
+    {
+      "name" : "service_cmd2",
+      "label" : "Service Cmd2 Label",
+      "description" : "Service Cmd2 Help",
+      "roleName" : "ECHO_WEBSERVER",
+      "roleCommand" : "role_cmd1",
+      "runMode" : "single"
+    }
+  ],
+  "stopRunner" : {
+    "relevantRoleTypes" : [
+      "ECHO_WEBSERVER"
+    ],
+    "runner" : {
+      "program" : "scripts/graceful_stop.sh",
+      "args" : ["--port 9981" ],
+      "environmentVariables" : {
+        "TEST_MESSAGE" : "Bye people",
+        "BACKGROUND_COLOR" : "#e2e2e2"
+      }
+    },
+    "timeout" : 180000,
+    "masterRole" : "ECHO_MASTER_SERVER"
+  },
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh",
+         "args" : [
+            "start_master",
+            "--port 9981"
+         ],
+         "environmentVariables" : {
+           "TEST_MESSAGE" : "Hello there people",
+           "BACKGROUND_COLOR" : "#d2d2d2"
+         }
+       },
+       "externalLink" : {
+          "name" : "master_web_ui",
+          "label" : "Master WebUI",
+          "url" : "http://myhost.com:80"
+       },
+       "additionalExternalLinks" : [
+          {
+           "name" : "master_web_ui2",
+           "label" : "Master WebUI2",
+           "url" : "http://myhost.com:80/host2"
+          }
+       ],
+       "topology" : {
+         "minInstances" : "1",
+         "maxInstances" : "1"
+       },
+       "parameters" : [
+         {
+          "name" : "master_server_var1",
+          "label" : "Master server var1 Label",
+          "description" : "Master Server var 1 Description",
+          "required" : "true",
+          "configName" : "master_server.var1.config",
+          "type" : "long",
+          "default" : 20
+         }
+       ],
+       "logging" : {
+         "dir" : "/var/log/echo",
+         "filename" : "master.log",
+         "configName" : "master.log.dir"
+       },
+       "configWriter" : {
+         "generators" : [
+           {
+             "filename" : "sample_xml_file.xml",
+             "configFormat" : "hadoop_xml"
+           }
+         ]
+       }
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh",
+         "args" : [
+            "start",
+            "--port 9981"
+         ],
+         "environmentVariables" : {
+           "TEST_MESSAGE" : "Hello there people",
+           "BACKGROUND_COLOR" : "#d2d2d2"
+         }
+       },
+       "logging" : {
+         "dir" : "/var/log/echo",
+         "filename" : "webserver.log",
+         "loggingType" : "log4j"
+       },
+       "parameters" : [
+          {
+            "name" : "role_var1",
+            "label" : "Role Var1 Label",
+            "description" : "Role Var1 Description",
+            "type" : "string",
+            "default" : "role_var1_default"
+          },
+          {
+            "name" : "role_var2",
+            "label" : "Role Var2 Label",
+            "description" : "Role Var2 Description",
+            "required" : "true",
+            "configName" : "role.var2.config",
+            "type" : "long", 
+            "unit" : "seconds",
+            "default" : 20 
+          },
+          {
+            "name" : "role_var3",
+            "label" : "Role Var3 Label",
+            "description" : "Role Var3 Description",
+            "required" : "true",
+            "configName" : "role.var3.config",
+            "type" : "boolean", 
+            "default" : true
+          },
+          {
+            "name" : "role_var4",
+            "label" : "Role Var4 Label",
+            "description" : "Role Var4 Description",
+            "configName" : "role.var4.config",
+            "type" : "double", 
+            "unit" : "times",
+            "default" : 0.3,
+            "minValue" : 0.01,
+            "maxValue" : 0.99
+          },
+          {
+            "name" : "role_var5",
+            "label" : "Role Var5 Label",
+            "description" : "Role Var5 Description",
+            "configName" : "role.var5.config",
+            "type" : "path_array", 
+            "minLength" : 1,
+            "maxLength" : 5,
+            "pathType" : "serviceSpecific"
+          },
+          {
+            "name" : "role_var6",
+            "label" : "Role Var6 Label",
+            "description" : "Role Var6 Description",
+            "configName" : "role.var6.config",
+            "type" : "string_array",
+            "default" : ["foo", "bar"],
+            "maxLength" : 5,
+            "separator" : ":"
+          },
+          {
+            "name" : "role_var7",
+            "label" : "Role Var7 Label",
+            "description" : "Role Var7 Description",
+            "configName" : "role.var7.config",
+            "type" : "string_enum",
+            "validValues" : ["foo", "bar"],
+            "default" : "foo"
+          },
+          {
+            "name" : "role_var8",
+            "label" : "Role Var8 Label",
+            "description" : "Role Var8 Description",
+            "configName" : "role.var8.config",
+            "type" : "uri_array",
+            "default" : ["ldap://foo", "ldaps://bar"],
+            "minLength" : 1,
+            "maxLength" : 5,
+            "allowedSchemes" : ["ldap", "ldaps"]
+          },
+          {
+            "name" : "role_var9",
+            "label" : "Role Var9 Label",
+            "description" : "Role Var9 Description",
+            "configName" : "role.var9.config",
+            "type" : "uri",
+            "allowedSchemes" : ["ldap", "ldaps"],
+            "opaque" : true
+          },
+          {
+            "name" : "role_var10",
+            "label" : "Role Var10 Label",
+            "description" : "Role Var10 Description",
+            "configName" : "role.var10.config",
+            "type" : "path",
+            "pathType" : "localDataDir"
+          },
+          {
+            "name" : "role_var11",
+            "label" : "Role Var11 Label",
+            "description" : "Role Var11 Description",
+            "configName" : "role.var11.config",
+            "type" : "port",
+            "zeroAllowed" : true,
+            "negativeOneAllowed" : true,
+            "outbound" : true
+          }
+       ],
+       "runAs" : {
+         "user" : "webserverrole",
+         "group" : "webserverrole"
+       },
+       "commands" : [
+         {
+           "name" : "role_cmd1",
+           "label" : "Role Cmd1 Label",
+           "description" : "Role Cmd1 Help",
+           "expectedExitCodes" : [0, 1, 2],
+           "requiredRoleState" : "running",
+           "commandRunner" : {
+             "program" : "scripts/control.sh",
+             "args" : ["cmd1"],
+             "environmentVariables" : {
+               "ENV_VAR" : "test value"
+             }
+           }
+         }
+       ],
+       "configWriter" : {
+         "generators" : [
+           {
+             "filename" : "sample_xml_file.xml",
+             "configFormat" : "hadoop_xml",
+             "excludedParams" : ["service_var1", "role_var3"]
+           },
+           {
+             "filename" : "sample_props_file.properties",
+             "configFormat" : "properties",
+             "includedParams" : ["service_var1", "role_var3"]
+           },
+           {
+             "filename" : "sample_role_props_file.properties",
+             "configFormat" : "properties",
+             "includedParams" : ["service_var1", "role_var3"]
+           }
+         ],
+         "peerConfigGenerators" : [
+           {
+             "filename" : "sample_role_peer_file.properties",
+             "params" : ["service_var1", "role_var3"]
+           },
+           {
+             "filename" : "sample_master_peer_file.properties",
+             "params" : ["master_server_var1"],
+             "roleName" : "ECHO_MASTER_SERVER"
+            }
+          ]
+       }
+    }
+  ]
+}

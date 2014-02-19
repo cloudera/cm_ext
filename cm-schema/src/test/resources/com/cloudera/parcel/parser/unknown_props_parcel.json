@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+
+  "name": "CDH",
+  "version": "5.0.0",
+  "setActiveSymlink": true,
+
+  "scripts": {
+  },
+
+  "packages": [
+  ],
+
+  "components": [
+  ],
+
+  "users": {
+  },
+
+  "groups": [
+  ],
+
+  "foo": "bar"
+}

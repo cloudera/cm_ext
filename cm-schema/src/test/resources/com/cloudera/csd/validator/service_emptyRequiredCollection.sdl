@@ -1,0 +1,21 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "parameters" : [
+    {
+      "name" : "name1",
+      "label" : "a label for name1",
+      "description" : "Service Var1 Description",
+      "configName" : "configName1",
+      "type" : "string_enum",
+      "validValues" : []
+    }
+  ]
+
+}

@@ -1,0 +1,20 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "roles" : [
+    {
+       "name" : "SERVER", /* Conflicts with zookeeper */
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       }
+    }
+  ]
+}
