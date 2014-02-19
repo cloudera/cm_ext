@@ -1,0 +1,16 @@
+{
+  "beeline" : {
+    "destination": "/usr/bin/beeline",
+    "source": "bin/beeline",
+    "priority": 10,
+    "isDirectory": false
+  },
+
+  "hive-conf" : {
+    "destination": "/etc/hive/conf",
+    "source": "etc/hive/conf.dist",
+    "priority": 20,
+    "isDirectory": true
+  }
+}
+

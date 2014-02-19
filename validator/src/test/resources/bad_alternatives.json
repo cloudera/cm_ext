@@ -1,0 +1,26 @@
+{
+  "beeline" : {
+    "source": "bin/beeline",
+    "priority": 10,
+    "isDirectory": false
+  },
+
+  "pig" : {
+    "destination": "/usr/bin/pig",
+    "source": "bin/pig",
+    "isDirectory": false
+  },
+
+  "oozie" : {
+    "destination": "/usr/bin/oozie",
+    "source": "bin/oozie",
+    "priority": 30
+  },
+
+  "hive-conf" : {
+    "destination": "/etc/hive/conf",
+    "priority": 20,
+    "isDirectory": true
+  }
+}
+

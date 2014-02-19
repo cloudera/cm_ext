@@ -1,0 +1,19 @@
+{
+  "version": "5.0.0",
+  "setActiveSymlink": true,
+
+  "scripts": {
+  },
+
+  "packages": [
+  ],
+
+  "components": [
+  ],
+
+  "users": {
+  },
+
+  "groups": [
+  ]
+}

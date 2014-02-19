@@ -1,0 +1,12 @@
+{
+  "lib/hadoop-0.20-mapreduce/sbin/Linux-amd64-64/task-controller": {
+    "user":  "root",
+    "group": "mapred",
+    "permissions": "4754"
+  },
+  "lib/hadoop-yarn/bin/container-executor": {
+    "user":  "root",
+    "group": "yarn",
+    "permissions": "6050"
+  }
+}
