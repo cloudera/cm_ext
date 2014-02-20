@@ -11,6 +11,7 @@
     <org.springframework.version>3.0.6.RELEASE</org.springframework.version>
     <guava.version>14.0</guava.version>
     <jackson2.version>2.1.0</jackson2.version>
+    <joda.version>2.1</joda.version>
     <junit.version>4.8.2</junit.version>
     <javax.validation.version>1.1.0.Final</javax.validation.version>
     <test.redirectToFile>true</test.redirectToFile>
@@ -145,9 +146,19 @@
       <version>${jackson2.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
+      <version>${jackson2.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>${joda.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.findbugs</groupId>

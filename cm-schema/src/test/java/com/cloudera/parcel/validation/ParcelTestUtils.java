@@ -3,9 +3,11 @@ package com.cloudera.parcel.validation;
 
 import com.cloudera.common.Parser;
 import com.cloudera.parcel.components.JsonAlternativesParser;
+import com.cloudera.parcel.components.JsonManifestParser;
 import com.cloudera.parcel.components.JsonParcelParser;
 import com.cloudera.parcel.components.JsonPermissionsParser;
 import com.cloudera.parcel.descriptors.AlternativesDescriptor;
+import com.cloudera.parcel.descriptors.ManifestDescriptor;
 import com.cloudera.parcel.descriptors.ParcelDescriptor;
 import com.cloudera.parcel.descriptors.PermissionsDescriptor;
 import com.cloudera.validation.DescriptorValidator;
@@ -22,6 +24,7 @@ public class ParcelTestUtils {
   private static final JsonParcelParser PARCEL_PARSER = new JsonParcelParser();
   private static final JsonAlternativesParser ALTERNATIVES_PARSER = new JsonAlternativesParser();
   private static final JsonPermissionsParser PERMISSIONS_PARSER = new JsonPermissionsParser();
+  private static final JsonManifestParser MANIFEST_PARSER = new JsonManifestParser();
 
   public static final ParcelDescriptor FULL_DESCRIPTOR = getParserJson("good_parcel.json");
   public static final DescriptorValidator<ParcelDescriptor> FAKE_VALIDATOR = getAlwaysPassingValidator();
@@ -61,6 +64,14 @@ public class ParcelTestUtils {
 
   public static PermissionsDescriptor getValidatorPermissionsJson(String filename) {
     return parseJson(PERMISSIONS_PARSER, PARCEL_VALIDATOR_RESOURCE_PATH + filename);
+  }
+
+  public static ManifestDescriptor getParserManifestJson(String filename) {
+    return parseJson(MANIFEST_PARSER, PARCEL_PARSER_RESOURCE_PATH + filename);
+  }
+
+  public static ManifestDescriptor getValidatorManifestJson(String filename) {
+    return parseJson(MANIFEST_PARSER, PARCEL_VALIDATOR_RESOURCE_PATH + filename);
   }
 
   public static <T> DescriptorValidator<T> getAlwaysPassingValidator() {

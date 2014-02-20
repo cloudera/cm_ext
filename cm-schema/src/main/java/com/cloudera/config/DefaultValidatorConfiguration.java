@@ -15,12 +15,15 @@ import com.cloudera.csd.validation.constraints.components.UniqueRoleTypeValidato
 import com.cloudera.csd.validation.constraints.components.UniqueServiceTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ValidServiceDependencyValidatorImpl;
 import com.cloudera.parcel.components.JsonAlternativesParser;
+import com.cloudera.parcel.components.JsonManifestParser;
 import com.cloudera.parcel.components.JsonParcelParser;
 import com.cloudera.parcel.components.JsonPermissionsParser;
 import com.cloudera.parcel.descriptors.AlternativesDescriptor;
+import com.cloudera.parcel.descriptors.ManifestDescriptor;
 import com.cloudera.parcel.descriptors.ParcelDescriptor;
 import com.cloudera.parcel.descriptors.PermissionsDescriptor;
 import com.cloudera.parcel.validation.components.AlternativesDescriptorValidatorImpl;
+import com.cloudera.parcel.validation.components.ManifestDescriptorValidatorImpl;
 import com.cloudera.parcel.validation.components.ParcelDescriptorValidatorImpl;
 import com.cloudera.parcel.validation.components.PermissionsDescriptorValidatorImpl;
 import com.cloudera.validation.BeanConstraintValidatorFactory;
@@ -188,6 +191,11 @@ public class DefaultValidatorConfiguration {
   }
 
   @Bean
+  public Parser<ManifestDescriptor> manifestParser() {
+    return new JsonManifestParser();
+  }
+
+  @Bean
   public StringInterpolator stringInterpolator() {
     return new StringInterpolator();
   }
@@ -214,6 +222,12 @@ public class DefaultValidatorConfiguration {
   public DescriptorValidator<PermissionsDescriptor> permissionsDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
     return new PermissionsDescriptorValidatorImpl(validator);
+  }
+
+  @Bean
+  public DescriptorValidator<ManifestDescriptor> manifestDescriptorValidator() {
+    Validator validator = ctx.getBean(Validator.class);
+    return new ManifestDescriptorValidatorImpl(validator);
   }
 
   @Bean
