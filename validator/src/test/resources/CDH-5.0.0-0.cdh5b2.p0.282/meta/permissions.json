@@ -1,0 +1,12 @@
+{
+  "bin/avro-tools": {
+    "user":  "root",
+    "group": "avro",
+    "permissions": "6755"
+  },
+  "etc/hbase/conf.dist": {
+    "user":  "hbase",
+    "group": "hbase",
+    "permissions": "0755"
+  }
+}

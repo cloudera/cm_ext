@@ -49,6 +49,12 @@ public class ApplicationConfiguration extends DefaultValidatorConfiguration {
   }
 
   @Bean
+  public DescriptorRunner<?> manifestRunner() {
+    return createValidationRunner("manifestParser",
+                                  "manifestDescriptorValidator");
+  }
+
+  @Bean
   public ValidationRunner parcelDirectoryRunner() {
     return new ParcelDirectoryRunner();
   }

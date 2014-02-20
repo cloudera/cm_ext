@@ -1,0 +1,14 @@
+{
+    "avro-tools": {
+      "destination": "/usr/bin/avro-tools",
+      "source": "bin/avro-tools",
+      "priority": 10,
+      "isDirectory": false
+    }
+    ,"hbase-conf": {
+      "destination": "/etc/hbase/conf",
+      "source": "etc/hbase/conf.dist",
+      "priority": 10,
+      "isDirectory": true
+    }
+}

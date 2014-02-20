@@ -1,0 +1,572 @@
+{
+  "schema_version":     1,
+  "name":               "CDH",
+  "version":            "5.0.0-0.cdh5b2.p0.282",
+  "extraVersionInfo": {
+    "fullVersion":        "5.0.0-0.cdh5b2.p0.282-wheezy",
+    "baseVersion":        "cdh5.0.0",
+    "patchCount":         "0"
+  },
+
+  "replaces":           "IMPALA, SOLR, SPARK",
+
+  "setActiveSymlink":   true,
+
+  "scripts": {
+    "defines": "cdh_env.sh"
+  },
+
+  "packages": [
+    { "name":    "avro-doc",
+      "version": "1.7.5+cdh5.0.0+6-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "avro-libs",
+      "version": "1.7.5+cdh5.0.0+6-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "avro-tools",
+      "version": "1.7.5+cdh5.0.0+6-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "bigtop-jsvc",
+      "version": "0.6.0+cdh5.0.0+384-0.cdh5b2.p0.169~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "bigtop-tomcat",
+      "version": "0.7.0+cdh5.0.0+0-0.cdh5b2.p0.175~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "bigtop-utils",
+      "version": "0.7.0+cdh5.0.0+0-0.cdh5b2.p0.187~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "crunch",
+      "version": "0.9.0+cdh5.0.0+17-0.cdh5b2.p0.50~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "crunch-doc",
+      "version": "0.9.0+cdh5.0.0+17-0.cdh5b2.p0.50~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "flume-ng",
+      "version": "1.4.0+cdh5.0.0+88-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "flume-ng-agent",
+      "version": "1.4.0+cdh5.0.0+88-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "flume-ng-doc",
+      "version": "1.4.0+cdh5.0.0+88-0.cdh5b2.p0.123~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-conf-pseudo",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-mapreduce",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-mapreduce-jobtracker",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-mapreduce-jobtrackerha",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-mapreduce-tasktracker",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-0.20-mapreduce-zkfc",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-client",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-conf-pseudo",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-doc",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-datanode",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-fuse",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-journalnode",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-namenode",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-nfs3",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-portmap",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-secondarynamenode",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-hdfs-zkfc",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-httpfs",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-mapreduce",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-mapreduce-historyserver",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-yarn",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-yarn-nodemanager",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-yarn-proxyserver",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hadoop-yarn-resourcemanager",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-doc",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-master",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-regionserver",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-rest",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-solr",
+      "version": "1.3+cdh5.0.0+37-0.cdh5b2.p0.149~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-solr-doc",
+      "version": "1.3+cdh5.0.0+37-0.cdh5b2.p0.149~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-solr-indexer",
+      "version": "1.3+cdh5.0.0+37-0.cdh5b2.p0.149~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hbase-thrift",
+      "version": "0.96.1.1+cdh5.0.0+21-0.cdh5b2.p0.213~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-hbase",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-hcatalog",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-hcatalog-server",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-jdbc",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-metastore",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-server",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-server2",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-webhcat",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hive-webhcat-server",
+      "version": "0.12.0+cdh5.0.0+259-0.cdh5b2.p0.364~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-beeswax",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-common",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-doc",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-hbase",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-impala",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-pig",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-plugins",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-rdbms",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-search",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-server",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-spark",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-sqoop",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "hue-zookeeper",
+      "version": "3.5.0+cdh5.0.0+182-0.cdh5b2.p0.130~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-catalog",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-dbg",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-server",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-shell",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-state-store",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "impala-udf-dev",
+      "version": "1.3.0+cdh5.0.0+0-0.cdh5b2.p0.320~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "kite",
+      "version": "0.10.0+cdh5.0.0+65-0.cdh5b2.p0.69~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "libhdfs0",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "libhdfs0-dev",
+      "version": "2.2.0+cdh5.0.0+1593-0.cdh5b2.p0.451~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "llama",
+      "version": "1.0.0+cdh5.0.0+0-0.cdh5b2.p0.203~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "llama-doc",
+      "version": "1.0.0+cdh5.0.0+0-0.cdh5b2.p0.203~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "llama-master",
+      "version": "1.0.0+cdh5.0.0+0-0.cdh5b2.p0.203~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "mahout",
+      "version": "0.8+cdh5.0.0+26-0.cdh5b2.p0.102~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "mahout-doc",
+      "version": "0.8+cdh5.0.0+26-0.cdh5b2.p0.102~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "oozie",
+      "version": "4.0.0+cdh5.0.0+138-0.cdh5b2.p0.137~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "oozie-client",
+      "version": "4.0.0+cdh5.0.0+138-0.cdh5b2.p0.137~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "parquet",
+      "version": "1.2.5+cdh5.0.0+27-0.cdh5b2.p0.103~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "parquet-format",
+      "version": "1.0.0-1.cdh5b2.p0.70~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "pig",
+      "version": "0.12.0+cdh5.0.0+18-0.cdh5b2.p0.151~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "pig-udf-datafu",
+      "version": "1.1.0+cdh5.0.0+4-0.cdh5b2.p0.77~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "search",
+      "version": "1.0.0+cdh5.0.0+0-0.cdh5b2.p0.101~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sentry",
+      "version": "1.2.0+cdh5.0.0+62-0.cdh5b2.p0.117~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "solr",
+      "version": "4.4.0+cdh5.0.0+156-0.cdh5b2.p0.194~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "solr-doc",
+      "version": "4.4.0+cdh5.0.0+156-0.cdh5b2.p0.194~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "solr-mapreduce",
+      "version": "1.0.0+cdh5.0.0+0-0.cdh5b2.p0.101~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "solr-server",
+      "version": "4.4.0+cdh5.0.0+156-0.cdh5b2.p0.194~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "spark-core",
+      "version": "0.9.0-1.cdh5b2.p0.77~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "spark-master",
+      "version": "0.9.0-1.cdh5b2.p0.77~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "spark-python",
+      "version": "0.9.0-1.cdh5b2.p0.77~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "spark-worker",
+      "version": "0.9.0-1.cdh5b2.p0.77~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sqoop",
+      "version": "1.4.4+cdh5.0.0+40-0.cdh5b2.p0.145~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sqoop2",
+      "version": "1.99.3+cdh5.0.0+17-0.cdh5b2.p0.114~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sqoop2-client",
+      "version": "1.99.3+cdh5.0.0+17-0.cdh5b2.p0.114~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sqoop2-server",
+      "version": "1.99.3+cdh5.0.0+17-0.cdh5b2.p0.114~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "sqoop-metastore",
+      "version": "1.4.4+cdh5.0.0+40-0.cdh5b2.p0.145~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "whirr",
+      "version": "0.8.2+cdh5.0.0+18-0.cdh5b2.p0.101~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "zookeeper",
+      "version": "3.4.5+cdh5.0.0+25-0.cdh5b2.p0.185~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "zookeeper-native",
+      "version": "3.4.5+cdh5.0.0+25-0.cdh5b2.p0.185~wheezy-cdh5.0.0"
+    }
+    ,{ "name":    "zookeeper-server",
+      "version": "3.4.5+cdh5.0.0+25-0.cdh5b2.p0.185~wheezy-cdh5.0.0"
+    }
+  ],
+
+  "components": [
+    { "name":     "bigtop-tomcat",
+      "version":  "6.0.37-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.7.0+cdh5.0.0+0" 
+    }
+    ,{ "name":     "crunch",
+      "version":  "0.9.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.9.0+cdh5.0.0+17" 
+    }
+    ,{ "name":     "flume-ng",
+      "version":  "1.4.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.4.0+cdh5.0.0+88" 
+    }
+    ,{ "name":     "hadoop-0.20-mapreduce",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hadoop",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hadoop-hdfs",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hadoop-httpfs",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hadoop-mapreduce",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hadoop-yarn",
+      "version":  "2.2.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "2.2.0+cdh5.0.0+1593" 
+    }
+    ,{ "name":     "hbase",
+      "version":  "0.96.1.1-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.96.1.1+cdh5.0.0+21" 
+    }
+    ,{ "name":     "hbase-solr",
+      "version":  "1.3-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.3+cdh5.0.0+37" 
+    }
+    ,{ "name":     "hive",
+      "version":  "0.12.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.12.0+cdh5.0.0+259" 
+    }
+    ,{ "name":     "hive-hcatalog",
+      "version":  "0.12.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.12.0+cdh5.0.0+259" 
+    }
+    ,{ "name":     "hue",
+      "version":  "3.5.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "3.5.0+cdh5.0.0+182" 
+    }
+    ,{ "name":     "impala",
+      "version":  "1.3.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.3.0+cdh5.0.0+0" 
+    }
+    ,{ "name":     "kite",
+      "version":  "0.10.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.10.0+cdh5.0.0+65" 
+    }
+    ,{ "name":     "llama",
+      "version":  "1.0.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.0.0+cdh5.0.0+0" 
+    }
+    ,{ "name":     "mahout",
+      "version":  "0.8-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.8+cdh5.0.0+26" 
+    }
+    ,{ "name":     "oozie",
+      "version":  "4.0.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "4.0.0+cdh5.0.0+138" 
+    }
+    ,{ "name":     "parquet",
+      "version":  "1.2.5-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.2.5+cdh5.0.0+27" 
+    }
+    ,{ "name":     "pig",
+      "version":  "0.12.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.12.0+cdh5.0.0+18" 
+    }
+    ,{ "name":     "solr",
+      "version":  "4.4.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "4.4.0+cdh5.0.0+156" 
+    }
+    ,{ "name":     "spark",
+      "version":  "0.9.0-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.9.0" 
+    }
+    ,{ "name":     "sqoop2",
+      "version":  "1.99.3-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.99.3+cdh5.0.0+17" 
+    }
+    ,{ "name":     "sqoop",
+      "version":  "1.4.4-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "1.4.4+cdh5.0.0+40" 
+    }
+    ,{ "name":     "whirr",
+      "version":  "0.8.2-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "0.8.2+cdh5.0.0+18" 
+    }
+    ,{ "name":     "zookeeper",
+      "version":  "3.4.5-cdh5.0.0-SNAPSHOT",
+      "pkg_version":  "3.4.5+cdh5.0.0+25" 
+    }
+  ],
+
+  "provides": [
+    "cdh",
+    "impala",
+    "solr",
+    "spark"
+  ],
+
+  "users": {
+     "flume": {
+       "longname"    : "Flume",
+       "home"        : "/var/lib/flume-ng",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "httpfs": {
+       "longname"    : "Hadoop HTTPFS",
+       "home"        : "/var/run/hadoop-httpfs",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ ]
+     },
+     "hdfs": {
+       "longname"    : "Hadoop HDFS",
+       "home"        : "/var/lib/hadoop-hdfs",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ "hadoop" ]
+     },
+     "yarn": {
+       "longname"    : "Hadoop Yarn",
+       "home"        : "/var/lib/hadoop-yarn",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ "hadoop" ]
+     },
+     "mapred": {
+       "longname"    : "Hadoop MapReduce",
+       "home"        : "/var/lib/hadoop-mapreduce",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ "hadoop" ]
+     },
+     "hbase": {
+       "longname"    : "HBase",
+       "home"        : "/var/run/hbase",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "hive": {
+       "longname"    : "Hive",
+       "home"        : "/var/lib/hive",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "hue": {
+       "longname"    : "Hue",
+       "home"        : "/usr/lib/hue",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "oozie": {
+       "longname"    : "Oozie User",
+       "home"        : "/var/lib/oozie",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "sqoop": {
+       "longname"    : "Sqoop",
+       "home"        : "/var/lib/sqoop",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "zookeeper": {
+       "longname"    : "ZooKeeper",
+       "home"        : "/var/run/zookeeper",
+       "shell"       : "/bin/false",
+       "extra_groups": [ ]
+     },
+     "sqoop2": {
+       "longname"    : "Sqoop 2 User",
+       "home"        : "/var/run/sqoop2",
+       "shell"       : "/sbin/nologin",
+       "extra_groups": [ "sqoop" ]
+     },
+     "llama": {
+       "longname"    : "Llama",
+       "home"        : "/var/run/llama",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ "llama" ]
+     },
+     "impala": {
+       "longname"    : "Impala",
+       "home"        : "/var/run/impala",
+       "shell"       : "/bin/bash",
+       "extra_groups": [ "hive", "hdfs" ]
+     },
+     "solr": {
+       "longname"    : "Solr",
+       "home"        : "/var/run/solr",
+       "shell"       : "/sbin/nologin",
+       "extra_groups": [ ]
+     },
+     "spark": {
+       "longname"    : "Spark",
+       "home"        : "/var/lib/spark",
+       "shell"       : "/sbin/nologin",
+       "extra_groups": [ ]
+     }
+  },
+
+  "groups": [
+     "hadoop"
+  ]
+}

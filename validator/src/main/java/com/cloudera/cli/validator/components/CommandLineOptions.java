@@ -53,6 +53,13 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("r");
 
+  private static final Option MANIFEST_JSON_OPTION = OptionBuilder.withLongOpt("manifest-json")
+      .withArgName("FILE")
+      .hasArg()
+      .withDescription("The manifest.json file to validate")
+      .isRequired(false)
+      .create("m");
+
   private static final Option PARCEL_DIR_OPTION = OptionBuilder.withLongOpt("parcel-dir")
       .withArgName("DIRECTORY")
       .hasArg()
@@ -72,6 +79,7 @@ public class CommandLineOptions {
     PARCEL_JSON(PARCEL_JSON_OPTION, "parcelRunner"),
     ALTERNATIVES_JSON(ALTERNATIVES_JSON_OPTION, "alternativesRunner"),
     PERMISSIONS_JSON(PERMISSIONS_JSON_OPTION, "permissionsRunner"),
+    MANIFEST_JSON(MANIFEST_JSON_OPTION, "manifestRunner"),
     PARCEL_DIR(PARCEL_DIR_OPTION, "parcelDirectoryRunner"),
     PARCEL_FILE(PARCEL_FILE_OPTION, "parcelFileRunner");
 
