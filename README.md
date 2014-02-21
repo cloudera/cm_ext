@@ -29,5 +29,12 @@ $ mvn install
 $ java -jar target/validator.jar <arguments>
 ```
 
+Running make_manifest
+---------------------
+
+```bash
+$ python make_manifest/make_manifest.py <path to directory>
+```
+
 All source in this repository is [Apache-Licensed](LICENSE.txt).
 
