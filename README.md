@@ -24,7 +24,7 @@ Building the validator creates an executable jar file. Make sure a java jre
 is installed and in the path.
 
 ```bash
-$ cd <validator_dir>
+$ cd validator
 $ mvn install
 $ java -jar target/validator.jar <arguments>
 ```
