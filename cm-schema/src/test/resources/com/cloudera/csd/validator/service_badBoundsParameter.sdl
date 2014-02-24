@@ -1,0 +1,22 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "parameters" : [
+    {
+       "type" : "long",
+       "name" : "my_param",
+       "label" : "blah blah",
+       "description" : "blah blah blah",
+       "minValue" : 5,
+       "softMinValue" : 5,
+       "softMaxValue" : 6,
+       "maxValue" : 10
+    }
+  ]
+}

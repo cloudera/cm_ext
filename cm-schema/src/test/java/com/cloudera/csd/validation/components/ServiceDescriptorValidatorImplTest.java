@@ -1,9 +1,25 @@
-// Copyright (c) 2013 Cloudera, Inc. All rights reserved.
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package com.cloudera.csd.validation.components;
 
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.descriptors.parameters.BoundedParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
+import com.cloudera.csd.validation.constraints.Expression;
 import com.google.common.collect.Iterables;
 
 import java.util.Set;
@@ -106,20 +122,34 @@ public class ServiceDescriptorValidatorImplTest {
 
   @Test
   public void testBadServiceDependency() {
-    Set <String> errors = validate("service_badDependencyType.sdl");
+    Set<String> errors = validate("service_badDependencyType.sdl");
     assertEquals("service.serviceDependencies[].name must be a valid service type", Iterables.getOnlyElement(errors));
   }
 
   @Test
   public void testNonUniqueRoleGlobally() {
-    Set <String> errors = validate("service_nonUniqueRoleGlobal.sdl");
+    Set<String> errors = validate("service_nonUniqueRoleGlobal.sdl");
     assertEquals("service.roles[].name conflicts with a built-in role type", Iterables.getOnlyElement(errors));
   }
 
   @Test
   public void testNonUniqueServiceGlobally() {
-    Set <String> errors = validate("service_nonUniqueServiceGlobal.sdl");
+    Set<String> errors = validate("service_nonUniqueServiceGlobal.sdl");
     assertEquals("service.name conflicts with a built-in service type", Iterables.getOnlyElement(errors));
+  }
+
+  @Test
+  public void testGoodBoundsOnParameters() {
+    Set<ConstraintViolation<ServiceDescriptor>> errors = violations("service_goodBoundsParameter.sdl");
+    assertTrue(errors.isEmpty());
+  }
+
+  @Test
+  public void testBadBoundsOnParameters() {
+    Set<String> errors = validate("service_badBoundsParameter.sdl");
+    assertEquals("service.parameters[].my_param must satisfy \"" +
+        BoundedParameter.class.getAnnotation(Expression.List.class).value()[0].value() + "\"",
+        Iterables.getOnlyElement(errors));
   }
 
   private void assertConstraint(ConstraintViolation<?> violation, Class<?> constraint) {

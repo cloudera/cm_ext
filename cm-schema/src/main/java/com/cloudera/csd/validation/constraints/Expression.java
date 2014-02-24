@@ -15,52 +15,48 @@
 // limitations under the License.
 package com.cloudera.csd.validation.constraints;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
 /**
- * A constraint that indicates that a bean field needs
- * to be unique within the collection.
+ * A constraint that ensures that an expression evaluated with one or more bean
+ * fields is satisfied.
  */
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Target({ TYPE, METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { UniqueFieldValidator.class })
-public @interface UniqueField {
+@Constraint(validatedBy = { ExpressionValidator.class })
+public @interface Expression {
 
   String value();
 
-  /**
-   * If we should skip null values in the check.
-   * Defaults to true.
-   */
-  boolean skipNulls() default true;
-
-  String message() default "{custom.validation.constraints.UniqueField.message}";
+  String message() default "{custom.validation.constraints.Expression.message}";
 
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
 
   /**
-   * Defines several {@link UniqueField} annotations on the same element.
+   * Defines several {@link Expression} annotations on the same element.
    *
-   * @see UniqueField
+   * @see Expression
    */
-  @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+  @Target({ TYPE, METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
   @Retention(RUNTIME)
   @Documented
   @interface List {
 
-    UniqueField[] value();
+    Expression[] value();
   }
 }

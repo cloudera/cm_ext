@@ -1,0 +1,65 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "parameters" : [
+    {
+       "type" : "long",
+       "name" : "no_bounds",
+       "label" : "no_bounds",
+       "description" : "no_bounds"
+    }, {
+       "type" : "long",
+       "name" : "min",
+       "label" : "min",
+       "description" : "min",
+       "minValue" : 5
+    }, {
+       "type" : "long",
+       "name" : "max",
+       "label" : "max",
+       "description" : "max",
+       "maxValue" : 8
+    }, {
+       "type" : "long",
+       "name" : "softMin",
+       "label" : "softMin",
+       "description" : "softMin",
+       "softMinValue" : 6
+    }, {
+       "type" : "long",
+       "name" : "softMax",
+       "label" : "softMax",
+       "description" : "softMax",
+       "softMaxValue" : 7
+    }, {
+       "type" : "long",
+       "name" : "both_soft",
+       "label" : "both_soft",
+       "description" : "both_soft",
+       "softMinValue" : 6,
+       "softMaxValue" : 7
+    }, {
+       "type" : "long",
+       "name" : "both_hard",
+       "label" : "both_hard",
+       "description" : "both_hard",
+       "minValue" : 5,
+       "maxValue" : 8
+    }, {
+       "type" : "long",
+       "name" : "all_bounds",
+       "label" : "all_bounds",
+       "description" : "all_bounds",
+       "minValue" : 5,
+       "softMinValue" : 6,
+       "softMaxValue" : 7,
+       "maxValue" : 8
+    }
+  ]
+}

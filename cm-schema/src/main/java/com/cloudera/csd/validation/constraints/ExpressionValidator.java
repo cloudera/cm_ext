@@ -13,25 +13,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.parcel.descriptors;
+package com.cloudera.csd.validation.constraints;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.ConstraintValidator;
 
 /**
- * Descriptor for a single entry in the alternatives.json file.
+ * The interface for the Expression Constraint
  */
-public interface AlternativeDescriptor {
-  @NotBlank
-  String getDestination();
-
-  @NotBlank
-  String getSource();
-
-  @NotNull
-  Integer getPriority();
-
-  @NotNull
-  Boolean getIsDirectory();
-}
+public interface ExpressionValidator extends ConstraintValidator<Expression, Object> {}
