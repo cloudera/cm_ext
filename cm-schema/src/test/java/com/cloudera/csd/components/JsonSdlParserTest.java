@@ -31,6 +31,7 @@ import com.cloudera.csd.descriptors.ServiceDependency;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.ServiceInitDescriptor;
 import com.cloudera.csd.descriptors.TopologyDescriptor;
+import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
@@ -39,6 +40,7 @@ import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.CsdParamUnits;
 import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
+import com.cloudera.csd.descriptors.parameters.MemoryParameter;
 import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
@@ -56,8 +58,8 @@ import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -115,7 +117,7 @@ public class JsonSdlParserTest {
     assertEquals("master_web_ui", externalLink.getName());
     assertEquals("Master WebUI", externalLink.getLabel());
     assertEquals("http://myhost.com:80", externalLink.getUrl());
-    Set<RoleExternalLink> moreLinks = master.getAdditionalExternalLinks();
+    List<RoleExternalLink> moreLinks = master.getAdditionalExternalLinks();
     assertNotNull(moreLinks);
     assertEquals(1, moreLinks.size());
 
@@ -188,7 +190,7 @@ public class JsonSdlParserTest {
   @Test
   public void testParametersParsing() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
-    assertEquals(2, descriptor.getParameters().size());
+    assertEquals(3, descriptor.getParameters().size());
     int found = 0;
     for (Parameter<?> p : descriptor.getParameters()) {
       // check that parameters are parsed polymorphically
@@ -199,13 +201,22 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("service_var2")) {
         assertTrue(p instanceof LongParameter);
         LongParameter lp = (LongParameter)p;
-        assertEquals(1, lp.getMinValue().longValue());
-        assertNull(lp.getMaxValue());
+        assertEquals(1, lp.getMin().longValue());
+        assertNull(lp.getMax());
         assertEquals(CsdParamUnits.MEGABYTES, lp.getUnit());
+        found++;
+      } else if (p.getName().equals("service_var3")) {
+        assertTrue(p instanceof LongParameter);
+        LongParameter lp = (LongParameter)p;
+        assertEquals(1, lp.getMin().longValue());
+        assertEquals(2, lp.getSoftMin().longValue());
+        assertEquals(3, lp.getSoftMax().longValue());
+        assertEquals(4, lp.getMax().longValue());
+        assertNull(lp.getUnit());
         found++;
       }
     }
-    assertEquals(2, found);
+    assertEquals(3, found);
 
     // Check service dependencies
     assertEquals(2, descriptor.getServiceDependencies().size());
@@ -223,7 +234,7 @@ public class JsonSdlParserTest {
 
     found = 0;
 
-    Set<RoleDescriptor> roles = descriptor.getRoles();
+    List<RoleDescriptor> roles = descriptor.getRoles();
     assertEquals(2, roles.size());
     Map<String, RoleDescriptor> rds = SdlTestUtils.makeRoleMap(roles);
     RoleDescriptor rd = rds.get("ECHO_WEBSERVER");
@@ -231,7 +242,7 @@ public class JsonSdlParserTest {
     assertEquals(1, rd.getCommands().size());
     RoleCommandDescriptor rcd = Iterables.getOnlyElement(rd.getCommands());
     
-    assertEquals(11, rd.getParameters().size());
+    assertEquals(12, rd.getParameters().size());
     for (Parameter<?> p : rd.getParameters()) {
       // check that parameters are parsed polymorphically
       if (p.getName().equals("role_var1")) {
@@ -242,8 +253,8 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("role_var2")) {
         assertTrue(p instanceof LongParameter);
         LongParameter lp = (LongParameter)p;
-        assertNull(lp.getMinValue());
-        assertNull(lp.getMaxValue());
+        assertNull(lp.getMin());
+        assertNull(lp.getMax());
         assertEquals(CsdParamUnits.SECONDS, lp.getUnit());
         found++;
       } else if (p.getName().equals("role_var3")) {
@@ -254,8 +265,8 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("role_var4")) {
         assertTrue(p instanceof DoubleParameter);
         DoubleParameter dp = (DoubleParameter)p;
-        assertNotNull(dp.getMinValue());
-        assertNotNull(dp.getMaxValue());
+        assertNotNull(dp.getMin());
+        assertNotNull(dp.getMax());
         assertEquals(CsdParamUnits.TIMES, dp.getUnit());
         found++;
       } else if (p.getName().equals("role_var5")) {
@@ -308,9 +319,16 @@ public class JsonSdlParserTest {
         assertTrue(dp.isNegativeOneAllowed());
         assertTrue(dp.isOutbound());
         found++;
+      } else if (p.getName().equals("echo_server_heap")) {
+        assertTrue(p instanceof MemoryParameter);
+        MemoryParameter mp = (MemoryParameter)p;
+        assertEquals(1024 * 1024 * 1024, mp.getDefault().longValue());
+        assertEquals(1.3, mp.getScaleFactor().doubleValue(), 0);
+        assertEquals(100, mp.getAutoConfigShare().intValue());
+        found++;
       }
     }
-    assertEquals(11, found);
+    assertEquals(12, found);
     
     // Check that config files are parsed correctly
     ConfigWriter cw = rd.getConfigWriter();
@@ -348,6 +366,15 @@ public class JsonSdlParserTest {
       }
     }
     assertEquals(2, found);
+    found = 0;
+    assertEquals(1, cw.getAuxConfigGenerators().size());
+    for (AuxConfigGenerator gen : cw.getAuxConfigGenerators()) {
+      if (gen.getFilename().equals("some_aux_file.json")) {
+        assertEquals("aux/filename.json", gen.getSourceFilename());
+        found++;
+      }
+    }
+    assertEquals(1, found);
   }
 
   private byte[] getSdl(String name) throws IOException {

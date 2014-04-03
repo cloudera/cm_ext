@@ -13,23 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors;
+package com.cloudera.csd.descriptors.cgroups;
 
-import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
-import com.cloudera.csd.descriptors.generators.ConfigGenerator;
-import com.cloudera.csd.descriptors.generators.PeerConfigGenerator;
-import com.cloudera.csd.validation.constraints.UniqueField;
-
-import java.util.List;
-
-public interface ConfigWriter {
-
-  @UniqueField("filename")
-  List<AuxConfigGenerator> getAuxConfigGenerators();
-
-  @UniqueField("filename")
-  List<ConfigGenerator> getGenerators();
-
-  @UniqueField("filename")
-  List<PeerConfigGenerator> getPeerConfigGenerators();
+public interface BlkioSubsystemDescriptor extends SubsystemDescriptor {
 }

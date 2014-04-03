@@ -1,0 +1,54 @@
+{
+  "name" : "SERVICE",
+  "label" : "Service",
+  "description" : "The service",
+  "version" : 1,
+  "roles" : [
+    {
+      "name" : "ROLE1",
+      "label" : "Role1",
+      "pluralLabel" : "Role 1s",
+      "parameters" : [
+        {
+         "name" : "parameter1",
+         "label" : "label1",
+         "description" : "desc1",
+         "type" : "memory",
+         "autoConfigShare" : 60
+        },
+        {
+         "name" : "parameter2",
+         "label" : "label2",
+         "description" : "desc2",
+         "type" : "memory",
+         "autoConfigShare" : 40
+        },
+        {
+         "name" : "parameter3",
+         "label" : "label3",
+         "description" : "desc3",
+         "type" : "memory"
+        }
+      ],
+      "startRunner" : {
+         "program" : "blah.sh"
+      }
+    },
+    {
+      "name" : "ROLE2",
+      "label" : "Role2",
+      "pluralLabel" : "Role 2s",
+      "parameters" : [
+        {
+         "name" : "parameter1",
+         "label" : "label1",
+         "description" : "desc1",
+         "type" : "memory"
+        }
+      ],
+      "startRunner" : {
+         "program" : "blah.sh"
+      }
+    }
+  ]
+}

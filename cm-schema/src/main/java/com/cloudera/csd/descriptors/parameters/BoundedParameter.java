@@ -18,26 +18,26 @@ package com.cloudera.csd.descriptors.parameters;
 import com.cloudera.csd.validation.constraints.Expression;
 
 @Expression.List({
-  @Expression("minValue == null or softMinValue == null or minValue < softMinValue"),
-  @Expression("minValue == null or softMaxValue == null or minValue < softMaxValue"),
-  @Expression("minValue == null or maxValue == null or minValue < maxValue"),
-  @Expression("softMinValue == null or softMaxValue == null or softMinValue < softMaxValue"),
-  @Expression("softMinValue == null or maxValue == null or softMinValue < maxValue"),
-  @Expression("softMaxValue == null or maxValue == null or softMaxValue < maxValue")
+  @Expression("min == null or softMin == null or min < softMin"),
+  @Expression("min == null or softMax == null or min < softMax"),
+  @Expression("min == null or max == null or min < max"),
+  @Expression("softMin == null or softMax == null or softMin < softMax"),
+  @Expression("softMin == null or max == null or softMin < max"),
+  @Expression("softMax == null or max == null or softMax < max")
 })
 public interface BoundedParameter<T extends Comparable<T>> extends Parameter<T> {
 
   /** Absolute minimum value of this parameter. */
-  T getMinValue();
+  T getMin();
 
   /** Absolute maximum value of this parameter. */
-  T getMaxValue();
+  T getMax();
 
   /** Recommended minimum value of this parameter. */
-  T getSoftMinValue();
+  T getSoftMin();
 
   /** Recommended maximum value of this parameter. */
-  T getSoftMaxValue();
+  T getSoftMax();
 
   /** Unit of this parameter. */
   CsdParamUnits getUnit();

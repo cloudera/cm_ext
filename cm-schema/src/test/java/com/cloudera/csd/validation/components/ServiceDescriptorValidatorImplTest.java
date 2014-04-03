@@ -67,7 +67,7 @@ public class ServiceDescriptorValidatorImplTest {
   @Test
   public void testEmptyCollection() {
     Set<String> errors = validate("service_emptyRequiredCollection.sdl");
-    assertEquals("service.parameters[].validValues must be present and not empty", Iterables.getOnlyElement(errors));
+    assertEquals("service.parameters[0].validValues must be present and not empty", Iterables.getOnlyElement(errors));
   }
 
   @Test
@@ -123,13 +123,13 @@ public class ServiceDescriptorValidatorImplTest {
   @Test
   public void testBadServiceDependency() {
     Set<String> errors = validate("service_badDependencyType.sdl");
-    assertEquals("service.serviceDependencies[].name must be a valid service type", Iterables.getOnlyElement(errors));
+    assertEquals("service.serviceDependencies[0].name must be a valid service type", Iterables.getOnlyElement(errors));
   }
 
   @Test
   public void testNonUniqueRoleGlobally() {
     Set<String> errors = validate("service_nonUniqueRoleGlobal.sdl");
-    assertEquals("service.roles[].name conflicts with a built-in role type", Iterables.getOnlyElement(errors));
+    assertEquals("service.roles[0].name conflicts with a built-in role type", Iterables.getOnlyElement(errors));
   }
 
   @Test
@@ -147,8 +147,21 @@ public class ServiceDescriptorValidatorImplTest {
   @Test
   public void testBadBoundsOnParameters() {
     Set<String> errors = validate("service_badBoundsParameter.sdl");
-    assertEquals("service.parameters[].my_param must satisfy \"" +
+    assertEquals("service.parameters[0].my_param must satisfy \"" +
         BoundedParameter.class.getAnnotation(Expression.List.class).value()[0].value() + "\"",
+        Iterables.getOnlyElement(errors));
+  }
+
+  @Test
+  public void testGoodAutoConfigShares() {
+    Set<ConstraintViolation<ServiceDescriptor>> errors = violations("service_goodAutoConfigShares.sdl");
+    assertTrue(errors.isEmpty());
+  }
+
+  @Test
+  public void testBadAutoConfigShares() {
+    Set<String> errors = validate("service_badAutoConfigShares.sdl");
+    assertEquals("service.roles[0].parameters must add up to 100 autoconfig shares",
         Iterables.getOnlyElement(errors));
   }
 

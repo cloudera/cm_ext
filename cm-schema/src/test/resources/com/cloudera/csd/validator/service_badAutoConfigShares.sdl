@@ -1,0 +1,32 @@
+{
+  "name" : "SERVICE",
+  "label" : "Service",
+  "description" : "The service",
+  "version" : 1,
+  "roles" : [
+    {
+      "name" : "ROLE",
+      "label" : "Role",
+      "pluralLabel" : "Roles",
+      "parameters" : [
+        {
+         "name" : "parameter1",
+         "label" : "label1",
+         "description" : "desc1",
+         "type" : "memory",
+         "autoConfigShare" : 60
+        },
+        {
+         "name" : "parameter2",
+         "label" : "label2",
+         "description" : "desc2",
+         "type" : "memory",
+         "autoConfigShare" : 80
+        }
+      ],
+      "startRunner" : {
+         "program" : "blah.sh"
+      }
+    }
+  ]
+}

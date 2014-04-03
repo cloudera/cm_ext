@@ -13,10 +13,10 @@
        "name" : "my_param",
        "label" : "blah blah",
        "description" : "blah blah blah",
-       "minValue" : 5,
-       "softMinValue" : 5,
-       "softMaxValue" : 6,
-       "maxValue" : 10
+       "min" : 5,
+       "softMin" : 5,
+       "softMax" : 6,
+       "max" : 10
     }
   ]
 }

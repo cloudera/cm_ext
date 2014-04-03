@@ -20,11 +20,13 @@ import com.cloudera.csd.StringInterpolator;
 import com.cloudera.csd.components.JsonSdlParser;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.validation.components.ServiceDescriptorValidatorImpl;
+import com.cloudera.csd.validation.constraints.AutoConfigSharesValidValidator;
 import com.cloudera.csd.validation.constraints.ExpressionValidator;
 import com.cloudera.csd.validation.constraints.UniqueFieldValidator;
 import com.cloudera.csd.validation.constraints.UniqueRoleTypeValidator;
 import com.cloudera.csd.validation.constraints.UniqueServiceTypeValidator;
 import com.cloudera.csd.validation.constraints.ValidServiceDependencyValidator;
+import com.cloudera.csd.validation.constraints.components.AutoConfigSharesValidValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ExpressionValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueFieldValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueRoleTypeValidatorImpl;
@@ -180,6 +182,12 @@ public class DefaultValidatorConfiguration {
   @Scope(BeanDefinition.SCOPE_PROTOTYPE)
   public ExpressionValidator expressionValidator() {
     return new ExpressionValidatorImpl();
+  }
+
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public AutoConfigSharesValidValidator autoConfigSharesValidValidator() {
+    return new AutoConfigSharesValidValidatorImpl();
   }
 
   public MessageInterpolator defaultInterpolator() {

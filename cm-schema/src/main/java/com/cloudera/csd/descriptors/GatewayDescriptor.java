@@ -18,6 +18,7 @@ package com.cloudera.csd.descriptors;
 import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.validation.constraints.UniqueField;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -52,7 +53,7 @@ public interface GatewayDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  Set<Parameter<?>> getParameters();
+  List<Parameter<?>> getParameters();
 
   @NotNull
   @Valid

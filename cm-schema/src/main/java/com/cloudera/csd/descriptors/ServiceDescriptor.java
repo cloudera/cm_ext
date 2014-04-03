@@ -20,6 +20,7 @@ import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -76,25 +77,25 @@ public interface ServiceDescriptor {
 
   @UniqueField("name")
   @Valid
-  Set<ServiceCommandDescriptor> getCommands();
+  List<ServiceCommandDescriptor> getCommands();
 
   @Valid
   GracefulStopDescriptor getStopRunner();
 
   @UniqueField("name")
   @Valid
-  Set<RoleDescriptor> getRoles();
+  List<RoleDescriptor> getRoles();
 
   @UniqueField.List({
     @UniqueField("name"),
     @UniqueField("configName")
   })
   @Valid
-  Set<Parameter<?>> getParameters();
+  List<Parameter<?>> getParameters();
   
   @UniqueField("name")
   @Valid
-  Set<ServiceDependency> getServiceDependencies();
+  List<ServiceDependency> getServiceDependencies();
   
   @Valid
   GatewayDescriptor getGateway();

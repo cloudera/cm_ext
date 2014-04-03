@@ -23,6 +23,7 @@ import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerat
 import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
+import com.cloudera.csd.descriptors.parameters.MemoryParameter;
 import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
@@ -101,6 +102,7 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       property = "type")  
   @JsonSubTypes({  
       @JsonSubTypes.Type(value = StringParameter.class, name = "string"),
+      @JsonSubTypes.Type(value = MemoryParameter.class, name = "memory"),
       @JsonSubTypes.Type(value = LongParameter.class, name = "long"),
       @JsonSubTypes.Type(value = BooleanParameter.class, name = "boolean"),
       @JsonSubTypes.Type(value = DoubleParameter.class, name = "double"),

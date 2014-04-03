@@ -15,12 +15,14 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.descriptors.cgroups.CgroupDescriptor;
 import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.validation.constraints.AutoConfigSharesValid;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueRoleType;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,7 +60,7 @@ public interface RoleDescriptor {
    */
   @Valid
   @UniqueField("name")
-  Set<RoleExternalLink> getAdditionalExternalLinks();
+  List<RoleExternalLink> getAdditionalExternalLinks();
 
   @NotNull
   @Valid
@@ -67,12 +69,13 @@ public interface RoleDescriptor {
   @Valid
   TopologyDescriptor getTopology();
 
+  @AutoConfigSharesValid
   @UniqueField.List({
     @UniqueField("name"),
     @UniqueField("configName")
   })
   @Valid
-  Set<Parameter<?>> getParameters();
+  List<Parameter<?>> getParameters();
 
   @Valid
   RunAs getRunAs();
@@ -82,8 +85,11 @@ public interface RoleDescriptor {
 
   @UniqueField("name")
   @Valid
-  Set<RoleCommandDescriptor> getCommands();
-  
+  List<RoleCommandDescriptor> getCommands();
+
   @Valid
   ConfigWriter getConfigWriter();
+
+  @Valid
+  CgroupDescriptor getCgroup();
 }

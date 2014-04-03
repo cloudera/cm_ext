@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +72,7 @@ public class SdlTestUtils {
     };
   }
 
-  public static Map<String, RoleDescriptor> makeRoleMap(Set<RoleDescriptor> roles) {
+  public static Map<String, RoleDescriptor> makeRoleMap(Collection<RoleDescriptor> roles) {
     ImmutableMap.Builder<String, RoleDescriptor> builder = ImmutableMap.builder();
     for (RoleDescriptor r : roles) {
       builder.put(r.getName(), r);

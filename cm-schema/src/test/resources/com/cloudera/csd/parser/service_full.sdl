@@ -33,8 +33,8 @@
        "name" : "CreateHomeDirCommand",
        "label" : "Create Echo Home Dir",
        "description" : "Create the home directory in HDFS for echo service",
-       "hdfsDirDescriptor" : { 
-         "type" : "path", 
+       "hdfsDirDescriptor" : {
+         "type" : "path",
          "path" : "/echo",
          "description" : "Home directory used by Echo service."
        },
@@ -44,8 +44,8 @@
        "name" : "CreateParamDirCommand",
        "label" : "Create Echo Home Dir",
        "description" : "Create the home directory in HDFS for echo service",
-       "hdfsDirDescriptor" : { 
-         "type" : "parameter", 
+       "hdfsDirDescriptor" : {
+         "type" : "parameter",
          "parameterName" : "service_var1",
          "dirDescription" : "Home directory used by Echo service."
        },
@@ -66,10 +66,20 @@
       "label" : "Service Var2 Label",
       "description" : "Service Var2 Description",
       "required" : "true",
-      "type" : "long", 
+      "type" : "long",
       "unit" : "megabytes",
-      "default" : 20 , 
-      "minValue" : 1
+      "default" : 20 ,
+      "min" : 1
+    },
+    {
+      "name" : "service_var3",
+      "label" : "Service Var3 Label",
+      "description" : "Service Var3 Description",
+      "type" : "long",
+      "min" : 1,
+      "softMin" : 2,
+      "softMax" : 3,
+      "max" : 4
     }
   ],
   "parcel" : {
@@ -78,7 +88,7 @@
     "optionalTags" : [ "opt" ]
   },
   "serviceDependencies" : [
-    {"name" : "ZOOKEEPER"}, 
+    {"name" : "ZOOKEEPER"},
     {"name" : "HDFS", "required" : "true"}
   ],
   "gateway" : {
@@ -118,7 +128,7 @@
     "configWriter" : {
       "generators" : [
         {
-          "filename" : "echo_client.xml",
+          "filename" : "echo-conf/echo_client.xml",
           "configFormat" : "hadoop_xml",
           "excludedParams" : ["client_var2"]
         },
@@ -204,6 +214,14 @@
           "configName" : "master_server.var1.config",
           "type" : "long",
           "default" : 20
+         },
+         {
+          "name" : "master_server_heap",
+          "label" : "Master Server heap Label",
+          "description" : "Master Server heap Description",
+          "type" : "memory",
+          "default" : 1073741824,
+          "scaleFactor" : 1.3
          }
        ],
        "logging" : {
@@ -254,9 +272,9 @@
             "description" : "Role Var2 Description",
             "required" : "true",
             "configName" : "role.var2.config",
-            "type" : "long", 
+            "type" : "long",
             "unit" : "seconds",
-            "default" : 20 
+            "default" : 20
           },
           {
             "name" : "role_var3",
@@ -264,7 +282,7 @@
             "description" : "Role Var3 Description",
             "required" : "true",
             "configName" : "role.var3.config",
-            "type" : "boolean", 
+            "type" : "boolean",
             "default" : true
           },
           {
@@ -272,18 +290,18 @@
             "label" : "Role Var4 Label",
             "description" : "Role Var4 Description",
             "configName" : "role.var4.config",
-            "type" : "double", 
+            "type" : "double",
             "unit" : "times",
             "default" : 0.3,
-            "minValue" : 0.01,
-            "maxValue" : 0.99
+            "min" : 0.01,
+            "max" : 0.99
           },
           {
             "name" : "role_var5",
             "label" : "Role Var5 Label",
             "description" : "Role Var5 Description",
             "configName" : "role.var5.config",
-            "type" : "path_array", 
+            "type" : "path_array",
             "minLength" : 1,
             "maxLength" : 5,
             "pathType" : "serviceSpecific"
@@ -344,6 +362,15 @@
             "zeroAllowed" : true,
             "negativeOneAllowed" : true,
             "outbound" : true
+          },
+          {
+            "name" : "echo_server_heap",
+            "label" : "Echo Server heap Label",
+            "description" : "Echo Server heap Description",
+            "type" : "memory",
+            "default" : 1073741824,
+            "scaleFactor" : 1.3,
+            "autoConfigShare" : 100
           }
        ],
        "runAs" : {
@@ -394,7 +421,25 @@
              "params" : ["master_server_var1"],
              "roleName" : "ECHO_MASTER_SERVER"
             }
-          ]
+          ],
+          "auxConfigGenerators" : [
+           {
+             "filename" : "some_aux_file.json",
+             "sourceFilename" : "aux/filename.json"
+           }
+         ]
+       },
+       "cgroup" : {
+         "cpu" : {
+           "autoConfigured" : true
+         },
+         "memory" : {
+           "autoConfigured" : true,
+           "autoConfiguredMin" : 1073741824
+         },
+         "blkio" : {
+           "autoConfigured" : true
+         }
        }
     }
   ]
