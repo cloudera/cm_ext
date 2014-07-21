@@ -1,0 +1,24 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "roles" : [
+    {
+       "name" : "ECHO_SERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "topology" : {
+         "minInstances" : 3,
+         "maxInstances" : 2
+       }
+    }
+  ]
+}

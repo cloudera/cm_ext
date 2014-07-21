@@ -19,6 +19,9 @@ import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +35,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * The root interface that describes a new service type
  * for the CSD framework.
  */
+@Named
 public interface ServiceDescriptor {
 
   @EntityTypeFormat
@@ -73,6 +77,7 @@ public interface ServiceDescriptor {
    * It is recommended that this is a list of only
    * singleton/master roles.
    */
+  @Referencing(type= ReferenceType.ROLE)
   Set<String> getRolesWithExternalLinks();
 
   @UniqueField("name")

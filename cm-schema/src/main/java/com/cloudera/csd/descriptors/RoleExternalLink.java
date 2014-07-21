@@ -15,6 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.HOST;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.GROUP;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.USER;
+
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -44,5 +51,6 @@ public interface RoleExternalLink {
    * where web_port is a parameter for this role.
    */
   @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   String getUrl();
 }

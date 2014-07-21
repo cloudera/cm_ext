@@ -42,6 +42,7 @@ import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
 import com.cloudera.csd.descriptors.parameters.MemoryParameter;
 import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.PasswordParameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
 import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
@@ -242,7 +243,7 @@ public class JsonSdlParserTest {
     assertEquals(1, rd.getCommands().size());
     RoleCommandDescriptor rcd = Iterables.getOnlyElement(rd.getCommands());
     
-    assertEquals(12, rd.getParameters().size());
+    assertEquals(14, rd.getParameters().size());
     for (Parameter<?> p : rd.getParameters()) {
       // check that parameters are parsed polymorphically
       if (p.getName().equals("role_var1")) {
@@ -314,10 +315,19 @@ public class JsonSdlParserTest {
         found++;
       } else if (p.getName().equals("role_var11")) {
         assertTrue(p instanceof PortNumberParameter);
-        PortNumberParameter dp = (PortNumberParameter)p;
+        PortNumberParameter dp = (PortNumberParameter) p;
         assertTrue(dp.isZeroAllowed());
         assertTrue(dp.isNegativeOneAllowed());
         assertTrue(dp.isOutbound());
+        found++;
+      } else if (p.getName().equals("role_var12")) {
+        assertTrue(p instanceof StringParameter);
+        StringParameter dp = (StringParameter) p;
+        assertTrue(dp.isSensitive());
+        found++;
+      } else if (p.getName().equals("role_var13")) {
+        assertTrue(p instanceof PasswordParameter);
+        PasswordParameter dp = (PasswordParameter) p;
         found++;
       } else if (p.getName().equals("echo_server_heap")) {
         assertTrue(p instanceof MemoryParameter);
@@ -328,7 +338,7 @@ public class JsonSdlParserTest {
         found++;
       }
     }
-    assertEquals(12, found);
+    assertEquals(14, found);
     
     // Check that config files are parsed correctly
     ConfigWriter cw = rd.getConfigWriter();

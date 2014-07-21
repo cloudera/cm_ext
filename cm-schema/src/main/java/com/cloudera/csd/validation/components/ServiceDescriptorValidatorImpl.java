@@ -16,11 +16,15 @@
 package com.cloudera.csd.validation.components;
 
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.validation.references.ReferenceValidator;
 import com.cloudera.validation.DescriptorValidator;
 import com.cloudera.validation.DescriptorValidatorImpl;
-import javax.validation.Validator;
+import com.google.common.annotations.VisibleForTesting;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 /**
  * A class that implements the DescriptorValidator interface
@@ -29,8 +33,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ServiceDescriptorValidatorImpl extends DescriptorValidatorImpl<ServiceDescriptor>
                                             implements DescriptorValidator<ServiceDescriptor> {
 
-  @Autowired
-  public ServiceDescriptorValidatorImpl(Validator validator) {
+  private final Validator validator;
+  private final ReferenceValidator refValidator;
+
+  public ServiceDescriptorValidatorImpl(Validator validator, ReferenceValidator refValidator) {
     super(validator, "service");
+    this.validator = validator;
+    this.refValidator = refValidator;
+  }
+
+  @VisibleForTesting
+  public Set<ConstraintViolation<ServiceDescriptor>> getViolations(ServiceDescriptor descriptor) {
+    Set<ConstraintViolation<ServiceDescriptor>> violations = validator.validate(descriptor);
+    if (violations.isEmpty()) {
+      violations = refValidator.validate(descriptor);
+    }
+    return violations;
   }
 }

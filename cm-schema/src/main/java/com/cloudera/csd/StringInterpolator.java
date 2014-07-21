@@ -19,11 +19,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,6 +102,22 @@ public class StringInterpolator {
       result = result.replaceFirst(REGEX, value);
     }
     return result;
+  }
+
+  /**
+   * Return all the placeholder variables that exist in
+   * the template.
+   *
+   * @param template the template.
+   * @return the set of variables in the template.
+   */
+  public Set<String> getVariables(String template) {
+    Set<String> variables = Sets.newHashSet();
+    Matcher m = PATTERN.matcher(template);
+    while (m.find()) {
+      variables.add(m.group(1));
+    }
+    return ImmutableSet.copyOf(variables);
   }
 
   /**

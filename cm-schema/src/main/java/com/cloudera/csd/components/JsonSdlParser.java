@@ -25,6 +25,7 @@ import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
 import com.cloudera.csd.descriptors.parameters.MemoryParameter;
 import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.PasswordParameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
 import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
@@ -112,6 +113,7 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       @JsonSubTypes.Type(value = URIArrayParameter.class, name = "uri_array"),
       @JsonSubTypes.Type(value = URIParameter.class, name = "uri"),
       @JsonSubTypes.Type(value = PathParameter.class, name = "path"),
+      @JsonSubTypes.Type(value = PasswordParameter.class, name = "password"),
       @JsonSubTypes.Type(value = PortNumberParameter.class, name = "port")})
   interface ParameterMixin {
   }

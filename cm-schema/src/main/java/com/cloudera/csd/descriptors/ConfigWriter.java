@@ -22,14 +22,19 @@ import com.cloudera.csd.validation.constraints.UniqueField;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 public interface ConfigWriter {
 
   @UniqueField("filename")
+  @Valid
   List<AuxConfigGenerator> getAuxConfigGenerators();
 
   @UniqueField("filename")
+  @Valid
   List<ConfigGenerator> getGenerators();
 
   @UniqueField("filename")
+  @Valid
   List<PeerConfigGenerator> getPeerConfigGenerators();
 }

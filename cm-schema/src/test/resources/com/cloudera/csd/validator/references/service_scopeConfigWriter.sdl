@@ -1,0 +1,68 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "type" : "string"
+    }
+  ],
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "parameters" : [
+         {
+          "name" : "master_server_var1",
+          "label" : "Master server var1 Label",
+          "description" : "Master Server var 1 Description",
+          "required" : "true",
+          "type" : "long",
+          "default" : 20
+         }
+       ]
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "parameters" : [
+          {
+            "name" : "role_var1",
+            "label" : "Role Var1 Label",
+            "description" : "Role Var1 Description",
+            "type" : "string",
+            "default" : "role_var1_default"
+          }
+        ],
+       "configWriter" : {
+         "peerConfigGenerators" : [
+           {
+             "filename" : "sample_role_peer_file.properties",
+             "params" : ["service_var1", "master_server_var1"]       /* FAIL: master_server_var1 only in ECHO_MASTER_SERVER */
+           },
+           {
+             "filename" : "sample_master_peer_file.properties",
+             "params" : ["master_server_var1"],
+             "roleName" : "ECHO_MASTER_SERVER"
+           }
+         ]
+       }
+    }
+  ]
+}

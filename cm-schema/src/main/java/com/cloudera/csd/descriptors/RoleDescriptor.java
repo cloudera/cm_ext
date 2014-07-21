@@ -21,6 +21,9 @@ import com.cloudera.csd.validation.constraints.AutoConfigSharesValid;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueRoleType;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
 
 import java.util.List;
 
@@ -33,6 +36,8 @@ import org.hibernate.validator.constraints.NotBlank;
  * Describes a role type used by the CSD
  * framework.
  */
+@Named
+@Referenced(type=ReferenceType.ROLE)
 public interface RoleDescriptor {
 
   @EntityTypeFormat

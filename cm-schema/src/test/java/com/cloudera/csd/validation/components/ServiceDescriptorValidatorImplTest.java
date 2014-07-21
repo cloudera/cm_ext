@@ -165,6 +165,14 @@ public class ServiceDescriptorValidatorImplTest {
         Iterables.getOnlyElement(errors));
   }
 
+  @Test
+  public void testTopologyRangeCheck() {
+    Set<String> errors = validate("service_topologyRangeCheck.sdl");
+    assertEquals("service.roles[0].topology must satisfy " +
+            "\"minInstances == null or maxInstances == null or minInstances <= maxInstances\"",
+        Iterables.getOnlyElement(errors));
+  }
+
   private void assertConstraint(ConstraintViolation<?> violation, Class<?> constraint) {
     ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
     assertEquals(constraint, descriptor.getAnnotation().annotationType());

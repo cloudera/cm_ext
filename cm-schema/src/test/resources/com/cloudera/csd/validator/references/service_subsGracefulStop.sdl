@@ -1,0 +1,47 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    }
+  ],
+  "stopRunner" : {
+    "relevantRoleTypes" : [
+      "ECHO_MASTER_SERVER"
+    ],
+    "runner" : {
+      "program" : "scripts/graceful_stop.sh",
+      "args" : ["${service_var1}-${host}", "${bad_var}"],              /* FAIL: bad_var doesn't exist */
+      "environmentVariables" : {
+        "USER" : "user is ${user}",
+        "GROUP" : "group is ${group}",
+        "BAD" : "${bad_param} ${host}",                               /* FAIL: bad_param doesn't exist */
+        "NO_VARS" : "there are no variables here"
+      }
+    },
+    "timeout" : 180000,
+    "masterRole" : "ECHO_MASTER_SERVER"
+  },
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+       }
+    }
+  ]
+}

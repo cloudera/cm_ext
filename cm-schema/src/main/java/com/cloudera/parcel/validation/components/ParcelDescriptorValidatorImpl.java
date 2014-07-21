@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ParcelDescriptorValidatorImpl extends DescriptorValidatorImpl<ParcelDescriptor> {
 
-  @Autowired
   public ParcelDescriptorValidatorImpl(Validator validator) {
     super(validator, "parcel");
   }

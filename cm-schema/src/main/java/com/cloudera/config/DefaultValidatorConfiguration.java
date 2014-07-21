@@ -32,6 +32,10 @@ import com.cloudera.csd.validation.constraints.components.UniqueFieldValidatorIm
 import com.cloudera.csd.validation.constraints.components.UniqueRoleTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueServiceTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ValidServiceDependencyValidatorImpl;
+import com.cloudera.csd.validation.references.DescriptorVisitor;
+import com.cloudera.csd.validation.references.ReferenceValidator;
+import com.cloudera.csd.validation.references.components.DescriptorVisitorImpl;
+import com.cloudera.csd.validation.references.components.ReferenceValidatorImpl;
 import com.cloudera.parcel.components.JsonAlternativesParser;
 import com.cloudera.parcel.components.JsonManifestParser;
 import com.cloudera.parcel.components.JsonParcelParser;
@@ -95,7 +99,8 @@ public class DefaultValidatorConfiguration {
       "HIVE",
       "SOLR",
       "SQOOP",
-      "KS_INDEXER"
+      "KS_INDEXER",
+      "SENTRY"
     );
   }
 
@@ -144,7 +149,8 @@ public class DefaultValidatorConfiguration {
       "SQOOP_SERVER",
       "STATESTORE",
       "TASKTRACKER",
-      "WEBHCAT"
+      "WEBHCAT",
+      "SENTRY_SERVER"
     );
   }
 
@@ -236,7 +242,20 @@ public class DefaultValidatorConfiguration {
   @Bean
   public DescriptorValidator<ServiceDescriptor> serviceDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
-    return new ServiceDescriptorValidatorImpl(validator);
+    ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
+    return new ServiceDescriptorValidatorImpl(validator, referenceValidator);
+  }
+
+  @Bean
+  public DescriptorVisitor descriptorVisitor() {
+    return new DescriptorVisitorImpl();
+  }
+
+  @Bean
+  public ReferenceValidator referenceValidator() {
+    DescriptorVisitor visitor = ctx.getBean(DescriptorVisitor.class);
+    StringInterpolator interpolator = ctx.getBean(StringInterpolator.class);
+    return new ReferenceValidatorImpl(visitor, interpolator);
   }
 
   @Bean

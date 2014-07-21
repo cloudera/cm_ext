@@ -15,11 +15,18 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
+
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Describes the logging context.
  */
+@Referenced(type=ReferenceType.PARAMETER, as="log_dir")
 public interface LoggingDescriptor {
 
   /**
@@ -31,12 +38,12 @@ public interface LoggingDescriptor {
   String getDir();
 
   /**
-   * Filename of the log file. If the filename contains the string
-   * "${host}", it gets replaced with hostname of the role.
+   * Filename of the log file.
    *
    * @return the filename
    */
   @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   String getFilename();
 
   /**

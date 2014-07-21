@@ -1,0 +1,90 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    }
+  ],
+  "gateway" : {
+    "alternatives" : {
+      "name" : "echo-conf",
+      "priority" : 50,
+      "linkRoot" : "/etc/echo"
+    },
+    "scriptRunner" : {
+      "program" : "scripts/cc.sh",
+      "environmentVariables" : {
+        "VAR" : "${master_server_var1}",                          /* FAIL: master_server_var1 not in this role */
+        "SERVICE" : "${service_var1}"
+      }
+    },
+    "parameters" : [
+      {
+        "name" : "client_var1",
+        "label" : "Client Var1 Label",
+        "description" : "Client Var1 Description",
+        "configName" : "client.var1.config",
+        "type" : "string"
+      }
+    ],
+    "configWriter" : {
+      "generators" : [
+        {
+          "filename" : "echo-conf/echo_client.xml",
+          "configFormat" : "hadoop_xml"
+        }
+      ]
+    }
+  },
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh",
+         "args" : ["${master_server_var1}", "${bad_var1}"]         /* FAIL: bad_var1 does not exist */
+       },
+       "parameters" : [
+         {
+          "name" : "master_server_var1",
+          "label" : "Master server var1 Label",
+          "description" : "Master Server var 1 Description",
+          "required" : "true",
+          "configName" : "master_server.var1.config",
+          "type" : "long",
+          "default" : 20
+         }
+       ]
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "parameters" : [
+          {
+            "name" : "role_var1",
+            "label" : "Role Var1 Label",
+            "description" : "Role Var1 Description",
+            "type" : "string",
+            "default" : "role_var1_default"
+          }
+        ]
+    }
+  ]
+}

@@ -33,22 +33,16 @@
        "name" : "CreateHomeDirCommand",
        "label" : "Create Echo Home Dir",
        "description" : "Create the home directory in HDFS for echo service",
-       "hdfsDirDescriptor" : {
-         "type" : "path",
-         "path" : "/echo",
-         "description" : "Home directory used by Echo service."
-       },
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "/echo",
        "permissions" : "0700"
      },
      {
        "name" : "CreateParamDirCommand",
        "label" : "Create Echo Home Dir",
        "description" : "Create the home directory in HDFS for echo service",
-       "hdfsDirDescriptor" : {
-         "type" : "parameter",
-         "parameterName" : "service_var1",
-         "dirDescription" : "Home directory used by Echo service."
-       },
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "${service_var1}",
        "permissions" : "0700"
      }
    ],
@@ -362,6 +356,21 @@
             "zeroAllowed" : true,
             "negativeOneAllowed" : true,
             "outbound" : true
+          },
+          {
+            "name" : "role_var12",
+            "label" : "Role Var12 Label",
+            "description" : "Role Var12 Description",
+            "type" : "string",
+            "sensitive" : true,
+            "default" : "role_var12_default"
+          },
+          {
+            "name" : "role_var13",
+            "label" : "Role Var13 Label",
+            "description" : "Role Var13 Description",
+            "type" : "password",
+            "default" : "role_var13_default"
           },
           {
             "name" : "echo_server_heap",

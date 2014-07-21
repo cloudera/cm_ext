@@ -15,18 +15,25 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Descriptor to specify a {@link ConfigFileGenerator}. */
+@Named("filename")
 public interface ConfigGenerator {
 
   @NotBlank
   String getFilename();
-  
+
+  @Referencing(type=ReferenceType.PARAMETER)
   Set<String> getIncludedParams();
-  
+
+  @Referencing(type=ReferenceType.PARAMETER)
   Set<String> getExcludedParams();
   
   // These subclasses don't have any fields yet,

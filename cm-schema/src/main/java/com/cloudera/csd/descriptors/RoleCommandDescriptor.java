@@ -15,6 +15,10 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
+
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -25,6 +29,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 /**
  * Describes a role command used by the CSD framework.
  */
+@Named
+@Referenced(type=ReferenceType.ROLE_COMMAND)
 public interface RoleCommandDescriptor {
 
   @NotBlank

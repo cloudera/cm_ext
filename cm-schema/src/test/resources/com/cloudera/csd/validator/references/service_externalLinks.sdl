@@ -1,0 +1,33 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "rolesWithExternalLinks" : [ "wrongRole", "ECHO_MASTER_SERVER" ],    /* FAIL: wrongRole doesn't exist */
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "externalLink" : {
+          "name" : "master_web_ui",
+          "label" : "Master WebUI",
+          "url" : "http://myhost.com:80"
+       },
+       "additionalExternalLinks" : [
+          {
+           "name" : "master_web_ui2",
+           "label" : "Master WebUI2",
+           "url" : "http://myhost.com:80/host2"
+          }
+       ]
+    }
+  ]
+}

@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ManifestDescriptorValidatorImpl extends DescriptorValidatorImpl<ManifestDescriptor> {
 
-  @Autowired
   public ManifestDescriptorValidatorImpl(Validator validator) {
     super(validator, "manifest");
   }

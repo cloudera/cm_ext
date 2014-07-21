@@ -1,0 +1,78 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "commands" : [
+    {
+      "name" : "service_cmd1",
+      "label" : "Service Cmd1 Label",
+      "description" : "Service Cmd1 Help",
+      "roleName" : "ECHO_WEBSERVER",
+      "roleCommand" : "role_cmd2",
+      "runMode" : "all"
+    },
+    {
+      "name" : "service_cmd2",
+      "label" : "Service Cmd2 Label",
+      "description" : "Service Cmd2 Help",
+      "roleName" : "ECHO_MASTER_SERVER",
+      "roleCommand" : "role_cmd2",                        /* FAIL: role_cmd2 only in ECHO_WEBSERVER */
+      "runMode" : "single"
+    },
+    {
+      "name" : "service_cmd3",
+      "label" : "Service Cmd3 Label",
+      "description" : "Service Cmd3 Help",
+      "roleName" : "ECHO_WEBSERVER",
+      "roleCommand" : "role_cmd1",                        /* FAIL: role_cmd1 only in ECHO_MASTER_SERVER */
+      "runMode" : "single"
+    }
+  ],
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+      },
+      "commands" : [
+         {
+           "name" : "role_cmd1",
+           "label" : "Role Cmd1 Label",
+           "description" : "Role Cmd1 Help",
+           "expectedExitCodes" : [0, 1, 2],
+           "requiredRoleState" : "running",
+           "commandRunner" : {
+             "program" : "scripts/control.sh"
+           }
+         }
+       ]
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "commands" : [
+         {
+           "name" : "role_cmd2",
+           "label" : "Role Cmd2 Label",
+           "description" : "Role Cmd2 Help",
+           "expectedExitCodes" : [0, 1, 2],
+           "requiredRoleState" : "running",
+           "commandRunner" : {
+             "program" : "scripts/control.sh"
+           }
+         }
+       ]
+    }
+  ]
+}

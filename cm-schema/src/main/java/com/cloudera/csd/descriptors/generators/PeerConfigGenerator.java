@@ -15,13 +15,19 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
+import com.cloudera.csd.validation.references.annotations.IncludeAdditionalReferences;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
-//TODO: check that this config generator is not present at the service level
 /** a descriptor to get peer parameter configurations **/
+@Named("filename")
+@IncludeAdditionalReferences("roleName")
 public interface PeerConfigGenerator {
 
   /** The file name of the config file that will be written **/
@@ -30,9 +36,10 @@ public interface PeerConfigGenerator {
 
   /** The parameters to include from each peer **/
   @NotEmpty
+  @Referencing(type=ReferenceType.PARAMETER)
   Set<String> getParams();
 
   /** specifies which role type to use, be default it uses the current role type **/
-  //TODO: Add validation that this rolename is valid.
+  @Referencing(type=ReferenceType.ROLE)
   String getRoleName();
 }

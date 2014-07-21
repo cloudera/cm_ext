@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import com.cloudera.csd.StringInterpolator.VariableProvider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,13 @@ public class StringInterpolatorTest {
   public void testInterpolateListNull() {
     assertEquals(ImmutableList.<String>of(),
                  interpolator.interpolateList(null, provider));
+  }
+
+  @Test
+  public void testGetVariables() {
+    assertEquals(ImmutableSet.of("var", "var2"),
+                 interpolator.getVariables(
+                 "This is a ${var} and ${var2} and ${var}"));
   }
 
   private String format(String template) {

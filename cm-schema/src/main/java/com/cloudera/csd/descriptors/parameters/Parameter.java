@@ -15,9 +15,15 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.parameters;
 
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Interface to specify ParamSpecs in a Service Descriptor. */
+@Named
+@Referenced(type=ReferenceType.PARAMETER)
 public interface  Parameter<T> {
   /**
    * Key for storing the value of this parameter in database.
@@ -61,4 +67,9 @@ public interface  Parameter<T> {
    * in Add Service Wizard. (DEFAULT: false)
    */
   boolean isConfigurableInWizard();
+
+  /**
+   * Whether the data in this parameter is sensitive.
+   */
+  boolean isSensitive();
 }

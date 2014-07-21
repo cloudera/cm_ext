@@ -15,6 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.HOST;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.GROUP;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.USER;
+
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +36,9 @@ public interface RunnerDescriptor {
   @NotBlank
   String getProgram();
 
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   List<String> getArgs();
 
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   Map<String, String> getEnvironmentVariables();
 }

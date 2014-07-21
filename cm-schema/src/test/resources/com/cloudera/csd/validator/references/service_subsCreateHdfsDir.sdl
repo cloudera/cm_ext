@@ -1,0 +1,46 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+   "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    }
+  ],
+  "hdfsDirs" : [
+    {
+       "name" : "CreateHomeDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "/echo",
+       "permissions" : "0700"
+     },
+     {
+       "name" : "CreateParamDirCommand",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "${service_var1}/${bad_service_var1}",                          /* FAIL: bad_service_var1 doesn't exist */
+       "permissions" : "0700"
+     },
+     {
+       "name" : "CreateParamDirCommand2",
+       "label" : "Create Echo Home Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "${host}/${user}/${group}",                                   /* FAIL: host, user and group not allowed */
+       "permissions" : "0700"
+     }
+  ]
+}

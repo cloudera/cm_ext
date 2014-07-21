@@ -15,13 +15,19 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
-import com.cloudera.validation.constraints.FilePermission;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
 
-import javax.validation.constraints.Pattern;
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
+import com.cloudera.validation.constraints.FilePermission;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Interface to specify command to create directory in HDFS. */
+@Named
+@Referenced(type=ReferenceType.SERVICE_COMMAND)
 public interface CreateHdfsDirDescriptor {
   
   /** Name of the command. */
@@ -40,8 +46,9 @@ public interface CreateHdfsDirDescriptor {
   @NotBlank
   String getDirectoryDescription();
 
-  /** The path in HDFS to create. This can have standard substitutions. */
+  /** The path in HDFS to create. */
   @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS, USER, GROUP})
   String getPath();
 
   /** Permission for this directory. */

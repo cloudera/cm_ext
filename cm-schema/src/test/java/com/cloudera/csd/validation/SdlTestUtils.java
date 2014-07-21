@@ -38,6 +38,7 @@ public class SdlTestUtils {
 
   private static final String RESOURCE_PATH = "/com/cloudera/csd/";
   public static final String SDL_VALIDATOR_RESOURCE_PATH = RESOURCE_PATH + "validator/";
+  public static final String SDL_REFERENCE_VALIDATOR_RESOURCE_PATH = SDL_VALIDATOR_RESOURCE_PATH + "references/";
   public static final String SDL_PARSER_RESOURCE_PATH = RESOURCE_PATH + "parser/";
 
   // Initialize our variables
@@ -62,6 +63,10 @@ public class SdlTestUtils {
 
   public static ServiceDescriptor getValidatorSdl(String filename) {
     return parseSDL(SDL_VALIDATOR_RESOURCE_PATH + filename);
+  }
+
+  public static ServiceDescriptor getReferenceValidatorSdl(String filename) {
+    return parseSDL(SDL_REFERENCE_VALIDATOR_RESOURCE_PATH + filename);
   }
 
   public static DescriptorValidator<ServiceDescriptor> getAlwaysPassingValidator() {

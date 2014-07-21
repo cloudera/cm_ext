@@ -1,0 +1,47 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "configName" : "service.var1.config",
+      "type" : "string",
+      "configurableInWizard" : true
+    }
+  ],
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh",
+         "args" : ["${log_dir}"]
+      },
+      "logging" : {
+        "dir" : "/var/log/echo",
+        "filename" : "${host}_${user}_${group}_${service_var1}.master.log"
+      }
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       },
+       "logging" : {
+        "dir" : "/var/log/echo",
+        "filename" : "${bad_var}_master.log"            /* FAIL: bad_var doesn't exist */
+      }
+    }
+  ]
+}

@@ -65,6 +65,13 @@ public class ParcelDescriptorValidatorImplTest {
   }
 
   @Test
+  public void testInvalidName() {
+    Set<String> violations = validate("invalid_name.json");
+    assertEquals(1, violations.size());
+    assertEquals("parcel.name must not contain any '-' characters", Iterables.getOnlyElement(violations));
+  }
+
+  @Test
   public void testMissingSchema() {
     Set<String> violations = validate("missing_schema.json");
     assertEquals(1, violations.size());

@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class PermissionsDescriptorValidatorImpl extends DescriptorValidatorImpl<PermissionsDescriptor> {
 
-  @Autowired
   public PermissionsDescriptorValidatorImpl(Validator validator) {
     super(validator, "permissions");
   }

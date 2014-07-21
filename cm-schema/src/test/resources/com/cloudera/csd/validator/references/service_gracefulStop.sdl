@@ -1,0 +1,39 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "stopRunner" : {
+    "relevantRoleTypes" : [
+      "BAD_ROLE",                                  /* FAIL: BAD_ROLE doesn't exist */
+      "ECHO_WEBSERVER"
+    ],
+    "runner" : {
+      "program" : "scripts/graceful_stop.sh"
+    },
+    "timeout" : 180000,
+    "masterRole" : "BAD_MASTER_ROLE"               /* FAIL: BAD_MASTER_ROLE doesn't exist */
+  },
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+       }
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh"
+       }
+    }
+  ]
+}

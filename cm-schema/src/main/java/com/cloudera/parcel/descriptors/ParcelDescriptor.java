@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
@@ -36,6 +37,7 @@ public interface ParcelDescriptor {
   Integer getSchema_version();
 
   @NotBlank
+  @Pattern(regexp="^((?!-).)*$", message="{custom.validation.constraints.ParcelName.message}")
   String getName();
 
   @NotBlank

@@ -15,6 +15,11 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.references.annotations.IncludeAdditionalReferences;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -22,6 +27,9 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * Describes a service command used by the CSD framework.
  */
+@Named
+@Referenced(type=ReferenceType.SERVICE_COMMAND)
+@IncludeAdditionalReferences("roleName")
 public interface ServiceCommandDescriptor {
 
   enum RunMode {
@@ -50,9 +58,11 @@ public interface ServiceCommandDescriptor {
   String getDescription();
 
   @NotBlank
+  @Referencing(type = ReferenceType.ROLE)
   String getRoleName();
 
   @NotBlank
+  @Referencing(type = ReferenceType.ROLE_COMMAND)
   String getRoleCommand();
 
   RunMode getRunMode();

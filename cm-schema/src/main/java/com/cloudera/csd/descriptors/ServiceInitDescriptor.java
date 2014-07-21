@@ -15,7 +15,12 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -30,12 +35,15 @@ public interface ServiceInitDescriptor {
   public interface ServiceInitStep {
     
     @NotBlank
+    @Referencing(type = ReferenceType.SERVICE_COMMAND)
     String getCommandName();
-    
+
     boolean isFailureAllowed();
   }
-  
+
+  @Valid
   List<ServiceInitStep> getPreStartSteps();
-  
+
+  @Valid
   List<ServiceInitStep> getPostStartSteps();
 }

@@ -1,0 +1,45 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parameters" : [
+    {
+      "name" : "service_var1",
+      "label" : "Service Var1 Label",
+      "description" : "Service Var1 Description",
+      "type" : "string"
+    }
+  ],
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+         "program" : "scripts/control.sh"
+      },
+      "externalLink" : {
+          "name" : "master_web_ui",
+          "label" : "Master WebUI",
+          "url" : "http://${host}.com:80/${user}/${group}/${service_var1}"
+       },
+       "additionalExternalLinks" : [
+          {
+           "name" : "master_web_ui2",
+           "label" : "Master WebUI2",
+           "url" : "http://${user}myhost.com:80/${bad_var}"                      /* FAIL: bad_var doesn't exist */
+          },
+          {
+           "name" : "master_web_ui3",
+           "label" : "Master WebUI3",
+           "url" : "http://${host}.com:80/"
+          }
+       ]
+    }
+  ]
+}

@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.constraints.Expression;
+
 import javax.validation.constraints.Min;
 
 /**
@@ -23,10 +25,8 @@ import javax.validation.constraints.Min;
  * and restrictions on co-location. If the topology
  * descriptor is not specified, then min instances are
  * set 1 and max instances are Integer.MAX_VALUE.
- *
- * TODO: Add validation on descriptor to check ranges
- * Need to make sure min < max
  */
+@Expression("minInstances == null or maxInstances == null or minInstances <= maxInstances")
 public interface TopologyDescriptor {
 
   /** Defaults to 1 */

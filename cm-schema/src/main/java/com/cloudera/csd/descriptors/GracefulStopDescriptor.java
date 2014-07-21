@@ -15,8 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.references.annotations.IncludeAdditionalReferences;
+import com.cloudera.csd.validation.references.annotations.Referencing;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -26,6 +31,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * Contains all the information needed to execute a custom program for shutting
  * down processes.
  */
+@IncludeAdditionalReferences("masterRole")
 public interface GracefulStopDescriptor {
 
   /**
@@ -44,6 +50,7 @@ public interface GracefulStopDescriptor {
    *
    * @return the role types. No role types means all role types.
    */
+  @Referencing(type = ReferenceType.ROLE)
   List<String> getRelevantRoleTypes();
 
   /**
@@ -52,6 +59,7 @@ public interface GracefulStopDescriptor {
    * @return the runner
    */
   @NotNull
+  @Valid
   RunnerDescriptor getRunner();
 
   /**
@@ -63,5 +71,6 @@ public interface GracefulStopDescriptor {
    * @return the role name.
    */
   @NotBlank
+  @Referencing(type = ReferenceType.ROLE)
   String getMasterRole();
 }
