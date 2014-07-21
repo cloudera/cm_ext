@@ -16,6 +16,7 @@
 package com.cloudera.cli.validator;
 
 import com.cloudera.cli.validator.components.CommandLineOptions;
+import com.cloudera.cli.validator.components.Constants;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +25,6 @@ import java.io.Writer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.ApplicationContext;
@@ -58,7 +58,7 @@ public class Main {
    * @return exit code
    */
   public int run(String[] args) throws IOException {
-    Writer writer = new OutputStreamWriter(outStream);
+    Writer writer = new OutputStreamWriter(outStream, Constants.CHARSET_UTF_8);
     try {
       CommandLineOptions cmdOptions = new CommandLineOptions(appName, args);
       CommandLineOptions.Mode mode = cmdOptions.getMode();

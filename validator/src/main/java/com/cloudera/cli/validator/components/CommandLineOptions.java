@@ -18,8 +18,11 @@ package com.cloudera.cli.validator.components;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
+import java.io.BufferedWriter;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
@@ -166,9 +169,12 @@ public class CommandLineOptions {
    *
    * @param appName the application name.
    * @param stream output stream.
+   * @throws UnsupportedEncodingException
    */
-  public static void printUsageMessage(String appName, OutputStream stream) {
-    PrintWriter writer = new PrintWriter(stream);
+  public static void printUsageMessage(String appName, OutputStream stream)
+      throws UnsupportedEncodingException {
+    PrintWriter writer = new PrintWriter(
+        new BufferedWriter(new OutputStreamWriter(stream, Constants.CHARSET_UTF_8)));
     try {
       String header = "Validates Cloudera Manager Schemas";
       String footer = "";
