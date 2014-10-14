@@ -47,7 +47,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * This {@link #ValidationRunner} validates a complete parcel file.
+ * This {@link ValidationRunner} validates a complete parcel file.
  *
  * It validates the parcel's filename as well as the contents of the parcel,
  * ensuring consistency between the filename, directory and contained metadata.
@@ -70,6 +70,7 @@ public class ParcelFileRunner implements ValidationRunner {
       "sles11",
       "lucid",
       "precise",
+      "trusty",
       "squeeze",
       "wheezy");
 
