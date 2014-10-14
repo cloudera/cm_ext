@@ -13,31 +13,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors.parameters;
+package com.cloudera.csd.descriptors;
 
-import com.cloudera.validation.constraints.FilePermission;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.CaseFormat;
 
-import javax.validation.constraints.NotNull;
+/** Whether a parameter should be exposed and if so, if it is required. */
+public enum CsdParameterOptionality {
+  /** do not expose this parameter */
+  NOT_EXPOSED,
+  /** expose this parameter as an optional parameter */
+  OPTIONAL,
+  /** expose this parameter as a required parameter */
+  REQUIRED;
 
-public interface PathArrayParameter extends StringArrayParameter {
-
-  /**
-   * Type of path specified by this parameter. (REQUIRED)
-   * <p>
-   * If type is LOG_DIR or LOCAL_DATA_DIR, then CM will
-   * auto-create this directory while starting daemon process.
-   */
-  @NotNull
-  CsdPathType getPathType();
-
-  /**
-   * Mode of the path specified by this parameter. (0755 if not specified).
-   *
-   * <p>
-   * If type is LOG_DIR or LOCAL_DATA_DIR, then CM will
-   * auto-create this directory with the specified mode
-   * while starting daemon process.
-   */
-  @FilePermission
-  String getMode();
+  @JsonValue
+  public String toJson() {
+    return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
+  }
 }

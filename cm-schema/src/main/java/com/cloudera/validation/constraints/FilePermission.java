@@ -28,14 +28,12 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
  * Constraint for a file permission in octal form.
  */
-@NotNull
 @Size(min = 4, max = 4)
 @Pattern(regexp="[0-7][0-7][0-7][0-7]")
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })

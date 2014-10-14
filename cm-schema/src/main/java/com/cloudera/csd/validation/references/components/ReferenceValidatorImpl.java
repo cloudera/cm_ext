@@ -26,6 +26,7 @@ import com.cloudera.csd.validation.references.annotations.IncludeAdditionalRefer
 import com.cloudera.csd.validation.references.annotations.Named;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
 import com.cloudera.csd.validation.references.annotations.Referenced;
+import com.cloudera.csd.validation.references.components.DescriptorPathImpl.BeanNode;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl.PropertyNode;
 import com.cloudera.csd.validation.references.components.DescriptorVisitorImpl.AbstractNodeProcessor;
 import com.cloudera.csd.validation.references.constraints.ReferencedEntityConstraint;
@@ -96,7 +97,7 @@ public class ReferenceValidatorImpl implements ReferenceValidator {
       Named named = ReflectionHelper.findAnnotation(node.getBean().getClass(), Named.class);
       Referenced referenced = ReflectionHelper.findAnnotation(node.getBean().getClass(), Referenced.class);
       if (referenced != null) {
-        if (referenced.as().equals("") && named == null) {
+        if (referenced.as().length == 0 && named == null) {
           throw new IllegalStateException("The @Referenced annotation requires the @Named to also exist.");
         }
         ReferenceType type = referenced.type();
@@ -152,7 +153,21 @@ public class ReferenceValidatorImpl implements ReferenceValidator {
         DescriptorPath refPath = entry.getValue();
         DescriptorPath prefix = refPath.removeFromHead();
         if (trimmedPath.equals(prefix) || (refPath.contains(additionalScope, ElementKind.BEAN))) {
-          refs.put(entry.getKey(), refPath.getHeadNode().getName());
+          DescriptorNode headNode = refPath.getHeadNode();
+          boolean addedNames = false;
+          if (ElementKind.BEAN.equals(headNode.getKind())) {
+            Referenced referenced = ReflectionHelper.findAnnotation(
+                ((BeanNode) headNode).getBean().getClass(), Referenced.class);
+            if (null != referenced && referenced.as().length > 0) {
+              for (String name : referenced.as()) {
+                refs.put(entry.getKey(), name);
+              }
+              addedNames = true;
+            }
+          }
+          if (!addedNames) {
+            refs.put(entry.getKey(), headNode.getName());
+          }
         }
       }
       return refs;

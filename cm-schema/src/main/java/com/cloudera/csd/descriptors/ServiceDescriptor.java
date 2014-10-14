@@ -15,10 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+
 import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 import com.cloudera.csd.validation.references.annotations.Named;
 import com.cloudera.csd.validation.references.annotations.Referencing;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
@@ -111,4 +114,31 @@ public interface ServiceDescriptor {
   
   @Valid
   ServiceInitDescriptor getServiceInit();
+
+  @Valid
+  ProvidesDfs getProvidesDfs();
+
+  @Valid
+  ProvidesKms getProvidesKms();
+
+  /**
+   * Whether kerberos authentication is used.
+   * <p>
+   * A service will require kerberos authentication if any of the following is true:
+   * <ol>
+   * <li>Any dependency of the service requires kerberos authentication
+   * <li>This field returns a value of "true" or "kerberos" (case-insensitive)
+   * </ol>
+   */
+  @AvailableSubstitutions(type={PARAMETERS})
+  public String getKerberos();
+
+  /**
+   * List of external kerberos principals used by the service.
+   * Cloudera Manager will not manage these principals, but this can be
+   * used to refer to any external principals in configuration.
+   */
+  @Valid
+  @UniqueField("name")
+  List<KerberosPrincipalDescriptor> getExternalKerberosPrincipals();
 }

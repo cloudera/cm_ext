@@ -232,18 +232,20 @@ public class DescriptorPathImpl implements DescriptorPath {
    */
   public DescriptorPathImpl addBeanNode(Object obj) {
     Preconditions.checkNotNull(obj);
-    String name = obj.getClass().getSimpleName();
+    String[] names = new String[]{obj.getClass().getSimpleName()};
     Named named = ReflectionHelper.findAnnotation(obj.getClass(), Named.class);
     if (named != null) {
-      name = ReflectionHelper.propertyValueByName(obj, named.value(), String.class);
+      names = new String[]{ReflectionHelper.propertyValueByName(obj, named.value(), String.class)};
     }
     // If there is a @Referenced annotation and it has a hardcoded "as" value,
     // use that name instead.
     Referenced referenced = ReflectionHelper.findAnnotation(obj.getClass(), Referenced.class);
-    if ((referenced != null) && (!referenced.as().equals(""))) {
-      name = referenced.as();
+    if ((referenced != null) && (referenced.as().length != 0)) {
+      names = referenced.as();
     }
-    return addToHead(new BeanNode(name, null, obj, (named != null)));
+    return addToHead(new BeanNode(
+        names.length == 1 ? names[0] : names.toString(),
+        null, obj, (named != null)));
   }
 
   @Override

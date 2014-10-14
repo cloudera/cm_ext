@@ -1,0 +1,24 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "roles" : [
+    {
+       "name" : "ECHO_SERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "sslClient" : {},
+       "startRunner" : {
+         "program" : "scripts/control.sh",
+         "environmentVariables" : {
+           "SSL_ENABLED" : "${ssl_enabled}"
+         }
+       }
+    }
+  ]
+}

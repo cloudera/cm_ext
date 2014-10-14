@@ -26,6 +26,17 @@
       { "commandName" : "CreateParamDirCommand", "failureAllowed" : true }
     ]
   },
+ "externalKerberosPrincipals" : [
+   {
+     "name" : "EXT_HARDCODED",
+     "primary" : "ext"
+   },
+   {
+     "name" : "EXT_CONFIG",
+     "primary" : "ext2",
+     "instance" : "${service_var1}"
+   }
+ ],
   "inExpressWizard" : true,
   "rolesWithExternalLinks" : ["ECHO_MASTER_SERVER"],
   "hdfsDirs" : [
@@ -74,8 +85,16 @@
       "softMin" : 2,
       "softMax" : 3,
       "max" : 4
+    },
+    {
+      "name" : "service_kerb_var",
+      "label" : "Service Kerb Label",
+      "description" : "Service Kerb Description",
+      "type" : "boolean",
+      "default" : "false"
     }
   ],
+  "kerberos" : "${service_kerb_var}",
   "parcel" : {
     "repoUrl" : "http://mywebsite.com",
     "requiredTags" : [ "req" ],
@@ -180,13 +199,27 @@
          ],
          "environmentVariables" : {
            "TEST_MESSAGE" : "Hello there people",
-           "BACKGROUND_COLOR" : "#d2d2d2"
+           "BACKGROUND_COLOR" : "#d2d2d2",
+           "SSL_ENABLED" : "${ssl_enabled}"
          }
        },
+       "kerberosPrincipals" : [
+         {
+           "name" : "ECHO_PRINCIPAL",
+           "primary" : "echo",
+           "instance" : "${host}"
+         },
+         {
+           "name" : "HTTP_PRINCIPAL",
+           "primary" : "HTTP",
+           "instance" : "${service_var1}"
+         }
+       ],
        "externalLink" : {
           "name" : "master_web_ui",
           "label" : "Master WebUI",
-          "url" : "http://myhost.com:80"
+          "url" : "http://myhost.com:80",
+          "secureUrl" : "https://myhost.com:80"
        },
        "additionalExternalLinks" : [
           {
@@ -218,6 +251,11 @@
           "scaleFactor" : 1.3
          }
        ],
+       "sslServer" : {
+         "keyIdentifier" : "echo_master",
+         "keyPasswordOptionality" : "required"
+       },
+       "sslClient" : {},
        "logging" : {
          "dir" : "/var/log/echo",
          "filename" : "master.log",
@@ -226,8 +264,46 @@
        "configWriter" : {
          "generators" : [
            {
+             "kerberosPrincipals" : [
+               {
+                 "principalName" : "ECHO_PRINCIPAL",
+                 "propertyName" : "echo.principal.name"
+               },
+               {
+                 "external" : "true",
+                 "principalName" : "EXT_CONFIG",
+                 "propertyName" : "ext.config.principal",
+                 "instanceWildcard" : "_WILD"
+               }
+             ],
              "filename" : "sample_xml_file.xml",
-             "configFormat" : "hadoop_xml"
+             "configFormat" : "hadoop_xml",
+             "additionalConfigs" : [
+               {
+                 "key" : "ssl.enabled",
+                 "value" : "${ssl_enabled}"
+               },
+               {
+                 "key" : "ssl.server.keystore.path",
+                 "value" : "${ssl_server_keystore_location}"
+               },
+               {
+                 "key" : "ssl.server.keystore.password",
+                 "value" : "${ssl_server_keystore_password}"
+               },
+               {
+                 "key" : "ssl.server.keystore.key.password",
+                 "value" : "${ssl_server_keystore_keypassword}"
+               },
+               {
+                 "key" : "ssl.client.truststore.path",
+                 "value" : "${ssl_client_truststore_location}"
+               },
+               {
+                 "key" : "ssl.server.truststore.password",
+                 "value" : "${ssl_client_truststore_password}"
+               }
+             ]
            }
          ]
        }
@@ -250,7 +326,22 @@
        "logging" : {
          "dir" : "/var/log/echo",
          "filename" : "webserver.log",
-         "loggingType" : "log4j"
+         "configFilename" : "webserver-log4j.properties",
+         "loggingType" : "log4j",
+         "additionalConfigs" : [
+           {
+             "key" : "additional.log.hardcoded.key",
+             "value" : "additional.log.hardcoded.value"
+           },
+           {
+             "key" : "additional.log.template.key",
+             "value" : "{{REPLACE_ME}}"
+           },
+           {
+             "key" : "additional.log.interpolate.host.${host}.svcvar1.${service_var1}.key",
+             "value" : "additional.log.interpolate.host.${host}.rolevar1.${role_var1}.value"
+           }
+         ]
        },
        "parameters" : [
           {
@@ -345,7 +436,8 @@
             "description" : "Role Var10 Description",
             "configName" : "role.var10.config",
             "type" : "path",
-            "pathType" : "localDataDir"
+            "pathType" : "localDataDir",
+            "mode" : "1700"
           },
           {
             "name" : "role_var11",
@@ -407,7 +499,28 @@
            {
              "filename" : "sample_xml_file.xml",
              "configFormat" : "hadoop_xml",
-             "excludedParams" : ["service_var1", "role_var3"]
+             "excludedParams" : ["service_var1", "role_var3"],
+             "kerberosPrincipals" : [
+               {
+                 "principalName" : "ECHO_PRINCIPAL",
+                 "propertyName" : "echo.principal.name",
+                 "peerRoleType" : "ECHO_MASTER_SERVER"
+               }
+             ],
+             "additionalConfigs" : [
+               {
+                 "key" : "additional.config.hardcoded.key",
+                 "value" : "additional.config.hardcoded.value"
+               },
+               {
+                 "key" : "additional.config.template.key",
+                 "value" : "{{REPLACE_ME}}"
+               },
+               {
+                 "key" : "additional.config.interpolate.host.${host}.svcvar1.${service_var1}.key",
+                 "value" : "prefix://${host}:${role_var1}"
+               }
+             ]
            },
            {
              "filename" : "sample_props_file.properties",

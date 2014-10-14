@@ -23,6 +23,8 @@ import com.cloudera.csd.validation.references.annotations.ReferenceType;
 import com.cloudera.csd.validation.references.annotations.Referenced;
 import com.cloudera.validation.constraints.FilePermission;
 
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 /** Interface to specify command to create directory in HDFS. */
@@ -52,6 +54,7 @@ public interface CreateHdfsDirDescriptor {
   String getPath();
 
   /** Permission for this directory. */
+  @NotNull
   @FilePermission
   String getPermissions();
 }

@@ -17,16 +17,21 @@ package com.cloudera.csd.descriptors;
 
 import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
 
+import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
 import com.cloudera.csd.validation.references.annotations.Referenced;
+
+import java.util.List;
+
+import javax.validation.Valid;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Describes the logging context.
  */
-@Referenced(type=ReferenceType.PARAMETER, as="log_dir")
+@Referenced(type=ReferenceType.PARAMETER, as={"log_dir"})
 public interface LoggingDescriptor {
 
   /**
@@ -47,20 +52,34 @@ public interface LoggingDescriptor {
   String getFilename();
 
   /**
+   * Optional. Filename of the logging configuration file. If not specified,
+   * uses a default file name as specified in {@link CsdLoggingType}.
+   *
+   * @return the filename
+   */
+  String getConfigFilename();
+
+  /**
    * Whether the directory should be exposed in CM UI for modification.
    *
    * @return true to be modifiable. Defaults to false.
    */
   boolean isModifiable();
-  
+
   /**
    * Logging type used by the entity using this descriptor.
    */
   CsdLoggingType getLoggingType();
-  
+
   /**
    * Used as the property name of the log directory parameter while emitting
    * it in config files. If not specified, then "log_dir" is used.
    */
   String getConfigName();
+
+  /**
+   * Emitted after parameter configs, before safety valves.
+   */
+  @Valid
+  List<ConfigEntry> getAdditionalConfigs();
 }

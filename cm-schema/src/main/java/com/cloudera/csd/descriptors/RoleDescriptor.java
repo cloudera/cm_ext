@@ -97,4 +97,29 @@ public interface RoleDescriptor {
 
   @Valid
   CgroupDescriptor getCgroup();
+
+  /**
+   * List of kerberos principals used by the role.
+   * If this is specified, a keytab file containing all the principals
+   * will be added to role's configuration whenever the role
+   * is started or when a command is run on the role.
+   */
+  @Valid
+  @UniqueField("name")
+  List<KerberosPrincipalDescriptor> getKerberosPrincipals();
+
+  /** Optional. If configured, then indicates that role is an SSL Server. */
+  @Valid
+  SslServerDescriptor getSslServer();
+
+  /** Optional. If configured, then indicates that role is an SSL Client. */
+  @Valid
+  SslClientDescriptor getSslClient();
+
+  /**
+   * Can be used to indicate which String parameters are unique identifiers for the
+   * role. If specified, Cloudera Manager will initialize the parameters to a unique
+   * value at role creation.
+   */
+  public List<String> getUniqueIdParameters();
 }

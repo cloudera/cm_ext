@@ -30,9 +30,23 @@ public enum CsdLoggingType {
    * <p>
    * It also creates a ConfigFileGenerator for log4j.properties file for the role.
    */
-  LOG4J,
+  LOG4J("log4j.properties"),
   /** CM doesn't do anything automatically for this logging type. */
-  OTHER;
+  OTHER(null);
+
+  private final String defaultLogConfigFilename;
+
+  private CsdLoggingType(String defaultLogConfigFilename) {
+    this.defaultLogConfigFilename = defaultLogConfigFilename;
+  }
+
+  /**
+   * @return the default logging configuration filename for this logging type,
+   *         or null if it is unknown.
+   */
+  public String getDefaultLogConfigFilename() {
+    return defaultLogConfigFilename;
+  }
 
   @JsonValue
   public String toJson() {

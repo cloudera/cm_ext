@@ -13,25 +13,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.parcel.descriptors;
+package com.cloudera.csd.descriptors.generators;
 
-import com.cloudera.validation.constraints.FilePermission;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.GROUP;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.HOST;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.USER;
 
-import javax.validation.constraints.NotNull;
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 
 import org.hibernate.validator.constraints.NotBlank;
 
-/**
- * Descriptor for a single entry in the permissions.json file.
- */
-public interface PermissionDescriptor {
-  @NotBlank
-  String getUser();
+/** Descriptor to specify an entry in a config file */
+public interface ConfigEntry {
 
   @NotBlank
-  String getGroup();
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
+  String getKey();
 
-  @NotNull
-  @FilePermission
-  String getPermissions();
+  @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
+  String getValue();
 }

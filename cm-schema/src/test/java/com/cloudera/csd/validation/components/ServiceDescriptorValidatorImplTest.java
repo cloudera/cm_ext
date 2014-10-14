@@ -20,6 +20,7 @@ import com.cloudera.csd.descriptors.parameters.BoundedParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.Expression;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.Set;
@@ -41,6 +42,18 @@ public class ServiceDescriptorValidatorImplTest {
 
   @Autowired
   private ServiceDescriptorValidatorImpl validator;
+
+  @Test
+  public void testFullSdl() {
+    assertEquals(ImmutableSet.of(),
+        validator.getViolations(SdlTestUtils.getParserSdl("service_full.sdl")));
+  }
+
+  @Test
+  public void testKmsSdl() {
+    assertEquals(ImmutableSet.of(),
+        validator.getViolations(SdlTestUtils.getParserSdl("service_kms.sdl")));
+  }
 
   @Test
   public void testNotNullCheck() {
@@ -171,6 +184,31 @@ public class ServiceDescriptorValidatorImplTest {
     assertEquals("service.roles[0].topology must satisfy " +
             "\"minInstances == null or maxInstances == null or minInstances <= maxInstances\"",
         Iterables.getOnlyElement(errors));
+  }
+
+  @Test
+  public void testInvalidSslServerReference() {
+    Set<String> errors = validate("service_badSslServerRef.sdl");
+    assertEquals(
+        ImmutableSet.of(
+            "service.roles.startRunner.environmentVariables has invalid " +
+            "substitutions [ssl_enabled]. Substitutions available: [host, " +
+            "ssl_client_truststore_password, group, " +
+            "ssl_client_truststore_location, user]"),
+        errors);
+  }
+
+  @Test
+  public void testInvalidSslClientReference() {
+    Set<String> errors = validate("service_badSslClientRef.sdl");
+    assertEquals(
+        ImmutableSet.of(
+            "service.roles.startRunner.environmentVariables has invalid " +
+            "substitutions [ssl_client_truststore_location]. Substitutions " +
+            "available: [ssl_server_keystore_location, host, " +
+            "ssl_server_keystore_keypassword, ssl_server_keystore_password, " +
+            "ssl_enabled, group, user]"),
+        errors);
   }
 
   private void assertConstraint(ConstraintViolation<?> violation, Class<?> constraint) {

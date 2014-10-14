@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.parameters;
 
+import com.cloudera.validation.constraints.FilePermission;
+
 import javax.validation.constraints.NotNull;
 
 public interface PathParameter extends StringParameter {
@@ -36,5 +38,6 @@ public interface PathParameter extends StringParameter {
    * auto-create this directory with the specified mode
    * while starting daemon process.
    */
-  Integer getMode();
+  @FilePermission
+  String getMode();
 }

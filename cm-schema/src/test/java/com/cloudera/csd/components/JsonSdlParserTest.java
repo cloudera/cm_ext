@@ -20,8 +20,10 @@ import static org.junit.Assert.*;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor.VersionRange;
 import com.cloudera.csd.descriptors.ConfigWriter;
+import com.cloudera.csd.descriptors.CsdParameterOptionality;
 import com.cloudera.csd.descriptors.GatewayDescriptor;
 import com.cloudera.csd.descriptors.GracefulStopDescriptor;
+import com.cloudera.csd.descriptors.ProvidesKms;
 import com.cloudera.csd.descriptors.RoleCommandDescriptor;
 import com.cloudera.csd.descriptors.RoleDescriptor;
 import com.cloudera.csd.descriptors.RoleExternalLink;
@@ -32,12 +34,14 @@ import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.ServiceInitDescriptor;
 import com.cloudera.csd.descriptors.TopologyDescriptor;
 import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
+import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
 import com.cloudera.csd.descriptors.generators.PeerConfigGenerator;
 import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.CsdParamUnits;
+import com.cloudera.csd.descriptors.parameters.CsdPathType;
 import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
 import com.cloudera.csd.descriptors.parameters.MemoryParameter;
@@ -53,6 +57,7 @@ import com.cloudera.csd.descriptors.parameters.URIArrayParameter;
 import com.cloudera.csd.descriptors.parameters.URIParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -109,15 +114,32 @@ public class JsonSdlParserTest {
 
     RoleDescriptor master = name2role.get("ECHO_MASTER_SERVER");
     assertNotNull(master);
+    assertEquals("Master Servers", master.getPluralLabel());
+
+    assertNotNull(master.getSslServer());
+    assertEquals("echo_master", master.getSslServer().getKeyIdentifier());
+    assertEquals(CsdParameterOptionality.REQUIRED,
+        master.getSslServer().getKeyPasswordOptionality());
+
+    assertNotNull(master.getSslClient());
+
     assertNotNull(master.getLogging());
     assertEquals("master.log.dir", master.getLogging().getConfigName());
-    assertEquals("Master Servers", master.getPluralLabel());
+
+    ConfigWriter masterConfigWriter = master.getConfigWriter();
+    assertNotNull(masterConfigWriter);
+    assertNotNull(masterConfigWriter.getGenerators());
+    ConfigGenerator masterGenerator = Iterables.getOnlyElement(masterConfigWriter.getGenerators());
+    assertTrue(masterGenerator instanceof HadoopXMLGenerator);
+    assertEquals("sample_xml_file.xml", masterGenerator.getFilename());
+    assertEquals(2, masterGenerator.getKerberosPrincipals().size());
 
     RoleExternalLink externalLink = master.getExternalLink();
     assertNotNull(externalLink);
     assertEquals("master_web_ui", externalLink.getName());
     assertEquals("Master WebUI", externalLink.getLabel());
     assertEquals("http://myhost.com:80", externalLink.getUrl());
+    assertEquals("https://myhost.com:80", externalLink.getSecureUrl());
     List<RoleExternalLink> moreLinks = master.getAdditionalExternalLinks();
     assertNotNull(moreLinks);
     assertEquals(1, moreLinks.size());
@@ -126,12 +148,36 @@ public class JsonSdlParserTest {
     assertNotNull(topology);
     assertEquals(Integer.valueOf(1), topology.getMinInstances());
     assertEquals(Integer.valueOf(1), topology.getMaxInstances());
-    
+
     RoleDescriptor role = name2role.get("ECHO_WEBSERVER");
     assertNotNull(role);
     assertNotNull(role.getLogging());
+    assertEquals("webserver.log",
+        role.getLogging().getFilename());
+    assertEquals("webserver-log4j.properties",
+        role.getLogging().getConfigFilename());
     assertNull(role.getLogging().getConfigName());
+    assertConfigEntries(
+        ImmutableMap.of(
+            "additional.log.hardcoded.key", "additional.log.hardcoded.value",
+            "additional.log.template.key", "{{REPLACE_ME}}",
+            "additional.log.interpolate.host.${host}.svcvar1.${service_var1}.key", "additional.log.interpolate.host.${host}.rolevar1.${role_var1}.value"),
+        role.getLogging().getAdditionalConfigs());
     assertEquals("Web Servers", role.getPluralLabel());
+
+    ConfigWriter roleConfigWriter = role.getConfigWriter();
+    assertNotNull(roleConfigWriter);
+    assertNotNull(roleConfigWriter.getGenerators());
+    ConfigGenerator roleGenerator = Iterables.getFirst(roleConfigWriter.getGenerators(), null);
+    assertTrue(roleGenerator instanceof HadoopXMLGenerator);
+    assertEquals("sample_xml_file.xml", roleGenerator.getFilename());
+    assertEquals(1, roleGenerator.getKerberosPrincipals().size());
+    assertConfigEntries(
+        ImmutableMap.of(
+            "additional.config.hardcoded.key", "additional.config.hardcoded.value",
+            "additional.config.template.key", "{{REPLACE_ME}}",
+            "additional.config.interpolate.host.${host}.svcvar1.${service_var1}.key", "prefix://${host}:${role_var1}"),
+            roleGenerator.getAdditionalConfigs());
 
     assertNotNull(descriptor.getCommands());
     assertEquals(2, descriptor.getCommands().size());
@@ -156,6 +202,15 @@ public class JsonSdlParserTest {
     assertEquals("ECHO_MASTER_SERVER", stopDesc.getMasterRole());
     assertEquals("scripts/graceful_stop.sh", stopDesc.getRunner().getProgram());
     assertEquals(ImmutableList.of("ECHO_WEBSERVER"), stopDesc.getRelevantRoleTypes());
+  }
+
+  private void assertConfigEntries(Map<String, String> expected,
+      List<ConfigEntry> additionalConfigs) {
+    ImmutableMap.Builder<String, String> actual = ImmutableMap.builder();
+    for (ConfigEntry entry : additionalConfigs) {
+      actual.put(entry.getKey(), entry.getValue());
+    }
+    assertEquals(expected, actual.build());
   }
 
   @Test
@@ -191,7 +246,7 @@ public class JsonSdlParserTest {
   @Test
   public void testParametersParsing() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
-    assertEquals(3, descriptor.getParameters().size());
+    assertEquals(4, descriptor.getParameters().size());
     int found = 0;
     for (Parameter<?> p : descriptor.getParameters()) {
       // check that parameters are parsed polymorphically
@@ -215,9 +270,12 @@ public class JsonSdlParserTest {
         assertEquals(4, lp.getMax().longValue());
         assertNull(lp.getUnit());
         found++;
+      } else if (p.getName().equals("service_kerb_var")) {
+        assertTrue(p instanceof BooleanParameter);
+        found++;
       }
     }
-    assertEquals(3, found);
+    assertEquals(4, found);
 
     // Check service dependencies
     assertEquals(2, descriptor.getServiceDependencies().size());
@@ -232,6 +290,9 @@ public class JsonSdlParserTest {
       }
     }
     assertEquals(2, found);
+
+    // Check external principals are parsed correctly
+    assertEquals(2, descriptor.getExternalKerberosPrincipals().size());
 
     found = 0;
 
@@ -311,7 +372,8 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("role_var10")) {
         assertTrue(p instanceof PathParameter);
         PathParameter dp = (PathParameter)p;
-        assertNotNull(dp.getPathType());
+        assertEquals(CsdPathType.LOCAL_DATA_DIR, dp.getPathType());
+        assertEquals(01700, Integer.parseInt(dp.getMode(), 8));
         found++;
       } else if (p.getName().equals("role_var11")) {
         assertTrue(p instanceof PortNumberParameter);
@@ -385,6 +447,32 @@ public class JsonSdlParserTest {
       }
     }
     assertEquals(1, found);
+
+    // check that kerberos principals are parsed correctly
+    assertEquals(2, rds.get("ECHO_MASTER_SERVER").getKerberosPrincipals().size());
+    assertNull(rds.get("ECHO_WEBSERVER").getKerberosPrincipals());
+  }
+
+  @Test
+  public void testKms() throws Exception {
+    ServiceDescriptor serviceDesc = parser.parse(getSdl("service_kms.sdl"));
+    assertNotNull(serviceDesc);
+    assertEquals("KMS", serviceDesc.getName());
+    assertEquals("${kms_auth_type}", serviceDesc.getKerberos());
+
+    ProvidesKms providesKms = serviceDesc.getProvidesKms();
+    assertNotNull(providesKms);
+    assertEquals("KMS", providesKms.getRoleName());
+    assertEquals("http://${host}:${kms_port}", providesKms.getInsecureUrl());
+    assertEquals("${kms_load_balancer}", providesKms.getLoadBalancerUrl());
+    assertEquals("https://${host}:${kms_ssl_port}", providesKms.getSecureUrl());
+
+    assertEquals(1, serviceDesc.getRoles().size());
+    RoleDescriptor roleDesc = serviceDesc.getRoles().get(0);
+    assertNotNull(roleDesc);
+    assertNotNull(roleDesc.getSslServer());
+    assertEquals("kms", roleDesc.getSslServer().getKeyIdentifier());
+    assertNull(roleDesc.getSslServer().getKeyPasswordOptionality());
   }
 
   private byte[] getSdl(String name) throws IOException {

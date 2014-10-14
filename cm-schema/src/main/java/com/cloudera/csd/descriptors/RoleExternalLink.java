@@ -53,4 +53,14 @@ public interface RoleExternalLink {
   @NotBlank
   @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   String getUrl();
+
+  /**
+   * Optional. The URL to the external site when SSL is enabled. SSL is
+   * considered enabled when this role has registered
+   * {@link RoleDescriptor#getSslServer()} and the cluster administrator has
+   * configured SSL to be enabled. If secureUrl is not provided, then will
+   * always use the regular url.
+   */
+  @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
+  String getSecureUrl();
 }

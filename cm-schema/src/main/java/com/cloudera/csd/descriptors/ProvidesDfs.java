@@ -13,35 +13,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.validation.references.annotations;
+package com.cloudera.csd.descriptors;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * Indicates the descriptor can be referenced
- * in another property. Unless otherwise specified,
- * the name of the reference is provided by the
- * {@link com.cloudera.csd.validation.references.annotations.Named}
- * annotation.
+ * Indicates that the service can provide distributed file system capabilities,
+ * and can act as replacements of HDFS.
  */
-@Inherited
-@Target({ TYPE })
-@Retention(RUNTIME)
-public @interface Referenced {
+public interface ProvidesDfs {
 
   /**
-   * The reference type.
+   * The complete file system URI including the scheme and authority.
+   *
+   * @return the URI
    */
-  ReferenceType type();
+  @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS})
+  public String getFileSystemUri();
 
   /**
-   * If the bean is not Named, this specifies
-   * a hardcoded name or list of names.
+   * The URL for the WebHDFS interface to the file system.
+   *
+   * @return the URL
    */
-  String[] as() default {};
+  @AvailableSubstitutions(type={PARAMETERS})
+  public String getWebInterface();
 }

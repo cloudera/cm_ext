@@ -1,0 +1,26 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+   },
+  "roles" : [
+    {
+       "name" : "ECHO_SERVER",
+       "label" : "Web Server",
+       "pluralLabel" : "Web Servers",
+       "sslServer" : {
+         "keyIdentifier" : "echo"
+       },
+       "startRunner" : {
+         "program" : "scripts/control.sh",
+         "environmentVariables" : {
+           "SSL_TRUSTSTORE_LOCATION" : "${ssl_client_truststore_location}"
+         }
+       }
+    }
+  ]
+}

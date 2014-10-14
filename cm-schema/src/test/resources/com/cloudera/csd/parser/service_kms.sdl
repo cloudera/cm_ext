@@ -1,0 +1,151 @@
+{
+  "name" : "KMS",
+  "label" : "Key Management Server",
+  "description" : "The KMS service",
+  "version" : "5.2.0",
+  "runAs" : {
+    "user" : "kms",
+    "group" : "kms"
+   },
+   "compatibility" : {
+     "generation" : 1
+   },
+  "icon" : "images/icon.png",
+  "kerberos" : "${kms_auth_type}",
+  "providesKms" : {
+    "roleName" : "KMS",
+    "insecureUrl" : "http://${host}:${kms_port}",
+    "loadBalancerUrl" : "${kms_load_balancer}",
+    "secureUrl" : "https://${host}:${kms_ssl_port}"
+  },
+  "parameters" : [
+    {
+      "name" : "kms_load_balancer",
+      "label" : "KMS Load Balancer",
+      "description" : "Key Management Store Load Balancer",
+      "type" : "uri"
+    },
+    {
+      "name" : "kms_auth_type",
+      "label" : "KMS Authorization Type",
+      "description" : "Whether requests to KMS should use Kerberos Authentication.",
+      "required" : "true",
+      "type" : "string_enum",
+      "validValues" : ["Simple", "Kerberos"],
+      "default" : "Simple"
+    }
+  ],
+  "roles" : [
+    {
+       "name" : "KMS",
+       "label" : "Key Management Server",
+       "pluralLabel" : "Key Management Servers",
+       "startRunner" : {
+         "program" : "scripts/control.sh",
+         "args" : [
+            "start",
+            "./params.properties",
+            "./workers.properties"
+         ],
+         "environmentVariables" : {
+           "SSL_ENABLED" : "${ssl_enabled}"
+         }
+       },
+       "kerberosPrincipals" : [
+         {
+           "name" : "kms_principal",
+           "primary" : "HTTP",
+           "instance" : "${host}"
+         }
+       ],
+       "sslServer" : {
+         "keyIdentifier" : "kms"
+       },
+       "logging" : {
+         "dir" : "/var/log/echo",
+         "filename" : "echo-webserver-${host}.log",
+         "configName" : "log.dir",
+         "loggingType" : "other"
+       },
+      "parameters" : [
+        {
+          "name" : "kms_port",
+          "label" : "KMS Port",
+          "description" : "Port of the Key Management Server.",
+          "required" : "true",
+          "type" : "port",
+          "default" : 42
+        },
+        {
+          "name" : "ssl_keystore_file",
+          "label" : "KMS SSL KeyStore Location",
+          "description" : "Location of the KeyStore file on the local file system.",
+          "type" : "path",
+          "pathType" : "serviceSpecific"
+        },
+        {
+          "name" : "ssl_keystore_password",
+          "label" : "KMS SSL KeyStore Password",
+          "description" : "Password for the KeyStore.",
+          "type" : "password"
+        },
+        {
+          "name" : "kms_ssl_port",
+          "label" : "Port of the Key Management Server while using SSL",
+          "description" : "KMS HTTPS Port",
+          "required" : "true",
+          "type" : "port",
+          "default" : 74
+        }
+      ],
+      "configWriter" : {
+         "generators" : [
+           {
+             "filename" : "kms-site.xml",
+             "configFormat" : "hadoop_xml",
+             "kerberosPrincipals" : [
+               {
+                 "principalName" : "kms_principal",
+                 "propertyName" : "kms.principal"
+               }
+             ],
+             "additionalConfigs" : [
+               {
+                 "key" : "kms.keystore.path",
+                 "value" : "${ssl_server_keystore_location}"
+               },
+               {
+                 "key" : "kms.keystore.password",
+                 "value" : "${ssl_server_keystore_password}"
+               }
+             ]
+           },
+           {
+             "filename" : "core-site.xml",
+             "configFormat" : "hadoop_xml",
+             "additionalConfigs" : [
+               {
+                 "key" : "kms.ssl.enabled",
+                 "value" : "${ssl_enabled}"
+               },
+               {
+                 "key" : "kms.ssl-server.location",
+                 "value" : "{{CONF_DIR}}/ssl-server.xml"
+               }
+             ]
+           },
+           {
+             "filename" : "ssl-server.xml",
+             "configFormat" : "hadoop_xml",
+             "additionalConfigs" : [
+               {
+                 "key" : "foo", // TODO
+                 "value" : "{{CONF_DIR}}/ssl-server.xml"
+               }
+             ]
+           }
+         ]
+       }
+    }
+  ]
+}

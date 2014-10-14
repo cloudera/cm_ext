@@ -5,7 +5,7 @@
   <groupId>com.cloudera.cmf.schema</groupId>
   <artifactId>cloudera-manager-schema</artifactId>
   <name>Cloudera Service Schemas</name>
-  <version>5.1.0</version>
+  <version>5.2.0</version>
 
   <properties>
     <org.springframework.version>3.0.6.RELEASE</org.springframework.version>
@@ -22,6 +22,37 @@
     <cglib.version>2.2</cglib.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>jdk8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+      <properties>
+        <javadocOptions>-Xdoclint:none</javadocOptions>
+        <findbugsVersion>3.0.0</findbugsVersion>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk7</id>
+      <activation>
+        <jdk>1.7</jdk>
+      </activation>
+      <properties>
+        <findbugsVersion>3.0.0</findbugsVersion>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdk6</id>
+      <activation>
+        <jdk>1.6</jdk>
+      </activation>
+      <properties>
+        <findbugsVersion>2.5.2</findbugsVersion>
+      </properties>
+    </profile>
+  </profiles>
 
   <distributionManagement>
     <repository>
@@ -91,6 +122,7 @@
           </execution>
         </executions>
         <configuration>
+          <additionalparam>${javadocOptions}</additionalparam>
           <docfilessubdirs>true</docfilessubdirs>
           <outputDirectory>${project.build.directory}/javadoc</outputDirectory>
           <stylesheetfile>${basedir}/src/javadoc/javadoc.css</stylesheetfile>
@@ -115,7 +147,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>2.5.2</version>
+        <version>${findbugsVersion}</version>
         <configuration>
           <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
         </configuration>

@@ -19,7 +19,10 @@ import com.cloudera.csd.validation.references.annotations.Named;
 import com.cloudera.csd.validation.references.annotations.Referencing;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
 
+import java.util.List;
 import java.util.Set;
+
+import javax.validation.Valid;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -35,7 +38,17 @@ public interface ConfigGenerator {
 
   @Referencing(type=ReferenceType.PARAMETER)
   Set<String> getExcludedParams();
-  
+
+  /** Kerberos principals to emit into config file. */
+  @Valid
+  List<KerberosPrincipalConfigEntry> getKerberosPrincipals();
+
+  /**
+   * Emitted after parameter configs, before safety valves.
+   */
+  @Valid
+  List<ConfigEntry> getAdditionalConfigs();
+
   // These subclasses don't have any fields yet,
   // but we want to be consistent with how Parameters are defined.
   public interface HadoopXMLGenerator extends ConfigGenerator {

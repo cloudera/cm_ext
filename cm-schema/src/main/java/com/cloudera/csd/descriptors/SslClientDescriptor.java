@@ -13,35 +13,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.validation.references.annotations;
+package com.cloudera.csd.descriptors;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
-
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
 
 /**
- * Indicates the descriptor can be referenced
- * in another property. Unless otherwise specified,
- * the name of the reference is provided by the
- * {@link com.cloudera.csd.validation.references.annotations.Named}
- * annotation.
+ * Indicates that this is an SSL client. Currently only supports the JKS format
+ * for the trust store. When specified, the role will automatically get the
+ * following parameters: ssl_client_truststore_location,
+ * ssl_client_truststore_password
  */
-@Inherited
-@Target({ TYPE })
-@Retention(RUNTIME)
-public @interface Referenced {
-
-  /**
-   * The reference type.
-   */
-  ReferenceType type();
-
-  /**
-   * If the bean is not Named, this specifies
-   * a hardcoded name or list of names.
-   */
-  String[] as() default {};
+@Referenced(type = ReferenceType.PARAMETER, as = {
+    "ssl_client_truststore_location", "ssl_client_truststore_password" })
+public interface SslClientDescriptor {
 }
