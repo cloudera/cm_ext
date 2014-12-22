@@ -192,9 +192,10 @@ public class ServiceDescriptorValidatorImplTest {
     assertEquals(
         ImmutableSet.of(
             "service.roles.startRunner.environmentVariables has invalid " +
-            "substitutions [ssl_enabled]. Substitutions available: [host, " +
-            "ssl_client_truststore_password, group, " +
-            "ssl_client_truststore_location, user]"),
+            "substitutions [ssl_enabled]. Substitutions available: [" +
+            "ssl_client_truststore_location, " +
+            "ssl_client_truststore_password, " +
+            "host, group, user]"),
         errors);
   }
 
@@ -205,9 +206,9 @@ public class ServiceDescriptorValidatorImplTest {
         ImmutableSet.of(
             "service.roles.startRunner.environmentVariables has invalid " +
             "substitutions [ssl_client_truststore_location]. Substitutions " +
-            "available: [ssl_server_keystore_location, host, " +
-            "ssl_server_keystore_keypassword, ssl_server_keystore_password, " +
-            "ssl_enabled, group, user]"),
+            "available: [ssl_enabled, ssl_server_keystore_location, " +
+            "ssl_server_keystore_password, ssl_server_keystore_keypassword, " +
+            "host, group, user]"),
         errors);
   }
 

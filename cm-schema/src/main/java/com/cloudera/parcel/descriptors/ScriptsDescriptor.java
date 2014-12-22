@@ -15,12 +15,14 @@
 // limitations under the License.
 package com.cloudera.parcel.descriptors;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * Descriptor for the 'scripts' section of parcel.json
  *
- * The scripts section can either be empty, or contain excatly one entry,
- * the 'defines' script.
+ * The scripts section must contain exactly one entry: the 'defines' script.
  */
 public interface ScriptsDescriptor {
+  @NotBlank
   String getDefines();
 }

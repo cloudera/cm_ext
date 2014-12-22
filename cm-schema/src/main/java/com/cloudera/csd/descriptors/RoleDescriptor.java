@@ -60,6 +60,11 @@ public interface RoleDescriptor {
   RoleExternalLink getExternalLink();
 
   /**
+   * Check if this role is Java based.
+   */
+  boolean isJvmBased();
+
+  /**
    * Any additional external links that are
    * relevant to the role.
    */

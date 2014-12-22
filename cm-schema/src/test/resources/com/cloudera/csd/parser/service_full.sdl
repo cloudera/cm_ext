@@ -191,6 +191,7 @@
       "name" : "ECHO_MASTER_SERVER",
       "label" : "Master Server",
       "pluralLabel" : "Master Servers",
+      "JvmBased" : true,
       "startRunner" : {
          "program" : "scripts/control.sh",
          "args" : [
@@ -261,6 +262,21 @@
          "filename" : "master.log",
          "configName" : "master.log.dir"
        },
+      "commands" : [
+         {
+           "name" : "role_cmd2",
+           "label" : "Role Cmd2 Label",
+           "description" : "Role Cmd1 Help",
+           "expectedExitCodes" : [0, 1, 2],
+           "commandRunner" : {
+             "program" : "scripts/control.sh",
+             "args" : ["cmd2"],
+             "environmentVariables" : {
+               "ENV_VAR" : "test value"
+             }
+           }
+         }
+       ],
        "configWriter" : {
          "generators" : [
            {

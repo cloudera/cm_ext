@@ -21,6 +21,7 @@ import com.cloudera.csd.descriptors.CompatibilityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor.VersionRange;
 import com.cloudera.csd.descriptors.ConfigWriter;
 import com.cloudera.csd.descriptors.CsdParameterOptionality;
+import com.cloudera.csd.descriptors.CsdRoleState;
 import com.cloudera.csd.descriptors.GatewayDescriptor;
 import com.cloudera.csd.descriptors.GracefulStopDescriptor;
 import com.cloudera.csd.descriptors.ProvidesKms;
@@ -105,11 +106,16 @@ public class JsonSdlParserTest {
     assertFalse(Iterables.getOnlyElement(initRunner.getPreStartSteps()).isFailureAllowed());
     assertEquals(1, initRunner.getPostStartSteps().size());
     assertTrue(Iterables.getOnlyElement(initRunner.getPostStartSteps()).isFailureAllowed());
-    
+
     assertEquals(2, descriptor.getRoles().size());
     Map<String, RoleDescriptor> name2role = Maps.newHashMap();
     for (RoleDescriptor desc : descriptor.getRoles()) {
       name2role.put(desc.getName(), desc);
+      if (desc.getName() == "ECHO_MASTER_SERVER") {
+        assertTrue(desc.isJvmBased());
+      } else {
+        assertFalse(desc.isJvmBased());
+      }
     }
 
     RoleDescriptor master = name2role.get("ECHO_MASTER_SERVER");
@@ -451,6 +457,26 @@ public class JsonSdlParserTest {
     // check that kerberos principals are parsed correctly
     assertEquals(2, rds.get("ECHO_MASTER_SERVER").getKerberosPrincipals().size());
     assertNull(rds.get("ECHO_WEBSERVER").getKerberosPrincipals());
+
+    // check the requiredRoleState is parsed correctly
+    if (descriptor.getRoles() != null) {
+      for (RoleDescriptor role : descriptor.getRoles()) {
+        if ("ECHO_WEBSERVER".equals(role.getName())) {
+          for (RoleCommandDescriptor roleCmd : role.getCommands()) {
+            if (roleCmd.getName().equals("role_cmd1")) {
+              assertEquals(CsdRoleState.RUNNING,
+                  roleCmd.getRequiredRoleState());
+            }
+          }
+        } else if ("ECHO_MASTER_SERVER".equals(role.getName())) {
+          for (RoleCommandDescriptor roleCmd : role.getCommands()) {
+            if (roleCmd.getName().equals("role_cmd2")) {
+              assertEquals(null, roleCmd.getRequiredRoleState());
+            }
+          }
+        }
+      }
+    }
   }
 
   @Test

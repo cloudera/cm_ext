@@ -54,6 +54,5 @@ public interface RoleCommandDescriptor {
    *
    * @return the required role state
    */
-  @NotNull
   CsdRoleState getRequiredRoleState();
 }

@@ -85,6 +85,13 @@ public class ParcelDescriptorValidatorImplTest {
     assertEquals("parcel.schema_version must be between 1 and 1", Iterables.getOnlyElement(violations));
   }
 
+  @Test
+  public void testMissingDefines() {
+    Set<String> violations = validate("missing_defines.json");
+    assertEquals(1, violations.size());
+    assertEquals("parcel.scripts.defines must be present and not blank", Iterables.getOnlyElement(violations));
+  }
+
   private void assertConstraint(ConstraintViolation<?> violation, Class<?> constraint) {
     ConstraintDescriptor<?> descriptor = violation.getConstraintDescriptor();
     assertEquals(constraint, descriptor.getAnnotation().annotationType());

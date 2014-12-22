@@ -83,7 +83,7 @@ public class SubstitutionConstraint<T> extends AbstractReferenceConstraint<T> {
     for (String template : templates) {
       Set<String> variables = interpolator.getVariables(template);
 
-      Set<String> candidates = Sets.newHashSet();
+      Set<String> candidates = Sets.newLinkedHashSet();
       for (SubstitutionType type : types) {
         if (type == SubstitutionType.PARAMETERS) {
           candidates.addAll(allowedRefs.get(ReferenceType.PARAMETER));

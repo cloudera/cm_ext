@@ -6,6 +6,7 @@
   "setActiveSymlink": true,
 
   "scripts": {
+    "defines": "defines.sh"
   },
 
   "packages": [
