@@ -11,6 +11,7 @@
   <modules>
     <module>cm-schema</module>
     <module>validator</module>
+    <module>validator-maven-plugin</module>
   </modules>
 
 </project>
