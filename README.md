@@ -36,5 +36,37 @@ Running make_manifest
 $ python make_manifest/make_manifest.py <path to directory>
 ```
 
+Using the validator in pom.xml
+------------------------------
+
+```bash
+$ mvn install
+```
+
+```xml
+  <!-- ... -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.cloudera.enterprise</groupId>
+        <artifactId>schema-validator-maven-plugin</artifactId>
+        <version>5.3.0</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>src</sourceDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <!-- ... -->
+```
+
 All source in this repository is [Apache-Licensed](LICENSE.txt).
 
