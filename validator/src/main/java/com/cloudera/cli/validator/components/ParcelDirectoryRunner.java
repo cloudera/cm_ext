@@ -15,13 +15,13 @@
 // limitations under the License.
 package com.cloudera.cli.validator.components;
 
-import com.cloudera.cli.validator.ValidationRunner;
 import com.cloudera.common.Parser;
 import com.cloudera.parcel.descriptors.AlternativeDescriptor;
 import com.cloudera.parcel.descriptors.AlternativesDescriptor;
 import com.cloudera.parcel.descriptors.ParcelDescriptor;
 import com.cloudera.parcel.descriptors.PermissionDescriptor;
 import com.cloudera.parcel.descriptors.PermissionsDescriptor;
+import com.cloudera.validation.ValidationRunner;
 
 import java.io.File;
 import java.io.FileInputStream;

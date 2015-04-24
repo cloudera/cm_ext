@@ -16,6 +16,9 @@
 package com.cloudera.cli.validator;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +32,7 @@ public class MainTest {
 
   private String goodSdl = "src/test/resources/service_good.sdl";
   private String badSdl = "src/test/resources/service_bad.sdl";
+  private String dependencySdl = "src/test/resources/service_dependency.sdl";
   private String goodParcel = "src/test/resources/good_parcel.json";
   private String badParcel = "src/test/resources/bad_parcel.json";
   private String badParseParcel = "src/test/resources/bad_parse_parcel.json";
@@ -68,6 +72,48 @@ public class MainTest {
     app.run(args);
     assertEquals("", err.toString());
     assertTrue(out.toString().contains("==>"));
+  }
+
+  @Test
+  public void testBadSdlWithSystemPropertyOption() throws IOException {
+    ByteArrayOutputStream expectedOut =  new ByteArrayOutputStream();
+    expectedOut.write("Validating: src/test/resources/service_dependency.sdl\n".getBytes());
+    expectedOut.write("==> FOO must be a valid service type\n".getBytes());
+    expectedOut.write("==> SPARK must be a valid service type\n".getBytes());
+    String[] args = {"-s", dependencySdl};
+    app.run(args);
+    assertEquals("", err.toString());
+    assertEquals(expectedOut.toString(), out.toString());
+  }
+
+  @Test
+  public void testBadSdlWithExtraServiceTypeFile() throws IOException {
+    FileWriter fileOutput = null;
+    File tempFile = null;
+    try {
+      tempFile = File.createTempFile("dependencySdl",".txt");
+      fileOutput = new FileWriter(tempFile);
+      fileOutput.write("SPARK" + "\n");
+      fileOutput.write("FOO" + "\n");
+      fileOutput.close();
+      String[] args = {
+          "-s", dependencySdl,
+          "-c", tempFile.getAbsolutePath()};
+      app.run(args);
+      assertEquals("", err.toString());
+      assertTrue(out.toString().contains("Validation succeeded"));
+    } finally {
+      fileOutput.close();
+      tempFile.deleteOnExit();
+    }
+  }
+
+  @Test
+  public void testBadSdlWithExtraServiceTypeList() throws IOException {
+    String[] args = {"-s", dependencySdl, "-l", "SPARK FOO"};
+    app.run(args);
+    assertEquals("", err.toString());
+    assertTrue(out.toString().contains("Validation succeeded"));
   }
 
   @Test

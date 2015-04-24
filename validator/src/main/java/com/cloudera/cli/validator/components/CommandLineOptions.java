@@ -39,6 +39,8 @@ import org.apache.commons.cli.ParseException;
  */
 public class CommandLineOptions {
 
+  public static final String BEAN_NAME = "commandLineOptionsBean";
+
   private final CommandLine cmdLine;
   private final String appName;
 
@@ -91,6 +93,21 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("f");
 
+  public static final Option EXTRA_SERVICE_TYPE_FILE = OptionBuilder.withLongOpt("service-type-file")
+      .withArgName("FILE")
+      .hasArg()
+      .withDescription("The file defines additional valid service types")
+      .isRequired(false)
+      .create("c");
+
+  public static final Option EXTRA_SERVICE_TYPES = OptionBuilder.withLongOpt("service-type-list")
+      .withArgName("STRING")
+      .hasArg()
+      .withDescription("The list containing additional valid service types separated " +
+          "by space. For example, \"FOO BAR\"")
+      .isRequired(false)
+      .create("l");
+
   public static enum Mode {
     SDL_FILE(SDL_FILE_OPTION, "sdlRunner"),
     PARCEL_JSON(PARCEL_JSON_OPTION, "parcelRunner"),
@@ -101,12 +118,13 @@ public class CommandLineOptions {
     PARCEL_FILE(PARCEL_FILE_OPTION, "parcelFileRunner");
 
     private static final Map<Option, Mode> optionMap;
+
     static {
-      ImmutableMap.Builder<Option, Mode> builder = ImmutableMap.builder();
+      ImmutableMap.Builder<Option, Mode> optionBuilder = ImmutableMap.builder();
       for (Mode e : Mode.values()) {
-        builder.put(e.option, e);
+        optionBuilder.put(e.option, e);
       }
-      optionMap = builder.build();
+      optionMap = optionBuilder.build();
     }
 
     private final Option option;
@@ -117,6 +135,8 @@ public class CommandLineOptions {
     }
 
     Mode(Option option, String runnerName) {
+      Preconditions.checkNotNull(option);
+      Preconditions.checkNotNull(runnerName);
       this.option = option;
       this.runnerName = runnerName;
     }
@@ -129,10 +149,11 @@ public class CommandLineOptions {
   private static final Options OPTIONS = new Options();
   static {
     for (Mode e : Mode.values()) {
-      if (e.option != null) {
-        OPTIONS.addOption(e.option);
-      }
+      OPTIONS.addOption(e.option);
     }
+
+    OPTIONS.addOption(EXTRA_SERVICE_TYPES);
+    OPTIONS.addOption(EXTRA_SERVICE_TYPE_FILE);
   }
 
   /**
@@ -160,8 +181,13 @@ public class CommandLineOptions {
     return null;
   }
 
-  public String getActiveTarget() {
+  public String getCommandLineOptionActiveTarget() {
     return cmdLine.getOptionValue(getMode().getOpt());
+  }
+
+  public String getOptionValue(Option option) {
+    Preconditions.checkNotNull(option);
+    return cmdLine.getOptionValue(option.getOpt());
   }
 
   /**

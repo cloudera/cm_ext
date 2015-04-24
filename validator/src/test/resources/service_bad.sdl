@@ -1,5 +1,5 @@
 {
-  "name" : "serviceName",
+  "name" : "SERVICENAME",
   "description" : "The echo service",
   "version" : 1,
   "runAs" : {

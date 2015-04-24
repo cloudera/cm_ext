@@ -6,5 +6,9 @@
   "runAs" : {
     "user" : "echoservice",
     "group" : "echoservice"
-   }
+   },
+  "serviceDependencies" : [
+    {"name" : "FOO", "required" : "true"},
+    {"name" : "SPARK", "required" : "true"}
+  ]
 }

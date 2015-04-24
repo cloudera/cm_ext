@@ -15,13 +15,14 @@
 // limitations under the License.
 package com.cloudera.cli.validator.components;
 
-import com.cloudera.cli.validator.ValidationRunner;
 import com.cloudera.common.Parser;
 import com.cloudera.parcel.descriptors.AlternativeDescriptor;
 import com.cloudera.parcel.descriptors.AlternativesDescriptor;
 import com.cloudera.parcel.descriptors.ParcelDescriptor;
 import com.cloudera.parcel.descriptors.PermissionDescriptor;
 import com.cloudera.parcel.descriptors.PermissionsDescriptor;
+import com.cloudera.validation.DescriptorRunner;
+import com.cloudera.validation.ValidationRunner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

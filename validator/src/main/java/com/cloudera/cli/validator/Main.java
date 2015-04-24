@@ -17,6 +17,7 @@ package com.cloudera.cli.validator;
 
 import com.cloudera.cli.validator.components.CommandLineOptions;
 import com.cloudera.cli.validator.components.Constants;
+import com.cloudera.validation.ValidationRunner;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.BeanInstantiationException;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -59,22 +63,48 @@ public class Main {
    */
   public int run(String[] args) throws IOException {
     Writer writer = new OutputStreamWriter(outStream, Constants.CHARSET_UTF_8);
+    AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
     try {
-      CommandLineOptions cmdOptions = new CommandLineOptions(appName, args);
+      BeanDefinition cmdOptsbeanDefinition = BeanDefinitionBuilder
+          .rootBeanDefinition(CommandLineOptions.class)
+          .addConstructorArgValue(appName)
+          .addConstructorArgValue(args)
+          .getBeanDefinition();
+      ctx.registerBeanDefinition(CommandLineOptions.BEAN_NAME, cmdOptsbeanDefinition);
+      ctx.register(ApplicationConfiguration.class);
+      ctx.refresh();
+      CommandLineOptions cmdOptions = ctx.getBean(CommandLineOptions.BEAN_NAME, CommandLineOptions.class);
       CommandLineOptions.Mode mode = cmdOptions.getMode();
       if (mode == null) {
         throw new ParseException("No valid command line arguments");
       }
-      ApplicationContext ctx = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
       ValidationRunner runner = ctx.getBean(mode.runnerName, ValidationRunner.class);
-      boolean success = runner.run(cmdOptions.getActiveTarget(), writer);
+      boolean success = runner.run(cmdOptions.getCommandLineOptionActiveTarget(), writer);
+      if (success) {
+        writer.write("Validation succeeded.\n");
+      }
       return success ? 0 : -1;
+    } catch (BeanCreationException e) {
+      String cause = e.getMessage();
+      if (e.getCause() instanceof BeanInstantiationException) {
+        BeanInstantiationException bie = (BeanInstantiationException) e.getCause();
+        cause = bie.getMessage();
+        if (bie.getCause() != null) {
+          cause = bie.getCause().getMessage();
+        }
+      }
+      IOUtils.write(cause + "\n", errStream);
+      CommandLineOptions.printUsageMessage(appName, errStream);
+      return -2;
     } catch (ParseException e) {
       LOG.debug("Exception", e);
       IOUtils.write(e.getMessage() + "\n", errStream);
       CommandLineOptions.printUsageMessage(appName, errStream);
       return -2;
     } finally {
+      if (ctx != null) {
+        ctx.close();
+      }
       writer.close();
     }
   }
