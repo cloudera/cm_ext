@@ -15,9 +15,11 @@
 // limitations under the License.
 package com.cloudera.csd.validation;
 
+import com.cloudera.csd.components.JsonMdlParser;
 import com.cloudera.csd.components.JsonSdlParser;
 import com.cloudera.csd.descriptors.RoleDescriptor;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.validation.DescriptorValidator;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -32,9 +34,13 @@ import org.apache.commons.io.IOUtils;
 
 public class SdlTestUtils {
 
-  public static final JsonSdlParser PARSER;
+  public static final JsonSdlParser SDL_PARSER;
+  public static final JsonMdlParser MDL_PARSER;
   public static final ServiceDescriptor FULL_DESCRIPTOR;
-  public static final DescriptorValidator<ServiceDescriptor> FAKE_VALIDATOR;
+  public static final DescriptorValidator<ServiceDescriptor>
+    FAKE_SDL_VALIDATOR;
+  public static final DescriptorValidator<ServiceMonitoringDefinitionsDescriptor>
+    FAKE_MDL_VALIDATOR;
 
   private static final String RESOURCE_PATH = "/com/cloudera/csd/";
   public static final String SDL_VALIDATOR_RESOURCE_PATH = RESOURCE_PATH + "validator/";
@@ -43,15 +49,26 @@ public class SdlTestUtils {
 
   // Initialize our variables
   static {
-    PARSER = new JsonSdlParser();
+    SDL_PARSER = new JsonSdlParser();
+    MDL_PARSER = new JsonMdlParser();
     FULL_DESCRIPTOR = getParserSdl("service_full.sdl");
-    FAKE_VALIDATOR = getAlwaysPassingValidator();
+    FAKE_SDL_VALIDATOR = getAlwaysPassingSdlValidator();
+    FAKE_MDL_VALIDATOR = getAlwaysPassingMdlValidator();
   }
 
   public static ServiceDescriptor parseSDL(String path) {
     try {
       InputStream stream = SdlTestUtils.class.getResourceAsStream(path);
-      return PARSER.parse(IOUtils.toByteArray(stream));
+      return SDL_PARSER.parse(IOUtils.toByteArray(stream));
+    } catch (IOException io) {
+      throw new RuntimeException(io);
+    }
+  }
+
+  public static ServiceMonitoringDefinitionsDescriptor parseMDL(String path) {
+    try {
+      InputStream stream = SdlTestUtils.class.getResourceAsStream(path);
+      return MDL_PARSER.parse(IOUtils.toByteArray(stream));
     } catch (IOException io) {
       throw new RuntimeException(io);
     }
@@ -65,13 +82,29 @@ public class SdlTestUtils {
     return parseSDL(SDL_VALIDATOR_RESOURCE_PATH + filename);
   }
 
+  public static ServiceMonitoringDefinitionsDescriptor getValidatorMdl(
+      String filename) {
+    return parseMDL(SDL_VALIDATOR_RESOURCE_PATH + filename);
+  }
+
   public static ServiceDescriptor getReferenceValidatorSdl(String filename) {
     return parseSDL(SDL_REFERENCE_VALIDATOR_RESOURCE_PATH + filename);
   }
 
-  public static DescriptorValidator<ServiceDescriptor> getAlwaysPassingValidator() {
+  public static DescriptorValidator<ServiceDescriptor>
+      getAlwaysPassingSdlValidator() {
     return new DescriptorValidator<ServiceDescriptor>() {
       public Set<String> validate(ServiceDescriptor serviceDescriptor) {
+        return Sets.newHashSet();
+      }
+    };
+  }
+
+  public static DescriptorValidator<ServiceMonitoringDefinitionsDescriptor>
+      getAlwaysPassingMdlValidator() {
+    return new DescriptorValidator<ServiceMonitoringDefinitionsDescriptor>() {
+      public Set<String> validate(
+          ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
         return Sets.newHashSet();
       }
     };

@@ -47,13 +47,15 @@ public class ParcelDescriptorValidatorImplTest {
 
   @Test
   public void testMinimal() {
-    Set<ConstraintViolation<ParcelDescriptor>> violations = validator.getViolations(ParcelTestUtils.getParserJson("minimal_parcel.json"));
+    Set<ConstraintViolation<ParcelDescriptor>> violations =
+        validator.getViolations(ParcelTestUtils.getParserJson("minimal_parcel.json"));
     assertTrue(violations.isEmpty());
   }
 
   @Test
   public void testEmpty() {
-    Set<ConstraintViolation<ParcelDescriptor>> violations = validator.getViolations(ParcelTestUtils.getParserJson("empty.json"));
+    Set<ConstraintViolation<ParcelDescriptor>> violations =
+        validator.getViolations(ParcelTestUtils.getParserJson("empty.json"));
     assertEquals(9, violations.size());
   }
 

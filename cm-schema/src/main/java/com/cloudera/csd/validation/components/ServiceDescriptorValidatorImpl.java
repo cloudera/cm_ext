@@ -16,10 +16,13 @@
 package com.cloudera.csd.validation.components;
 
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.validation.constraints.ServiceDependencyValidationGroup;
 import com.cloudera.csd.validation.references.ReferenceValidator;
 import com.cloudera.validation.DescriptorValidator;
 import com.cloudera.validation.DescriptorValidatorImpl;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -30,24 +33,66 @@ import javax.validation.Validator;
  * A class that implements the DescriptorValidator interface
  * for ServiceDescriptor objects.
  */
-public class ServiceDescriptorValidatorImpl extends DescriptorValidatorImpl<ServiceDescriptor>
-                                            implements DescriptorValidator<ServiceDescriptor> {
+public class ServiceDescriptorValidatorImpl extends
+    DescriptorValidatorImpl<ServiceDescriptor> implements
+    DescriptorValidator<ServiceDescriptor> {
 
   private final Validator validator;
   private final ReferenceValidator refValidator;
+  private final boolean enforceDependencyCheck;
+  private Set<String> dependencyViolationStringSet;
 
-  public ServiceDescriptorValidatorImpl(Validator validator, ReferenceValidator refValidator) {
+  public ServiceDescriptorValidatorImpl(
+      Validator validator,
+      ReferenceValidator refValidator,
+      boolean enforceDependencyCheck) {
     super(validator, "service");
     this.validator = validator;
     this.refValidator = refValidator;
+    this.enforceDependencyCheck = enforceDependencyCheck;
+    this.dependencyViolationStringSet = Sets.newHashSet();
   }
 
   @VisibleForTesting
-  public Set<ConstraintViolation<ServiceDescriptor>> getViolations(ServiceDescriptor descriptor) {
-    Set<ConstraintViolation<ServiceDescriptor>> violations = validator.validate(descriptor);
-    if (violations.isEmpty()) {
-      violations = refValidator.validate(descriptor);
+  public Set<ConstraintViolation<ServiceDescriptor>> getViolations(
+      ServiceDescriptor descriptor) {
+    Set<ConstraintViolation<ServiceDescriptor>> violations =
+        validator.validate(descriptor);
+    if (enforceDependencyCheck) {
+      Set<ConstraintViolation<ServiceDescriptor>> dependencyViolations =
+          validator.validate(
+              descriptor,
+              ServiceDependencyValidationGroup.class);
+      for (ConstraintViolation<ServiceDescriptor> violation : dependencyViolations) {
+        String message = violation.getMessage();
+        String[] propertyPathSections =
+            violation.getPropertyPath().toString().split("\\.");
+        dependencyViolationStringSet.add(
+            String.format("%s %s",
+                propertyPathSections[propertyPathSections.length - 1],
+                message));
+      }
     }
-    return violations;
+
+    if (!violations.isEmpty()) {
+      return violations;
+    }
+    return refValidator.validate(descriptor);
+  }
+
+  @Override
+  public Set<String> validate(ServiceDescriptor descriptor) {
+    Set<ConstraintViolation<ServiceDescriptor>> constraintViolations;
+    constraintViolations = getViolations(descriptor);
+
+    ImmutableSet.Builder<String> violations = ImmutableSet.builder();
+    for (ConstraintViolation<ServiceDescriptor> violation : constraintViolations) {
+      String message = violation.getMessage();
+      String relativePath = violation.getPropertyPath().toString();
+      violations.add(String.format("%s.%s %s", "service", relativePath, message));
+    }
+    violations.addAll(dependencyViolationStringSet);
+    dependencyViolationStringSet.clear();
+    return violations.build();
   }
 }

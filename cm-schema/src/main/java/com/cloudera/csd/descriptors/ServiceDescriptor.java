@@ -15,16 +15,18 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
-import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
 
+import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
+import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
 import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 import com.cloudera.csd.validation.references.annotations.Named;
-import com.cloudera.csd.validation.references.annotations.Referencing;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referencing;
 
 import java.util.List;
 import java.util.Set;
@@ -100,18 +102,22 @@ public interface ServiceDescriptor {
   })
   @Valid
   List<Parameter<?>> getParameters();
-  
+
   @UniqueField("name")
   @Valid
   List<ServiceDependency> getServiceDependencies();
-  
+
+  @Valid
+  @Unstable
+  List<DependencyExtension> getDependencyExtensions();
+
   @Valid
   GatewayDescriptor getGateway();
 
   @UniqueField("name")
   @Valid
   Set<CreateHdfsDirDescriptor> getHdfsDirs();
-  
+
   @Valid
   ServiceInitDescriptor getServiceInit();
 
@@ -141,4 +147,12 @@ public interface ServiceDescriptor {
   @Valid
   @UniqueField("name")
   List<KerberosPrincipalDescriptor> getExternalKerberosPrincipals();
+
+  /**
+   * Optional. If set, gets the license feature that all roles of this service
+   * will require. If not set, then roles will not require any license feature.
+   * Not intended for use outside of Cloudera, as License Features are not part
+   * of any documentation or stable API.
+   */
+  String getLicenseFeature();
 }

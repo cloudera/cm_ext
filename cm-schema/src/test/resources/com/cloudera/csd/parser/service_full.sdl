@@ -8,7 +8,8 @@
   "version" : 1,
   "runAs" : {
     "user" : "echoservice",
-    "group" : "echoservice"
+    "group" : "echoservice",
+    "principal" : "serviceprinc"
    },
   "maxInstances" : 1,
   "compatibility" : {
@@ -55,6 +56,14 @@
        "directoryDescription" : "Home directory used by Echo service",
        "path" : "${service_var1}",
        "permissions" : "0700"
+     },
+     {
+       "name" : "CreateUserDirCommand",
+       "label" : "Create Echo User Dir",
+       "description" : "Create the home directory in HDFS for echo service",
+       "directoryDescription" : "Home directory used by Echo service",
+       "path" : "/user/${principal}",
+       "permissions" : "0700"
      }
    ],
   "parameters" : [
@@ -64,6 +73,7 @@
       "description" : "Service Var1 Description",
       "configName" : "service.var1.config",
       "type" : "string",
+      "initType" : "randomBase64",
       "configurableInWizard" : true
     },
     {
@@ -103,6 +113,31 @@
   "serviceDependencies" : [
     {"name" : "ZOOKEEPER"},
     {"name" : "HDFS", "required" : "true"}
+  ],
+  "dependencyExtensions" : [
+    {
+     "extensionId" : "extension1",
+     "name" : "id1",
+     "className" : "extClass",
+     "type" : "classAndConfigs"
+    },
+    {
+     "extensionId" : "yarnAuxService",
+     "name": "id2",
+     "className" : "yarnClass",
+     "type" : "classAndConfigs",
+     "configs" : [
+       {
+         "key" : "configKey_${service_var2}",
+         "value" : "configValue_${service_kerb_var}"
+       }
+     ]
+    },
+    {
+      "extensionId" : "yarnAuxService",
+      "className" : "extClass2",
+      "type" : "classAndConfigs"
+    }
   ],
   "gateway" : {
     "alternatives" : {
@@ -151,6 +186,16 @@
           "includedParams" : ["service_var1", "client_var1", "client_var2"]
         }
       ]
+    },
+    "logging" : {
+      "configFilename" : "gateway-log4j.properties",
+      "loggingType" : "log4j",
+      "additionalConfigs" : [
+         {
+           "key" : "foo.enabled",
+           "value" : "true"
+         }
+       ]
     }
   },
   "commands" : [
@@ -207,7 +252,7 @@
        "kerberosPrincipals" : [
          {
            "name" : "ECHO_PRINCIPAL",
-           "primary" : "echo",
+           "primary" : "${principal}",
            "instance" : "${host}"
          },
          {
@@ -471,6 +516,7 @@
             "description" : "Role Var12 Description",
             "type" : "string",
             "sensitive" : true,
+            "initType" : "randomBase64",
             "default" : "role_var12_default"
           },
           {
@@ -492,7 +538,8 @@
        ],
        "runAs" : {
          "user" : "webserverrole",
-         "group" : "webserverrole"
+         "group" : "webserverrole",
+         "principal" : "roleprinc"
        },
        "commands" : [
          {

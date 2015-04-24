@@ -18,19 +18,35 @@ package com.cloudera.csd.descriptors;
 import javax.validation.constraints.Min;
 
 /**
- * Describes the compatibility requirements for the CSD.
+ * Describes the CDH compatibility requirements.
  */
 public interface CompatibilityDescriptor {
 
   /**
    * A range of versions for the dependent software.
-   * Both the min and max are inclusive and optional.
-   *
-   * TODO: Add range checks.
+   * Both the min and max are optional.
    */
   public interface VersionRange {
+
+    /**
+     * The full version string in the format of major.minor.micro. For compatibility,
+     * specifying just the major version e.g. "4" is interpreted as "4.0.0".
+     * <p>
+     * The minimum version itself is included in the range
+     *
+     * @return the minimum version of the range
+     */
     String getMin();
 
+    /**
+     * The full version string in the format of major.minor.micro. For compatibility,
+     * specifying just the major version e.g. "4" is interpreted as the next major
+     * version, i.e. "5.0.0".
+     * <p>
+     * The maximum version itself is excluded from the range
+     *
+     * @return the maximum version of the range
+     */
     String getMax();
   }
 

@@ -17,6 +17,8 @@ package com.cloudera.csd.components;
 
 import com.cloudera.common.Parser;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
+import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
@@ -51,6 +53,7 @@ import java.util.Map.Entry;
 /**
  * This class is used to read an SDL that is written in the JSON language.
  */
+@SuppressWarnings("serial")
 public class JsonSdlParser implements Parser<ServiceDescriptor> {
 
   /**
@@ -69,12 +72,13 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
    * 3. We add mixin classes to the object mapper to let jackson know of
    * property name remaps.
    */
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   static {
 
     final Map<Class<?>, Class<?>> mixins = new HashMap<Class<?>, Class<?>>() {{
       put(Parameter.class, ParameterMixin.class);
       put(ConfigGenerator.class, GeneratorMixin.class);
+      put(DependencyExtension.class, DependencyExtensionMixin.class);
     }};
 
     OBJECT_MAPPER.registerModule(new SimpleModule() {
@@ -126,5 +130,14 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       @JsonSubTypes.Type(value = HadoopXMLGenerator.class, name = "hadoop_xml"),
       @JsonSubTypes.Type(value = PropertiesGenerator.class, name = "properties")})
   interface GeneratorMixin {
+  }
+
+  @JsonTypeInfo(
+      use = JsonTypeInfo.Id.NAME,
+      include = JsonTypeInfo.As.PROPERTY,
+      property = "type")
+  @JsonSubTypes({
+      @JsonSubTypes.Type(value = ClassAndConfigsExtension.class, name = "classAndConfigs")})
+  interface DependencyExtensionMixin {
   }
 }

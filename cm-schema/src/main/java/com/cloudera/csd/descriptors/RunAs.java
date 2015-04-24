@@ -23,9 +23,35 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 public interface RunAs {
 
+  /**
+   * The user as which daemon and all processes on it run.
+   * This specifies the default value of a parameter that gets
+   * added for configuring the process user.
+   * The value of this parameter is used to replace ${user} while
+   * generating configuration.
+   */
   @NotBlank
   String getUser();
 
+  /**
+   * The group as which daemon and all processes on it run.
+   * This specifies the default value of a parameter that gets
+   * added for configuring the process group.
+   * The value of this parameter is used to replace ${group} while
+   * generating configuration.
+   */
   @NotBlank
   String getGroup();
+
+  /**
+   * The kerberos user as which daemon and all processes on it run.
+   * This specifies the default value of a parameter that gets
+   * added for configuring the kerberos principal.
+   * The value of this parameter is used to replace ${principal} while
+   * generating configuration.
+   *
+   * Note that ${principal} will have the same value as ${user} on
+   * non-secure clusters.
+   */
+  String getPrincipal();
 }

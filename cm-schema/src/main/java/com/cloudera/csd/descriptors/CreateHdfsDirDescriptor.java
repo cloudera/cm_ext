@@ -50,7 +50,7 @@ public interface CreateHdfsDirDescriptor {
 
   /** The path in HDFS to create. */
   @NotBlank
-  @AvailableSubstitutions(type={PARAMETERS, USER, GROUP})
+  @AvailableSubstitutions(type={PARAMETERS, USER, GROUP, PRINCIPAL})
   String getPath();
 
   /** Permission for this directory. */

@@ -27,7 +27,7 @@ import javax.validation.Payload;
 /**
  * A constraint that checks that the service type
  * does not conflict with any built-in service type in CM.
- * This is a best effor as there could be more service
+ * This is a best effort as there could be more service
  * types that conflict in CM.
  */
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })

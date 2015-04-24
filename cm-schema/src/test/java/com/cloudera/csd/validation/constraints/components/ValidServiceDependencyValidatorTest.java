@@ -19,14 +19,19 @@ import com.cloudera.csd.validation.constraints.ValidServiceDependencyValidator;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
-import javax.validation.ConstraintValidatorContext;
 
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ValidServiceDependencyValidatorTest {
@@ -35,6 +40,27 @@ public class ValidServiceDependencyValidatorTest {
   private ConstraintValidatorContext context;
 
   private ValidServiceDependencyValidator validator;
+
+  @Mock
+  ConstraintViolationBuilder contextBuilder;
+
+  @Mock
+  NodeBuilderCustomizableContext contextBuilderContext;
+
+  @Mock
+  ConstraintValidatorContext constraintValidatorContext;
+
+  @Before
+  public void setup() throws Exception {
+    doNothing().when(context).disableDefaultConstraintViolation();
+    when(context.getDefaultConstraintMessageTemplate()).thenReturn("foobar");
+    when(context.buildConstraintViolationWithTemplate(eq("foobar")))
+      .thenReturn(contextBuilder);
+    when(contextBuilder.addPropertyNode(anyString()))
+      .thenReturn(contextBuilderContext);
+    when(contextBuilderContext.addConstraintViolation())
+      .thenReturn(constraintValidatorContext);
+  }
 
   @Test
   public void testServiceTypeIsNotValid() {

@@ -17,21 +17,32 @@ package com.cloudera.config;
 
 import com.cloudera.common.Parser;
 import com.cloudera.csd.StringInterpolator;
+import com.cloudera.csd.components.JsonMdlParser;
 import com.cloudera.csd.components.JsonSdlParser;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
+import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.components.ServiceDescriptorValidatorImpl;
+import com.cloudera.csd.validation.components.ServiceMonitoringDefinitionsDescriptorValidatorImpl;
 import com.cloudera.csd.validation.constraints.AutoConfigSharesValidValidator;
+import com.cloudera.csd.validation.constraints.ExistingRoleTypeValidator;
+import com.cloudera.csd.validation.constraints.ExistingServiceTypeValidator;
 import com.cloudera.csd.validation.constraints.ExpressionValidator;
 import com.cloudera.csd.validation.constraints.UniqueFieldValidator;
 import com.cloudera.csd.validation.constraints.UniqueRoleTypeValidator;
 import com.cloudera.csd.validation.constraints.UniqueServiceTypeValidator;
 import com.cloudera.csd.validation.constraints.ValidServiceDependencyValidator;
 import com.cloudera.csd.validation.constraints.components.AutoConfigSharesValidValidatorImpl;
+import com.cloudera.csd.validation.constraints.components.ExistingRoleTypeValidatorImpl;
+import com.cloudera.csd.validation.constraints.components.ExistingServiceTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ExpressionValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueFieldValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueRoleTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueServiceTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ValidServiceDependencyValidatorImpl;
+import com.cloudera.csd.validation.monitoring.components.MetricNameFormatValidatorImpl;
+import com.cloudera.csd.validation.monitoring.components.NameForCrossEntityAggregatesFormatValidatorImpl;
+import com.cloudera.csd.validation.monitoring.constraints.MetricNameFormatValidator;
+import com.cloudera.csd.validation.monitoring.constraints.NameForCrossEntityAggregatesFormatValidator;
 import com.cloudera.csd.validation.references.DescriptorVisitor;
 import com.cloudera.csd.validation.references.ReferenceValidator;
 import com.cloudera.csd.validation.references.components.DescriptorVisitorImpl;
@@ -53,6 +64,7 @@ import com.cloudera.validation.DescriptorValidator;
 import com.cloudera.validation.MessageSourceInterpolator;
 import com.cloudera.validation.TemplateMessageInterpolator;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -60,6 +72,8 @@ import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -81,12 +95,18 @@ public class DefaultValidatorConfiguration {
   @Autowired
   protected ConfigurableListableBeanFactory beanFactory;
 
+  private static final Logger LOG = LoggerFactory.getLogger(
+      DefaultValidatorConfiguration.class);
   public static final String BUILTIN_SERVICE_TYPES_BEAN_NAME = "builtInServiceTypes";
   public static final String BUILTIN_ROLE_TYPES_BEAN_NAME = "builtInRoleTypes";
+  public static final String BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS =
+      "builtInNamesForCrossEntityAggregateMetrics";
+  public static final String CMD_EXTRA_SERVICE_TYPE_FILE = "service-type-file";
+  public static final String CMD_EXTRA_SERVICE_TYPE_LIST = "service-type-list";
 
   @Bean(name = BUILTIN_SERVICE_TYPES_BEAN_NAME)
   public Set<String> builtInServiceTypes() {
-    return ImmutableSet.of(
+    Set<String> serviceTypes = Sets.newHashSet(
       "HDFS",
       "MAPREDUCE",
       "HBASE",
@@ -100,8 +120,10 @@ public class DefaultValidatorConfiguration {
       "SOLR",
       "SQOOP",
       "KS_INDEXER",
-      "SENTRY"
+      "SENTRY",
+      "MGMT"
     );
+    return serviceTypes;
   }
 
   @Bean(name = BUILTIN_ROLE_TYPES_BEAN_NAME)
@@ -154,6 +176,14 @@ public class DefaultValidatorConfiguration {
     );
   }
 
+  @Bean(name = BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS)
+  public Set<String> builtInNamesForCrossEntityAggregateMetrics() {
+    return ImmutableSet.of(
+      "time_series_tables",
+      "servicemonitors",
+      "hostmonitors");
+  }
+
   @Bean
   @Scope(BeanDefinition.SCOPE_PROTOTYPE)
   public UniqueFieldValidator uniqueFieldValidator() {
@@ -164,7 +194,8 @@ public class DefaultValidatorConfiguration {
   @Bean
   @Scope(BeanDefinition.SCOPE_PROTOTYPE)
   public ValidServiceDependencyValidator validServiceDependencyValidator() {
-    Set<String> validServiceTypes = (Set<String>)ctx.getBean(BUILTIN_SERVICE_TYPES_BEAN_NAME);
+    Set<String> validServiceTypes =
+        (Set<String>)ctx.getBean(BUILTIN_SERVICE_TYPES_BEAN_NAME);
     return new ValidServiceDependencyValidatorImpl(validServiceTypes);
   }
 
@@ -182,6 +213,24 @@ public class DefaultValidatorConfiguration {
   public UniqueRoleTypeValidator uniqueRoleTypeValidator() {
     Set<String> roleTypes = (Set<String>)ctx.getBean(BUILTIN_ROLE_TYPES_BEAN_NAME);
     return new UniqueRoleTypeValidatorImpl(roleTypes);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public ExistingServiceTypeValidator existingServiceTypeValidator() {
+    Set<String> serviceTypes =
+        (Set<String>)ctx.getBean(BUILTIN_SERVICE_TYPES_BEAN_NAME);
+    return new ExistingServiceTypeValidatorImpl(serviceTypes);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public ExistingRoleTypeValidator existingRoleTypeValidator() {
+    Set<String> roleTypes =
+        (Set<String>)ctx.getBean(BUILTIN_ROLE_TYPES_BEAN_NAME);
+    return new ExistingRoleTypeValidatorImpl(roleTypes);
   }
 
   @Bean
@@ -215,6 +264,11 @@ public class DefaultValidatorConfiguration {
   }
 
   @Bean
+  public Parser<ServiceMonitoringDefinitionsDescriptor> mdlParser() {
+    return new JsonMdlParser();
+  }
+
+  @Bean
   public Parser<ParcelDescriptor> parcelParser() {
     return new JsonParcelParser();
   }
@@ -240,10 +294,40 @@ public class DefaultValidatorConfiguration {
   }
 
   @Bean
-  public DescriptorValidator<ServiceDescriptor> serviceDescriptorValidator() {
+  public DescriptorValidator<ServiceDescriptor>
+  serviceDescriptorValidatorWithoutDependencyCheck() {
+    return getServiceDescriptorValidator(false);
+  }
+
+  @Bean
+  public DescriptorValidator<ServiceDescriptor>
+  serviceDescriptorValidatorWithDependencyCheck() {
+    return getServiceDescriptorValidator(true);
+  }
+
+  private DescriptorValidator<ServiceDescriptor> 
+  getServiceDescriptorValidator(boolean enforceDependencyCheck) {
+    Validator validator = ctx.getBean(Validator.class);
+    ReferenceValidator referenceValidator =
+        ctx.getBean(ReferenceValidator.class);
+    return new ServiceDescriptorValidatorImpl(
+        validator,
+        referenceValidator,
+        enforceDependencyCheck);
+  }
+
+  @Bean
+  public DescriptorValidator<ServiceMonitoringDefinitionsDescriptor>
+      serviceMonitoringDefinitionsDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
     ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
-    return new ServiceDescriptorValidatorImpl(validator, referenceValidator);
+    Set<String> builtInNamesForCrossEntityAggregateMetrics =
+        (Set<String>)ctx.getBean(
+            BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS);
+    return new ServiceMonitoringDefinitionsDescriptorValidatorImpl(
+        validator,
+        referenceValidator,
+        builtInNamesForCrossEntityAggregateMetrics);
   }
 
   @Bean
@@ -306,5 +390,19 @@ public class DefaultValidatorConfiguration {
     factoryBean.setMessageInterpolator(messageInterpolator);
     factoryBean.setConstraintValidatorFactory(validatorFactory);
     return factoryBean;
+  }
+
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public MetricNameFormatValidator metricNameFormatValidator() {
+    return new MetricNameFormatValidatorImpl();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public NameForCrossEntityAggregatesFormatValidator
+      nameForCrossEntityAggregateFormatValidator() {
+    return new NameForCrossEntityAggregatesFormatValidatorImpl();
   }
 }

@@ -66,7 +66,7 @@ public interface DescriptorVisitor {
    * @param rootObject the root object
    * @param processor the processor.
    * @param <T> the result type
-   * @return the result fromt he processor.
+   * @return the result from the processor.
    */
   <T> T visit(Object rootObject, NodeProcessor<T> processor);
 }

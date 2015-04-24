@@ -1,0 +1,11 @@
+{
+  "name" : "ECHO",
+  "version" : 1,
+  "roles" : [
+    {
+       "name" : "ECHOROLE",
+       "metricDefinitions": []
+    }
+  ]
+
+}

@@ -15,6 +15,7 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.validation.constraints.ServiceDependencyValidationGroup;
 import com.cloudera.csd.validation.constraints.ValidServiceDependency;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -23,7 +24,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public interface ServiceDependency {
 
   @NotBlank
-  @ValidServiceDependency
+  @ValidServiceDependency (groups = ServiceDependencyValidationGroup.class)
   String getName();
 
   boolean isRequired();

@@ -1,0 +1,75 @@
+{
+  "name" : "ECHO",
+  "version" : 1,
+  "roles" : [
+    {
+       "name" : "ECHOROLE",
+       "metricDefinitions": [
+         {
+           "name" : "BOGUS METRIC NAME!",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "validonewordornounderscore",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "total_starts_with_total_valid",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "valid_name_that_ends_with_num_ops_rate",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "0starts_with_a_number_invalid",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "valid_name_that_ends_with_count_rate",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "_starts_with_an_underscore_invalid",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "ends_with_an_underscore_invalid_",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         }
+       ]
+    }
+  ]
+}

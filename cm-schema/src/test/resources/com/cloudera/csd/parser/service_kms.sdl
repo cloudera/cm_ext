@@ -3,6 +3,7 @@
   "label" : "Key Management Server",
   "description" : "The KMS service",
   "version" : "5.2.0",
+  "licenseFeature" : "KEYTRUSTEE",
   "runAs" : {
     "user" : "kms",
     "group" : "kms"

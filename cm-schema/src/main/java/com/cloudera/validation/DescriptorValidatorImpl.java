@@ -15,7 +15,6 @@
 // limitations under the License.
 package com.cloudera.validation;
 
-import com.cloudera.validation.DescriptorValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 

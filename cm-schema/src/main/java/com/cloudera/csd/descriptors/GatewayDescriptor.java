@@ -19,7 +19,6 @@ import com.cloudera.csd.descriptors.parameters.Parameter;
 import com.cloudera.csd.validation.constraints.UniqueField;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,4 +57,11 @@ public interface GatewayDescriptor {
   @NotNull
   @Valid
   ConfigWriter getConfigWriter();
+
+  /**
+   * Optional descriptor for logging.
+   * @return logging descriptor.
+   */
+  @Valid
+  GatewayLoggingDescriptor getLogging();
 }

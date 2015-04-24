@@ -22,5 +22,6 @@ public enum SubstitutionType {
   PARAMETERS,
   HOST,
   USER,
-  GROUP
+  GROUP,
+  PRINCIPAL,
 }

@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -31,6 +32,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -40,6 +42,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ServiceDescriptorValidatorImplTest {
 
+  @Qualifier("serviceDescriptorValidatorWithDependencyCheck")
   @Autowired
   private ServiceDescriptorValidatorImpl validator;
 
@@ -136,7 +139,7 @@ public class ServiceDescriptorValidatorImplTest {
   @Test
   public void testBadServiceDependency() {
     Set<String> errors = validate("service_badDependencyType.sdl");
-    assertEquals("service.serviceDependencies[0].name must be a valid service type", Iterables.getOnlyElement(errors));
+    assertEquals("foo must be a valid service type", Iterables.getOnlyElement(errors));
   }
 
   @Test
@@ -182,7 +185,7 @@ public class ServiceDescriptorValidatorImplTest {
   public void testTopologyRangeCheck() {
     Set<String> errors = validate("service_topologyRangeCheck.sdl");
     assertEquals("service.roles[0].topology must satisfy " +
-            "\"minInstances == null or maxInstances == null or minInstances <= maxInstances\"",
+        "\"minInstances == null or maxInstances == null or minInstances <= maxInstances\"",
         Iterables.getOnlyElement(errors));
   }
 

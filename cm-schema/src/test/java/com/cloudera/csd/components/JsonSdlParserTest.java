@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor.VersionRange;
 import com.cloudera.csd.descriptors.ConfigWriter;
+import com.cloudera.csd.descriptors.CsdLoggingType;
 import com.cloudera.csd.descriptors.CsdParameterOptionality;
 import com.cloudera.csd.descriptors.CsdRoleState;
 import com.cloudera.csd.descriptors.GatewayDescriptor;
@@ -34,6 +35,9 @@ import com.cloudera.csd.descriptors.ServiceDependency;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.ServiceInitDescriptor;
 import com.cloudera.csd.descriptors.TopologyDescriptor;
+import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
+import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
+import com.cloudera.csd.descriptors.dependencyExtension.ExtensionConfigEntry;
 import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
@@ -54,6 +58,7 @@ import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
 import com.cloudera.csd.descriptors.parameters.StringArrayParameter;
 import com.cloudera.csd.descriptors.parameters.StringEnumParameter;
 import com.cloudera.csd.descriptors.parameters.StringParameter;
+import com.cloudera.csd.descriptors.parameters.StringParameter.InitType;
 import com.cloudera.csd.descriptors.parameters.URIArrayParameter;
 import com.cloudera.csd.descriptors.parameters.URIParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
@@ -97,8 +102,16 @@ public class JsonSdlParserTest {
     assertEquals("/etc/echo", clientCfg.getAlternatives().getLinkRoot());
     assertEquals(2, clientCfg.getParameters().size());
     assertEquals(2, clientCfg.getConfigWriter().getGenerators().size());
+    assertNotNull(clientCfg.getLogging());
+    assertEquals(CsdLoggingType.LOG4J, clientCfg.getLogging().getLoggingType());
+    assertEquals("gateway-log4j.properties", clientCfg.getLogging().getConfigFilename());
+    List<ConfigEntry> additionalConfigs = clientCfg.getLogging().getAdditionalConfigs();
+    assertNotNull(additionalConfigs);
+    assertEquals(1, additionalConfigs.size());
+    assertEquals("foo.enabled", additionalConfigs.get(0).getKey());
+    assertEquals("true", additionalConfigs.get(0).getValue());
 
-    assertEquals(2, descriptor.getHdfsDirs().size());
+    assertEquals(3, descriptor.getHdfsDirs().size());
     
     ServiceInitDescriptor initRunner= descriptor.getServiceInit();
     assertNotNull(initRunner);
@@ -250,6 +263,38 @@ public class JsonSdlParserTest {
   }
 
   @Test
+  public void testDependencyExtensions() throws Exception {
+    ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
+    int found = 0;
+
+    // Check service dependencies
+    assertEquals(3, descriptor.getDependencyExtensions().size());
+    for (DependencyExtension ext: descriptor.getDependencyExtensions()) {
+      if (ext.getExtensionId().equals("extension1")) {
+        ClassAndConfigsExtension ccExt = (ClassAndConfigsExtension) ext;
+        assertEquals(null, ccExt.getConfigs());
+        assertEquals("extClass", ccExt.getClassName());
+        assertEquals("id1", ccExt.getName());
+        found++;
+      } else if (ext.getExtensionId().equals("yarnAuxService")) {
+        ClassAndConfigsExtension ccExt = (ClassAndConfigsExtension)ext;
+        if (ccExt.getName() == null) {
+          assertEquals("extClass2", ccExt.getClassName());
+          assertEquals(null, ccExt.getConfigs());
+          found++;
+        } else if (ccExt.getName().equals("id2")) {
+          assertEquals("yarnClass", ccExt.getClassName());
+          ExtensionConfigEntry entry = Iterables.getOnlyElement(ccExt.getConfigs());
+          assertEquals("configKey_${service_var2}", entry.getKey());
+          assertEquals("configValue_${service_kerb_var}", entry.getValue());
+          found++;
+        }
+      }
+    }
+    assertEquals(3, found);
+  }
+
+  @Test
   public void testParametersParsing() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
     assertEquals(4, descriptor.getParameters().size());
@@ -259,6 +304,8 @@ public class JsonSdlParserTest {
       if (p.getName().equals("service_var1")) {
         assertTrue(p instanceof StringParameter);
         assertTrue(p.isConfigurableInWizard());
+        StringParameter sp = (StringParameter) p;
+        assertEquals(StringParameter.InitType.RANDOM_BASE64, sp.getInitType());
         found++;
       } else if (p.getName().equals("service_var2")) {
         assertTrue(p instanceof LongParameter);
@@ -392,6 +439,7 @@ public class JsonSdlParserTest {
         assertTrue(p instanceof StringParameter);
         StringParameter dp = (StringParameter) p;
         assertTrue(dp.isSensitive());
+        assertEquals(InitType.RANDOM_BASE64, dp.getInitType());
         found++;
       } else if (p.getName().equals("role_var13")) {
         assertTrue(p instanceof PasswordParameter);
@@ -484,6 +532,7 @@ public class JsonSdlParserTest {
     ServiceDescriptor serviceDesc = parser.parse(getSdl("service_kms.sdl"));
     assertNotNull(serviceDesc);
     assertEquals("KMS", serviceDesc.getName());
+    assertEquals("KEYTRUSTEE", serviceDesc.getLicenseFeature());
     assertEquals("${kms_auth_type}", serviceDesc.getKerberos());
 
     ProvidesKms providesKms = serviceDesc.getProvidesKms();

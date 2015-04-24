@@ -20,17 +20,41 @@ import com.google.common.base.CaseFormat;
 
 public enum CsdLoggingType {
   /**
-   * CM auto-generates the following ParamSpecs for a role that uses this method:
+   * CM auto-generates the following ParamSpecs for a daemon role that uses this method:
    * <ol>
-   * <li>Log Threshold
+   * <li>Log threshold
    * <li>Max file size
    * <li>Max backup index size
+   * <li>Log4j safety valve
+   * </ol>
+   * <p>
+   * CM auto-generates the following ParamSpecs for a gateway role that uses this method:
+   * <ol>
+   * <li>Log threshold
    * <li>Log4j safety valve
    * </ol>
    * <p>
    * It also creates a ConfigFileGenerator for log4j.properties file for the role.
    */
   LOG4J("log4j.properties"),
+  /**
+   * CM auto-generates the following ParamSpecs for a daemon role that uses this method:
+   * <ol>
+   * <li>Log threshold
+   * <li>Max file size
+   * <li>Max backup index size
+   * <li>Logback XML override
+   * </ol>
+   * <p>
+   * CM auto-generates the following ParamSpecs for a gateway role that uses this method:
+   * <ol>
+   * <li>Log threshold
+   * <li>Logback XML override
+   * </ol>
+   * <p>
+   * It also creates a ConfigFileGenerator for logback.xml file for the role.
+   */
+  LOGBACK("logback.xml"),
   /** CM doesn't do anything automatically for this logging type. */
   OTHER(null);
 

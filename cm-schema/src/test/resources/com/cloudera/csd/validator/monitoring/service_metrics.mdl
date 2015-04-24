@@ -1,0 +1,25 @@
+{
+  "name" : "ECHO",
+  "version" : 1,
+  "roles" : [
+    {
+       "name" : "ECHOROLE",
+       "metricDefinitions": [
+         {
+           "name" : "echo_metric_1",
+           "label" : "csdMetric1Label",
+           "description" : "csdMetric1Description",
+           "numeratorUnit" : "bytes",
+           "denominatorUnit" : "seconds",
+           "isCounter" : true
+         },
+         {
+           "name" : "echo_metric_2",
+           "label" : "csdMetric2Label",
+           "description" : "csdMetric2Description",
+           "numeratorUnit" : "bytes"
+         }
+       ]
+    }
+  ]
+}

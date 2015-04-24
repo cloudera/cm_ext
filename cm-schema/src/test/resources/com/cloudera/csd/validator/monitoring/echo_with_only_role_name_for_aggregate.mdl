@@ -1,0 +1,10 @@
+{
+  "name" : "ECHO",
+  "version" : 1,
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "nameForCrossEntityAggregateMetrics" : "echo_masterssssss"
+    }
+  ]
+}

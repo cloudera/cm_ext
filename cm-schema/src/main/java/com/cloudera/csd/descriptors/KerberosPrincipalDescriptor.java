@@ -17,6 +17,7 @@ package com.cloudera.csd.descriptors;
 
 import static com.cloudera.csd.validation.references.annotations.SubstitutionType.HOST;
 import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PRINCIPAL;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -39,6 +40,7 @@ public interface KerberosPrincipalDescriptor {
    * First part of the principal.
    */
   @NotBlank
+  @AvailableSubstitutions(type={PARAMETERS, PRINCIPAL})
   String getPrimary();
 
   /**

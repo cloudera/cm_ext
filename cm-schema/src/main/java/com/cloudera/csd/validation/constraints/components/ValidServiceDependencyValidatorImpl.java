@@ -38,6 +38,20 @@ public class ValidServiceDependencyValidatorImpl implements ValidServiceDependen
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    return validServiceTypes.contains(value);
+    boolean isValid = validServiceTypes.contains(value);
+    if (!isValid) {
+      context.disableDefaultConstraintViolation();
+      // Customizes the validation result message by adding the validation
+      // target value at the end of the violation object path. It will be
+      // something like:
+      // serviceDependencies[1].name.SPARK
+      context.buildConstraintViolationWithTemplate(
+            context.getDefaultConstraintMessageTemplate()
+          )
+          .addPropertyNode(value)
+          .addConstraintViolation();
+    }
+
+    return isValid;
   }
 }

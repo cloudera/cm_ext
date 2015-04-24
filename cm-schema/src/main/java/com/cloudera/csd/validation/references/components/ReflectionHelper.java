@@ -163,4 +163,36 @@ public class ReflectionHelper {
       throw new IllegalStateException("Could not invoke " + propertyName, e);
     }
   }
+
+  /**
+   * Returns the property getter method if one exists, 'null' otherwise.
+   * @param obj The object which has the property 'propertyName'
+   * @param propertyName The property name, e.g., "name".
+   * @return
+   */
+  @Nullable
+  public static Method propertyGetter(Object obj, String propertyName) {
+    Preconditions.checkNotNull(obj);
+    Preconditions.checkNotNull(propertyName);
+    try {
+      PropertyDescriptor desc =
+          PropertyUtils.getPropertyDescriptor(obj, propertyName);
+      return desc.getReadMethod();
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException(
+          "Could not access " + propertyName + " of " +
+          obj.getClass().getSimpleName(),
+          e);
+    } catch (InvocationTargetException e) {
+      throw new IllegalStateException(
+          "Could not access " + propertyName + " of " +
+          obj.getClass().getSimpleName(),
+          e);
+    } catch (NoSuchMethodException e) {
+      throw new IllegalStateException(
+          "No such property " + propertyName + " for " +
+          obj.getClass().getSimpleName(),
+          e);
+    }
+  }
 }

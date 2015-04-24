@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -244,7 +245,7 @@ public class DescriptorPathImpl implements DescriptorPath {
       names = referenced.as();
     }
     return addToHead(new BeanNode(
-        names.length == 1 ? names[0] : names.toString(),
+        names.length == 1 ? names[0] : Arrays.toString(names),
         null, obj, (named != null)));
   }
 

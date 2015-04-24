@@ -1,0 +1,27 @@
+{
+  "serviceName": "test_service",
+  "serviceMetrics": [
+    {
+      "name": "test_svc_metric1",
+      "metricType": "timer",
+      "label": "test_svc_metric1_label",
+      "description": "test_svc_metric1_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "calls",
+      "denominatorUnit": "second",
+      "denominatorForRateMetrics" : "foobar"
+    },
+    {
+      "name": "test_svc_metric2",
+      "metricType": "timer",
+      "label": "test_svc_metric2_label",
+      "description": "test_svc_metric2_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "calls",
+      "denominatorUnit": "second",
+      "denominatorForRateMetrics" : "foobar"
+    }
+  ],
+  "rolesMetrics": {},
+  "additionalServiceEntityTypesMetrics": {}
+}
