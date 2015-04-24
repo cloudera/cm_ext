@@ -59,7 +59,7 @@ def make_manifest(path, timestamp=time.time()):
   @return: the manifest.json as a string
   """
   manifest = {}
-  manifest['lastUpdated'] = int(timestamp)
+  manifest['lastUpdated'] = int(timestamp * 1000)
   manifest['parcels'] = []
 
   files = os.listdir(path)
