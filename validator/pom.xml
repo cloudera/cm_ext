@@ -162,6 +162,45 @@
           <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.4</version>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>[3.0.2,)</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>[1.7,)</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+            <id>clean</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>pre-clean</phase>
+          </execution>
+          <execution>
+            <id>default</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+          <execution>
+            <id>site</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
   <dependencies>
