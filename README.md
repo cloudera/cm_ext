@@ -12,7 +12,7 @@ Requirements
 ------------
 
 * validator
-  * Java 6/7
+  * Java 7
   * Maven 3 (to build)
 * make_manifest
   * Python 2.7/3.3 or higher
