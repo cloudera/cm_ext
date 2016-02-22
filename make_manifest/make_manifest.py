@@ -92,6 +92,7 @@ def make_manifest(path, timestamp=time.time()):
       _safe_copy('replaces', parcel, entry)
       _safe_copy('conflicts', parcel, entry)
       _safe_copy('components', parcel, entry)
+      _safe_copy('servicesRestartInfo', parcel, entry)
 
       try:
         notes_member = tar.getmember(os.path.join(_get_parcel_dirname(f),
