@@ -57,32 +57,34 @@ public class ApplicationConfiguration extends DefaultValidatorConfiguration {
   @Override
   public Set<String> builtInServiceTypes() {
     Set<String> validServiceTypes = Sets.newHashSet(super.builtInServiceTypes());
-    CommandLineOptions cmdOptions = ctx.getBean(CommandLineOptions.BEAN_NAME,
-        CommandLineOptions.class);
-    String extraServiceTypeFileName = cmdOptions.getOptionValue(
-        CommandLineOptions.EXTRA_SERVICE_TYPE_FILE);
-    String extraServiceTypeList = cmdOptions.getOptionValue(
-        CommandLineOptions.EXTRA_SERVICE_TYPES);
+    if (ctx.containsBean(CommandLineOptions.BEAN_NAME)) {
+      CommandLineOptions cmdOptions = ctx.getBean(CommandLineOptions.BEAN_NAME,
+          CommandLineOptions.class);
+      String extraServiceTypeFileName = cmdOptions.getOptionValue(
+          CommandLineOptions.EXTRA_SERVICE_TYPE_FILE);
+      String extraServiceTypeList = cmdOptions.getOptionValue(
+          CommandLineOptions.EXTRA_SERVICE_TYPES);
 
-    if (extraServiceTypeFileName != null) {
-      try {
-        validServiceTypes.addAll(
-            Files.readAllLines(
-                Paths.get(extraServiceTypeFileName),
-                Charset.defaultCharset()));
-      } catch (IOException e) {
-        LOG.error("Failed to read extra service type file: {}",
-            extraServiceTypeFileName,
-            e);
-      }
-    } else if (extraServiceTypeList != null) {
-      try {
-        validServiceTypes.addAll(
-            Arrays.asList(extraServiceTypeList.split(" ")));
-      } catch (Exception e) {
-        LOG.error("Failed to parse extra service type list: {}",
-            extraServiceTypeList,
-            e);
+      if (extraServiceTypeFileName != null) {
+        try {
+          validServiceTypes.addAll(
+              Files.readAllLines(
+                  Paths.get(extraServiceTypeFileName),
+                  Charset.defaultCharset()));
+        } catch (IOException e) {
+          LOG.error("Failed to read extra service type file: {}",
+              extraServiceTypeFileName,
+              e);
+        }
+      } else if (extraServiceTypeList != null) {
+        try {
+          validServiceTypes.addAll(
+              Arrays.asList(extraServiceTypeList.split(" ")));
+        } catch (Exception e) {
+          LOG.error("Failed to parse extra service type list: {}",
+              extraServiceTypeList,
+              e);
+        }
       }
     }
     return validServiceTypes;
@@ -93,6 +95,13 @@ public class ApplicationConfiguration extends DefaultValidatorConfiguration {
     return createValidationRunner(
         "sdlParser",
         "serviceDescriptorValidatorWithDependencyCheck");
+  }
+
+  @Bean
+  public DescriptorRunner<?> mdlRunner() {
+    return createValidationRunner(
+        "mdlParser",
+        "serviceMonitoringDefinitionsDescriptorValidator");
   }
 
   @Bean

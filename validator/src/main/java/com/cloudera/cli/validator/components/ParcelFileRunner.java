@@ -68,6 +68,7 @@ public class ParcelFileRunner implements ValidationRunner {
   private static final Set<String> KNOWN_DISTROS = ImmutableSet.of(
       "el5",
       "el6",
+      "el7",
       "sles11",
       "lucid",
       "precise",
