@@ -1,0 +1,15 @@
+{
+  "serviceName": "test_service",
+  "serviceMetrics": [
+    {
+      "name": "test_svc_metric1",
+      "metricType": "unknown type",
+      "label": "test_svc_metric1_label",
+      "description": "test_svc_metric1_description",
+      "numeratorUnit": "bytes",
+      "denominatorUnit": "second"
+    }
+  ],
+  "rolesMetrics": {},
+  "additionalServiceEntityTypesMetrics": {}
+}

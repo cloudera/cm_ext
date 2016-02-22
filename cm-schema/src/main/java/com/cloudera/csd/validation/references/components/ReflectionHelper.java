@@ -51,7 +51,7 @@ public class ReflectionHelper {
    * @return true if the annotation is on this method.
    */
   public static <A extends Annotation> boolean hasAnnotation(Method method, Class<A> annotationType) {
-    return (findAnnotation(method, annotationType) != null);
+    return findAnnotation(method, annotationType) != null;
   }
 
   /**

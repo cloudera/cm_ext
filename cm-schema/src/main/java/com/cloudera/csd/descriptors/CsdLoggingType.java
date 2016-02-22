@@ -55,6 +55,23 @@ public enum CsdLoggingType {
    * It also creates a ConfigFileGenerator for logback.xml file for the role.
    */
   LOGBACK("logback.xml"),
+  /**
+   * CM auto-generates some ParamSpecs for a daemon role that uses this method.
+   * Each ParamSpec will automatically be emitted into the environment. The
+   * ParamSpecs are listed below with their corresponding environment variable
+   * names in parentheses:
+   * <ol>
+   * <li>Log directory (GLOG_log_dir)
+   * <li>Minimum log level (GLOG_minloglevel)
+   * <li>Maximum log level to buffer (GLOG_logbuflevel)
+   * <li>Minimum log verbosity (GLOG_v)
+   * <li>Maximum log size (GLOG_max_log_size)
+   * </ol>
+   * <p>
+   * When using glog-based logging, {@link LoggingDescriptor#getFilename()}
+   * must end in ".INFO".
+   */
+  GLOG(null),
   /** CM doesn't do anything automatically for this logging type. */
   OTHER(null);
 

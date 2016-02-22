@@ -33,6 +33,15 @@ public interface ConfigGenerator {
   @NotBlank
   String getFilename();
 
+  /**
+   * Optional. Whether this file can be refreshed. If at least one file is
+   * refreshable, the role will have a refresh command automatically created for
+   * it that will refresh all files for the role.
+   * <p>
+   * Defaults to False.
+   */
+  boolean isRefreshable();
+
   @Referencing(type=ReferenceType.PARAMETER)
   Set<String> getIncludedParams();
 
@@ -55,5 +64,8 @@ public interface ConfigGenerator {
   }
   
   public interface PropertiesGenerator extends ConfigGenerator {
+  }
+
+  public interface GFlagsGenerator extends ConfigGenerator {
   }
 }

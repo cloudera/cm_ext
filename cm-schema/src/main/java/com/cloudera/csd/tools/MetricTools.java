@@ -42,6 +42,7 @@ public class MetricTools {
 
   private static final String GENERATE_METRIC_TOOL_NAME = "generate";
   private static final String VALIDATE_METRIC_TOOL_NAME = "validate";
+  private static final String ADD_METRICS_METRIC_TOOL_NAME = "addMetrics";
 
   @SuppressWarnings({ "AccessStaticViaInstance", "static-access" })
   @VisibleForTesting
@@ -49,10 +50,12 @@ public class MetricTools {
       .withArgName("TOOL")
       .hasArg()
       .withDescription("The metric tool to run. Can be one of the following:\n" +
-                           "1) " + GENERATE_METRIC_TOOL_NAME + ": generate a " +
-                           "list of metric descriptors for review.\n" +
-                           "2) " + VALIDATE_METRIC_TOOL_NAME + ": validate " +
-                           "metric descriptors.\n")
+          "1) " + GENERATE_METRIC_TOOL_NAME + ": generate a " +
+          "list of metric descriptors for review.\n" +
+          "2) " + VALIDATE_METRIC_TOOL_NAME + ": validate " +
+          "metric descriptors.\n" +
+          "2) " + ADD_METRICS_METRIC_TOOL_NAME + ": add metrics to a particular " +
+          "type from a file to an MDL.\n")
       .isRequired(true)
       .create('t');
   @VisibleForTesting
@@ -63,6 +66,7 @@ public class MetricTools {
     options.addOption(OPT_TOOL);
     MetricDescriptorGeneratorTool.addToolOptions(options);
     MetricDescriptorValidatorTool.addToolOptions(options);
+    MetricDescriptorAddMetricsTool.addToolOptions(options);
     OPTIONS = options;
   }
 
@@ -140,6 +144,8 @@ public class MetricTools {
         return new MetricDescriptorGeneratorTool();
       } else if (VALIDATE_METRIC_TOOL_NAME.equals(toolName)) {
         return new MetricDescriptorValidatorTool();
+      } else if (ADD_METRICS_METRIC_TOOL_NAME.equals(toolName)) {
+        return new MetricDescriptorAddMetricsTool();
       } else {
         throw new ParseException("Unknown metric tool: " + toolName);
       }

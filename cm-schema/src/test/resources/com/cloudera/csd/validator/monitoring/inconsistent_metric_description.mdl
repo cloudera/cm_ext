@@ -1,0 +1,42 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "parcel" : {
+    "repoUrl" : "http://www.google.com",
+    "requiredTags" : ["req"]
+  },
+  "metricDefinitions" : [
+   {
+     "name" : "echo_metric",
+     "label" : "csdMetric1Label",
+     "description" : "csdMetric1Description",
+     "numeratorUnit" : "bytes",
+     "denominatorUnit" : "seconds"
+   }
+  ],
+  "roles" : [
+    {
+      "name" : "ECHOROLE",
+      "label" : "Web Server",
+      "pluralLabel" : "Web Servers",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "metricDefinitions": [
+        {
+          "name" : "echo_metric",
+          "label" : "csdMetric1Label",
+          "description" : "csdMetric1DescriptionDIFFERENT",
+          "numeratorUnit" : "bytes",
+          "denominatorUnit" : "seconds"
+        }
+      ]
+    }
+  ]
+}

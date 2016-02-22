@@ -21,6 +21,8 @@ import com.cloudera.parcel.descriptors.ComponentDescriptor;
 import com.cloudera.parcel.descriptors.PackageDescriptor;
 import com.cloudera.parcel.descriptors.ParcelDescriptor;
 import com.cloudera.parcel.descriptors.UserDescriptor;
+import com.cloudera.parcel.descriptors.VersionServicesRestartDescriptor;
+import com.cloudera.parcel.descriptors.VersionServicesRestartDescriptor.Scope;
 import com.cloudera.parcel.validation.ParcelTestUtils;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.collect.ImmutableSet;
@@ -97,6 +99,27 @@ public class JsonParcelParserTest {
     assertEquals(ImmutableSet.of("hive", "hdfs"), impala.getExtra_groups());
 
     assertEquals(ImmutableSet.of("hadoop"), parcel.getGroups());
+
+    assertNotNull(parcel.getServicesRestartInfo());
+    assertNotNull(parcel.getServicesRestartInfo().getVersionInfo());
+
+    Map<String, VersionServicesRestartDescriptor> versionServicesRestartDescriptorMap =
+      parcel.getServicesRestartInfo().getVersionInfo();
+    assertEquals(3, versionServicesRestartDescriptorMap.size());
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.0.0-0.cdh5b2.p0.282"));
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.0.0-0.cdh5b2.p0.281"));
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.0.0-0.cdh5b2.p0.280"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.282").getParentVersion().equals("5.0.0-0.cdh5b2.p0.281"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.282").getServiceInfo().containsKey("IMPALA"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.282").getServiceInfo().containsValue(Scope.DEPENDENTS_ONLY));
+
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.281").getParentVersion().equals("5.0.0-0.cdh5b2.p0.280"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.281").getServiceInfo().containsKey("HDFS"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.281").getServiceInfo().containsValue(Scope.SERVICE_ONLY));
+
+    assertNull(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.280").getParentVersion());
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.280").getServiceInfo().containsKey("HBASE"));
+    assertTrue(versionServicesRestartDescriptorMap.get("5.0.0-0.cdh5b2.p0.280").getServiceInfo().containsValue(Scope.SERVICE_AND_DEPENDENTS));
   }
 
   @Test

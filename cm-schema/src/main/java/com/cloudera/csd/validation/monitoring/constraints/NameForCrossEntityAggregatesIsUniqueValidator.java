@@ -19,8 +19,8 @@ import com.cloudera.csd.descriptors.MetricEntityTypeDescriptor;
 import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -40,11 +40,6 @@ import javax.validation.ConstraintViolation;
 public class NameForCrossEntityAggregatesIsUniqueValidator
     extends AbstractMonitoringValidator<ServiceMonitoringDefinitionsDescriptor> {
 
-  public NameForCrossEntityAggregatesIsUniqueValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
-    super(serviceDescriptor);
-  }
-
   @Override
   public String getDescription() {
     return
@@ -55,8 +50,10 @@ public class NameForCrossEntityAggregatesIsUniqueValidator
 
   @Override
   public <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       ServiceMonitoringDefinitionsDescriptor serviceDescriptor,
       DescriptorPathImpl path) {
+    Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(serviceDescriptor);
     Preconditions.checkNotNull(path);
     List<ConstraintViolation<T>> violations = Lists.newArrayList();

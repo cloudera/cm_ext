@@ -1,0 +1,81 @@
+{
+  "serviceName": "test_service",
+  "serviceMetrics": [
+    {
+      "name": "test_svc_metric1",
+      "metricType": "statistical",
+      "label": "test_svc_metric1_label",
+      "description": "test_svc_metric1_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "threads",
+      "metricNameForCounterMetric" : "counter_name_override",
+      "denominatorUnit": "second"
+    }
+  ],
+  "rolesMetrics": {
+    "test_role1_metrics" : [
+    {
+      "name": "test_role1_metric1",
+      "metricType": "counter",
+      "label": "test_role1_metric1_label",
+      "description": "test_role1_metric1_description",
+      "numeratorUnit": "bytes",
+      "metricNameForCounterMetric" : "name_for_counter_should_be_ignored"
+    },
+    {
+      "name": "test_role1_metric2",
+      "metricType": "gauge",
+      "label": "test_role1_metric2_label",
+      "description": "test_role1_metric2_description",
+      "numeratorUnit": "bytes",
+      "denominatorUnit": "second",
+      "metricNameForCounterMetric" : "name_for_counter_should_be_ignored"
+    }
+    ],
+    "test_role2_metrics" : [
+    {
+      "name": "test_role2_metric1",
+      "metricType": "statistical",
+      "label": "test_role2_metric1_label",
+      "description": "test_role2_metric1_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "threads",
+      "denominatorUnit": "second"
+    }
+    ]
+  },
+  "additionalServiceEntityTypesMetrics": {
+    "test_entity1_metrics" : [
+    {
+      "name": "test_entity1_metric1",
+      "metricType": "statistical",
+      "label": "test_entity1_metric1_label",
+      "description": "test_entity1_metric1_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "threads",
+      "metricNameForCounterMetric" : "entity1_metric1_counter_override",
+      "denominatorUnit": "second"
+    },
+    {
+      "name": "test_entity1_metric2",
+      "metricType": "statistical",
+      "label": "test_entity1_metric2_label",
+      "description": "test_entity1_metric2_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "threads",
+      "metricNameForCounterMetric" : "entity1_metric2_counter_override",
+      "denominatorUnit": "second"
+    }
+    ],
+    "test_entity2_metrics" : [
+    {
+      "name": "test_entity2_metric1",
+      "metricType": "statistical",
+      "label": "test_entity2_metric1_label",
+      "description": "test_entity2_metric1_description",
+      "numeratorUnit": "bytes",
+      "numeratorForCounterMetric" : "threads"
+    }
+    ]
+  }
+}

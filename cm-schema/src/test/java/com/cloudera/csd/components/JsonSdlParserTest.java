@@ -17,23 +17,37 @@ package com.cloudera.csd.components;
 
 import static org.junit.Assert.*;
 
+import com.cloudera.csd.descriptors.AuthorityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor.VersionRange;
 import com.cloudera.csd.descriptors.ConfigWriter;
+import com.cloudera.csd.descriptors.CsdConfigEntryType;
 import com.cloudera.csd.descriptors.CsdLoggingType;
 import com.cloudera.csd.descriptors.CsdParameterOptionality;
 import com.cloudera.csd.descriptors.CsdRoleState;
 import com.cloudera.csd.descriptors.GatewayDescriptor;
 import com.cloudera.csd.descriptors.GracefulStopDescriptor;
+import com.cloudera.csd.descriptors.CertificateFileFormat;
+import com.cloudera.csd.descriptors.PlacementRuleDescriptor;
+import com.cloudera.csd.descriptors.PlacementRuleDescriptor.AlwaysWithRule;
+import com.cloudera.csd.descriptors.PlacementRuleDescriptor.NeverWithRule;
 import com.cloudera.csd.descriptors.ProvidesKms;
 import com.cloudera.csd.descriptors.RoleCommandDescriptor;
 import com.cloudera.csd.descriptors.RoleDescriptor;
 import com.cloudera.csd.descriptors.RoleExternalLink;
+import com.cloudera.csd.descriptors.RollingRestartDescriptor;
+import com.cloudera.csd.descriptors.RollingRestartNonWorkerStepDescriptor;
+import com.cloudera.csd.descriptors.RollingRestartWorkerStepDescriptor;
 import com.cloudera.csd.descriptors.ServiceCommandDescriptor;
 import com.cloudera.csd.descriptors.ServiceCommandDescriptor.RunMode;
+import com.cloudera.csd.descriptors.SslClientDescriptor.JksSslClientDescriptor;
+import com.cloudera.csd.descriptors.SslServerDescriptor.JksSslServerDescriptor;
 import com.cloudera.csd.descriptors.ServiceDependency;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.ServiceInitDescriptor;
+import com.cloudera.csd.descriptors.SslClientDescriptor;
+import com.cloudera.csd.descriptors.SslServerDescriptor;
+import com.cloudera.csd.descriptors.SslServerDescriptor.PemSslServerDescriptor;
 import com.cloudera.csd.descriptors.TopologyDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
@@ -41,6 +55,7 @@ import com.cloudera.csd.descriptors.dependencyExtension.ExtensionConfigEntry;
 import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
+import com.cloudera.csd.descriptors.generators.ConfigGenerator.GFlagsGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
 import com.cloudera.csd.descriptors.generators.PeerConfigGenerator;
@@ -62,23 +77,27 @@ import com.cloudera.csd.descriptors.parameters.StringParameter.InitType;
 import com.cloudera.csd.descriptors.parameters.URIArrayParameter;
 import com.cloudera.csd.descriptors.parameters.URIParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class JsonSdlParserTest {
 
-  private JsonSdlParser parser = new JsonSdlParser();
+  private JsonSdlObjectMapper mapper = new JsonSdlObjectMapper();
+  private JsonSdlParser parser = new JsonSdlParser(mapper);
 
   @Test
   public void testParseFullFile() throws Exception {
@@ -107,12 +126,22 @@ public class JsonSdlParserTest {
     assertEquals("gateway-log4j.properties", clientCfg.getLogging().getConfigFilename());
     List<ConfigEntry> additionalConfigs = clientCfg.getLogging().getAdditionalConfigs();
     assertNotNull(additionalConfigs);
-    assertEquals(1, additionalConfigs.size());
+    assertEquals(3, additionalConfigs.size());
+
     assertEquals("foo.enabled", additionalConfigs.get(0).getKey());
     assertEquals("true", additionalConfigs.get(0).getValue());
+    assertNull(additionalConfigs.get(0).getType());
+
+    assertEquals("auth.to.local.rules", additionalConfigs.get(1).getKey());
+    assertNull(additionalConfigs.get(1).getValue());
+    assertEquals(CsdConfigEntryType.AUTH_TO_LOCAL, additionalConfigs.get(1).getType());
+
+    assertEquals("foo.simple", additionalConfigs.get(2).getKey());
+    assertEquals("simple_value", additionalConfigs.get(2).getValue());
+    assertEquals(CsdConfigEntryType.SIMPLE, additionalConfigs.get(2).getType());
 
     assertEquals(3, descriptor.getHdfsDirs().size());
-    
+
     ServiceInitDescriptor initRunner= descriptor.getServiceInit();
     assertNotNull(initRunner);
     assertEquals(1, initRunner.getPreStartSteps().size());
@@ -120,11 +149,11 @@ public class JsonSdlParserTest {
     assertEquals(1, initRunner.getPostStartSteps().size());
     assertTrue(Iterables.getOnlyElement(initRunner.getPostStartSteps()).isFailureAllowed());
 
-    assertEquals(2, descriptor.getRoles().size());
+    assertEquals(4, descriptor.getRoles().size());
     Map<String, RoleDescriptor> name2role = Maps.newHashMap();
     for (RoleDescriptor desc : descriptor.getRoles()) {
       name2role.put(desc.getName(), desc);
-      if (desc.getName() == "ECHO_MASTER_SERVER") {
+      if (desc.getName().equals("ECHO_MASTER_SERVER")) {
         assertTrue(desc.isJvmBased());
       } else {
         assertFalse(desc.isJvmBased());
@@ -135,12 +164,24 @@ public class JsonSdlParserTest {
     assertNotNull(master);
     assertEquals("Master Servers", master.getPluralLabel());
 
-    assertNotNull(master.getSslServer());
-    assertEquals("echo_master", master.getSslServer().getKeyIdentifier());
+    SslServerDescriptor sslServer = master.getSslServer();
+    assertNotNull(sslServer);
+    assertEquals(null, sslServer.getKeystoreFormat());
+    assertEquals("echo.ssl.enabled", sslServer.getEnabledConfigName());
+    assertEquals(null, sslServer.getEnabledOptionality());
+    assertTrue(sslServer instanceof JksSslServerDescriptor);
+    JksSslServerDescriptor jksSslServer = (JksSslServerDescriptor) sslServer;
+    assertFalse(jksSslServer.isKeystorePasswordScriptBased());
+    assertEquals("echo_master", jksSslServer.getKeyIdentifier());
     assertEquals(CsdParameterOptionality.REQUIRED,
-        master.getSslServer().getKeyPasswordOptionality());
+        jksSslServer.getKeyPasswordOptionality());
+    assertEquals("echo.ssl.key.password",
+        jksSslServer.getKeystoreKeyPasswordConfigName());
+    assertTrue(jksSslServer.isKeystoreKeyPasswordScriptBased());
 
-    assertNotNull(master.getSslClient());
+    SslClientDescriptor sslClient = master.getSslClient();
+    assertNotNull(sslClient);
+    assertEquals(CertificateFileFormat.PEM, sslClient.getTruststoreFormat());
 
     assertNotNull(master.getLogging());
     assertEquals("master.log.dir", master.getLogging().getConfigName());
@@ -151,6 +192,7 @@ public class JsonSdlParserTest {
     ConfigGenerator masterGenerator = Iterables.getOnlyElement(masterConfigWriter.getGenerators());
     assertTrue(masterGenerator instanceof HadoopXMLGenerator);
     assertEquals("sample_xml_file.xml", masterGenerator.getFilename());
+    assertTrue(masterGenerator.isRefreshable());
     assertEquals(2, masterGenerator.getKerberosPrincipals().size());
 
     RoleExternalLink externalLink = master.getExternalLink();
@@ -184,12 +226,30 @@ public class JsonSdlParserTest {
         role.getLogging().getAdditionalConfigs());
     assertEquals("Web Servers", role.getPluralLabel());
 
+    sslServer = role.getSslServer();
+    assertNotNull(sslServer);
+    assertEquals(null, sslServer.getKeystoreFormat());
+    assertTrue(sslServer instanceof JksSslServerDescriptor);
+    jksSslServer = (JksSslServerDescriptor) sslServer;
+    assertTrue(jksSslServer.isKeystorePasswordCredentialProviderCompatible());
+    assertTrue(jksSslServer.isKeystoreKeyPasswordCredentialProviderCompatible());
+
+    sslClient = role.getSslClient();
+    assertNotNull(sslClient);
+    assertEquals(null, sslClient.getTruststoreFormat());
+    assertTrue(sslClient instanceof JksSslClientDescriptor);
+    JksSslClientDescriptor jksSslClient = (JksSslClientDescriptor) sslClient;
+    assertTrue(jksSslClient.isTruststorePasswordCredentialProviderCompatible());
+
     ConfigWriter roleConfigWriter = role.getConfigWriter();
     assertNotNull(roleConfigWriter);
     assertNotNull(roleConfigWriter.getGenerators());
     ConfigGenerator roleGenerator = Iterables.getFirst(roleConfigWriter.getGenerators(), null);
     assertTrue(roleGenerator instanceof HadoopXMLGenerator);
     assertEquals("sample_xml_file.xml", roleGenerator.getFilename());
+    assertFalse(
+        "unspecified ConfigGenerator.isRefreshable should default to false",
+        roleGenerator.isRefreshable());
     assertEquals(1, roleGenerator.getKerberosPrincipals().size());
     assertConfigEntries(
         ImmutableMap.of(
@@ -197,6 +257,25 @@ public class JsonSdlParserTest {
             "additional.config.template.key", "{{REPLACE_ME}}",
             "additional.config.interpolate.host.${host}.svcvar1.${service_var1}.key", "prefix://${host}:${role_var1}"),
             roleGenerator.getAdditionalConfigs());
+    Set<String> foundGenerators = Sets.newHashSet();
+    for (PeerConfigGenerator peerGenerator : roleConfigWriter.getPeerConfigGenerators()) {
+      String filename = peerGenerator.getFilename();
+      foundGenerators.add(filename);
+      if ("sample_role_peer_file.properties".equals(filename)) {
+        assertTrue(peerGenerator.isRefreshable());
+        assertEquals(ImmutableSet.of("service_var1", "role_var3"),
+            peerGenerator.getParams());
+      } else if ("sample_master_peer_file.properties".equals(filename)) {
+        assertFalse(peerGenerator.isRefreshable());
+        assertEquals(ImmutableSet.of("master_server_var1"),
+            peerGenerator.getParams());
+        assertEquals("ECHO_MASTER_SERVER", peerGenerator.getRoleName());
+      } else {
+        fail("unexpected peer generator: " + filename);
+      }
+    }
+    assertEquals(ImmutableSet.of("sample_role_peer_file.properties",
+        "sample_master_peer_file.properties"), foundGenerators);
 
     assertNotNull(descriptor.getCommands());
     assertEquals(2, descriptor.getCommands().size());
@@ -221,6 +300,59 @@ public class JsonSdlParserTest {
     assertEquals("ECHO_MASTER_SERVER", stopDesc.getMasterRole());
     assertEquals("scripts/graceful_stop.sh", stopDesc.getRunner().getProgram());
     assertEquals(ImmutableList.of("ECHO_WEBSERVER"), stopDesc.getRelevantRoleTypes());
+
+    AuthorityDescriptor authorityDescriptor = descriptor.getAuthorities();
+    assertNotNull(authorityDescriptor);
+    assertEquals("AUTH_BDR_ADMIN", authorityDescriptor.getAuthorityForAddRemove());
+    assertEquals("AUTH_NAVIGATOR", authorityDescriptor.getDefaultAuthorityForParameters());
+    assertEquals("AUTH_AUDITS", authorityDescriptor.getAuthorityForPowerState());
+
+    RoleDescriptor webserverBuddy = name2role.get("ECHO_WEBSERVER_BUDDY");
+    assertNotNull(webserverBuddy);
+    topology = webserverBuddy.getTopology();
+    assertNotNull(topology);
+    List<PlacementRuleDescriptor> placementRules = topology.getPlacementRules();
+    assertNotNull(placementRules);
+    assertEquals(1, placementRules.size());
+    assertTrue(placementRules.get(0) instanceof AlwaysWithRule);
+    assertEquals("ECHO_WEBSERVER",
+        ((AlwaysWithRule) placementRules.get(0)).getRoleType());
+
+    RoleDescriptor exile = name2role.get("ECHO_EXILE");
+    assertNotNull(exile);
+    topology = exile.getTopology();
+    assertNotNull(topology);
+    placementRules = topology.getPlacementRules();
+    assertNotNull(placementRules);
+    assertEquals(1, placementRules.size());
+    assertTrue(placementRules.get(0) instanceof NeverWithRule);
+    assertEquals(
+        ImmutableList.of(
+            "ECHO_MASTER_SERVER", "ECHO_WEBSERVER", "ECHO_WEBSERVER_BUDDY"),
+        ((NeverWithRule) placementRules.get(0)).getRoleTypes());
+
+    RollingRestartDescriptor rrDesc = descriptor.getRollingRestart();
+    assertNotNull(rrDesc);
+    assertEquals(1, rrDesc.getNonWorkerSteps().size());
+    RollingRestartNonWorkerStepDescriptor nwStep = rrDesc.getNonWorkerSteps().get(0);
+    assertNonWorkerRRStep(nwStep, "ECHO_MASTER_SERVER",
+        null /* uses auto-stop */, ImmutableList.of("Start", "role_cmd2"));
+    assertWorkerRRStep(rrDesc.getWorkerSteps(), "ECHO_WEBSERVER",
+        ImmutableList.of("service_cmd1", "Stop"), null /*uses auto-start */);
+  }
+
+  private void assertNonWorkerRRStep(RollingRestartNonWorkerStepDescriptor rrStep,
+      String expectedRoleName, List<String> expectedBringDown, List<String> expectedBringUp) {
+    assertEquals(expectedRoleName, rrStep.getRoleName());
+    assertEquals(expectedBringDown, rrStep.getBringDownCommands());
+    assertEquals(expectedBringUp, rrStep.getBringUpCommands());
+  }
+
+  private void assertWorkerRRStep(RollingRestartWorkerStepDescriptor rrStep,
+      String expectedRoleName, List<String> expectedBringDown, List<String> expectedBringUp) {
+    assertEquals(expectedRoleName, rrStep.getRoleName());
+    assertEquals(expectedBringDown, rrStep.getBringDownCommands());
+    assertEquals(expectedBringUp, rrStep.getBringUpCommands());
   }
 
   private void assertConfigEntries(Map<String, String> expected,
@@ -255,6 +387,16 @@ public class JsonSdlParserTest {
     ServiceDescriptor descriptor = parser
         .parse(getSdl("service_unknown_elements.sdl"));
     assertEquals(descriptor.getName(), "ECHO");
+  }
+
+  @Test(expected = UnrecognizedPropertyException.class)
+  public void testParseUnknownElementStrictly() throws Exception {
+    try {
+      mapper.setFailOnUnknownProperties(true);
+      parser.parse(getSdl("service_unknown_elements.sdl"));
+    } finally {
+      mapper.setFailOnUnknownProperties(false);
+    }
   }
 
   @Test(expected = IOException.class)
@@ -350,14 +492,13 @@ public class JsonSdlParserTest {
     found = 0;
 
     List<RoleDescriptor> roles = descriptor.getRoles();
-    assertEquals(2, roles.size());
+    assertEquals(4, roles.size());
     Map<String, RoleDescriptor> rds = SdlTestUtils.makeRoleMap(roles);
     RoleDescriptor rd = rds.get("ECHO_WEBSERVER");
     // check role command
     assertEquals(1, rd.getCommands().size());
-    RoleCommandDescriptor rcd = Iterables.getOnlyElement(rd.getCommands());
-    
-    assertEquals(14, rd.getParameters().size());
+
+    assertEquals(16, rd.getParameters().size());
     for (Parameter<?> p : rd.getParameters()) {
       // check that parameters are parsed polymorphically
       if (p.getName().equals("role_var1")) {
@@ -394,7 +535,7 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("role_var6")) {
         assertTrue(p instanceof StringArrayParameter);
         StringArrayParameter dp = (StringArrayParameter)p;
-        ImmutableList expected = ImmutableList.of("foo", "bar");
+        ImmutableList<String> expected = ImmutableList.of("foo", "bar");
         assertEquals(expected, dp.getDefault());
         assertNull(dp.getMinLength());
         assertNotNull(dp.getMaxLength());
@@ -409,7 +550,7 @@ public class JsonSdlParserTest {
       } else if (p.getName().equals("role_var8")) {
         assertTrue(p instanceof URIArrayParameter);
         URIArrayParameter dp = (URIArrayParameter)p;
-        ImmutableList expected = ImmutableList.of("ldap://foo", "ldaps://bar");
+        ImmutableList<String> expected = ImmutableList.of("ldap://foo", "ldaps://bar");
         assertEquals(expected, dp.getDefault());
         assertNotNull(dp.getMinLength());
         assertNotNull(dp.getMaxLength());
@@ -443,7 +584,16 @@ public class JsonSdlParserTest {
         found++;
       } else if (p.getName().equals("role_var13")) {
         assertTrue(p instanceof PasswordParameter);
-        PasswordParameter dp = (PasswordParameter) p;
+        found++;
+      } else if (p.getName().equals("role_var14")) {
+        assertTrue(p instanceof PasswordParameter);
+        PasswordParameter pp = (PasswordParameter) p;
+        assertTrue(pp.isCredentialProviderCompatible());
+        found++;
+      } else if (p.getName().equals("role_var15")) {
+        assertTrue(p instanceof PasswordParameter);
+        PasswordParameter pp = (PasswordParameter) p;
+        assertEquals("role.var15.altscript", pp.getAlternateScriptParameterName());
         found++;
       } else if (p.getName().equals("echo_server_heap")) {
         assertTrue(p instanceof MemoryParameter);
@@ -454,11 +604,11 @@ public class JsonSdlParserTest {
         found++;
       }
     }
-    assertEquals(14, found);
-    
+    assertEquals(16, found);
+
     // Check that config files are parsed correctly
     ConfigWriter cw = rd.getConfigWriter();
-    assertEquals(3, cw.getGenerators().size());
+    assertEquals(4, cw.getGenerators().size());
     found = 0;
     for (ConfigGenerator gen : cw.getGenerators()) {
       if (gen.getFilename().equals("sample_xml_file.xml")) {
@@ -476,9 +626,14 @@ public class JsonSdlParserTest {
         assertEquals(2, gen.getIncludedParams().size());
         assertNull(gen.getExcludedParams());
         found++;
+      } else if (gen.getFilename().equals("sample_gflags_file")) {
+        assertTrue(gen instanceof GFlagsGenerator);
+        assertEquals(2, gen.getIncludedParams().size());
+        assertNull(gen.getExcludedParams());
+        found++;
       }
     }
-    assertEquals(3, found);
+    assertEquals(4, found);
     found = 0;
     assertEquals(2, cw.getPeerConfigGenerators().size());
     for (PeerConfigGenerator gen : cw.getPeerConfigGenerators()) {
@@ -545,9 +700,42 @@ public class JsonSdlParserTest {
     assertEquals(1, serviceDesc.getRoles().size());
     RoleDescriptor roleDesc = serviceDesc.getRoles().get(0);
     assertNotNull(roleDesc);
-    assertNotNull(roleDesc.getSslServer());
-    assertEquals("kms", roleDesc.getSslServer().getKeyIdentifier());
-    assertNull(roleDesc.getSslServer().getKeyPasswordOptionality());
+
+    SslServerDescriptor sslServer = roleDesc.getSslServer();
+    assertNotNull(sslServer);
+    assertEquals(CertificateFileFormat.PEM, sslServer.getKeystoreFormat());
+    assertEquals(CsdParameterOptionality.REQUIRED,
+        sslServer.getEnabledOptionality());
+    assertTrue(sslServer instanceof PemSslServerDescriptor);
+    PemSslServerDescriptor pemServer = (PemSslServerDescriptor) sslServer;
+    assertEquals("kms.ssl.privatekey.location",
+        pemServer.getPrivateKeyLocationConfigName());
+    assertEquals("/var/lib/hadoop-kms/.ssl/privatekey.pem",
+        pemServer.getPrivateKeyLocationDefault());
+    assertEquals("kms.ssl.cert.location",
+        pemServer.getCertificateLocationConfigName());
+    assertEquals("/var/lib/hadoop-kms/.ssl/cert.pem",
+        pemServer.getCertificateLocationDefault());
+    assertEquals("kms.ssl.cacert.location",
+        pemServer.getCaCertificateLocationConfigName());
+    assertEquals("/var/lib/hadoop-kms/.ssl/cacert.pem",
+        pemServer.getCaCertificateLocationDefault());
+    assertEquals("kms.ssl.privatekey.password",
+        pemServer.getPrivateKeyPasswordConfigName());
+    assertTrue(pemServer.isPrivateKeyPasswordScriptBased());
+
+    SslClientDescriptor sslClient = roleDesc.getSslClient();
+    assertNotNull(sslClient);
+    assertEquals(CertificateFileFormat.JKS, sslClient.getTruststoreFormat());
+    assertEquals("kms.ssl.truststore.location",
+        sslClient.getTruststoreLocationConfigName());
+    assertEquals("/var/lib/hadoop-kms/.ssl/truststore.jceks",
+        sslClient.getTruststoreLocationDefault());
+    assertTrue(sslClient instanceof JksSslClientDescriptor);
+    JksSslClientDescriptor jksClient = (JksSslClientDescriptor) sslClient;
+    assertEquals("kms.ssl.truststore.password",
+        jksClient.getTruststorePasswordConfigName());
+    assertTrue(jksClient.isTruststorePasswordScriptBased());
   }
 
   private byte[] getSdl(String name) throws IOException {

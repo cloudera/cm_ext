@@ -26,7 +26,7 @@ public class CodahaleMetricTypes {
   /**
    * An enum of all the Codahale metric types this adapter supports.
    */
-  public static enum CodahaleMetricType {
+  public enum CodahaleMetricType {
     GAUGE,
     COUNTER,
     HISTOGRAM,
@@ -39,10 +39,42 @@ public class CodahaleMetricTypes {
    * For example, a timer exposes a few gauge metrics, a counter, and a few
    * rate gauges.
    */
-  public static enum MetricClass {
+  public enum CodahaleMetricClass {
     COUNTER,
     GAUGE,
     RATE_GAUGE
+  }
+
+  /**
+   * An interface defining what histogram, timer, and meter codahale metric
+   * types expose.
+   */
+  public interface ComplexCodahaleMetric {
+    /**
+     * Returns 'true' if the underlying codahale metric type is a counter.
+     * @return
+     */
+    boolean isCounter();
+
+    /**
+     * Returns 'true' if the underlying codahale metric type is a rate.
+     * @return
+     */
+    boolean isRate();
+
+    /**
+     * Generates the full metric name from the 'metricNameBase' and the specific
+     * underlying codahale metric type.
+     * @param metricNameBase
+     * @return
+     */
+    String makeMetricName(String metricNameBase);
+
+    /**
+     * Return the suffix used in the metric name.
+     * @return
+     */
+    String suffix();
   }
 
   /**
@@ -50,24 +82,24 @@ public class CodahaleMetricTypes {
    * 'suffix' will be appended to the base metric name to generate each specific
    * metric.
    */
-  public enum HistogramMetricType {
-    MAX("_max", MetricClass.GAUGE, ": Max"),
-    MIN("_min", MetricClass.GAUGE, ": Min"),
-    MEAN("_avg", MetricClass.GAUGE, ": Avg"),
-    COUNT("_count", MetricClass.COUNTER, ": Samples"),
-    STDDEV("_stddev", MetricClass.GAUGE, ": Standard Deviation"),
-    MEDIAN("_median", MetricClass.GAUGE, ": 50th Percentile"),
-    PERCENTILE_75("_75th_percentile", MetricClass.GAUGE, ": 75th Percentile"),
-    PERCENTILE_99("_99th_percentile", MetricClass.GAUGE, ": 99th Percentile"),
-    PERCENTILE_999("_999th_percentile", MetricClass.GAUGE, ": 999th Percentile");
+  public enum HistogramMetricType implements ComplexCodahaleMetric {
+    MAX("_max", CodahaleMetricClass.GAUGE, ": Max"),
+    MIN("_min", CodahaleMetricClass.GAUGE, ": Min"),
+    MEAN("_avg", CodahaleMetricClass.GAUGE, ": Avg"),
+    COUNT("_count", CodahaleMetricClass.COUNTER, ": Samples"),
+    STDDEV("_stddev", CodahaleMetricClass.GAUGE, ": Standard Deviation"),
+    MEDIAN("_median", CodahaleMetricClass.GAUGE, ": 50th Percentile"),
+    PERCENTILE_75("_75th_percentile", CodahaleMetricClass.GAUGE, ": 75th Percentile"),
+    PERCENTILE_99("_99th_percentile", CodahaleMetricClass.GAUGE, ": 99th Percentile"),
+    PERCENTILE_999("_999th_percentile", CodahaleMetricClass.GAUGE, ": 999th Percentile");
 
     private final String metricNameSuffix;
-    private final MetricClass metricClass;
+    private final CodahaleMetricClass metricClass;
     private final String descriptionSuffix;
 
-    private HistogramMetricType(String val,
-                                MetricClass metricClass,
-                                String descriptionSuffix) {
+    HistogramMetricType(String val,
+                        CodahaleMetricClass metricClass,
+                        String descriptionSuffix) {
       Preconditions.checkNotNull(val);
       Preconditions.checkNotNull(metricClass);
       Preconditions.checkNotNull(descriptionSuffix);
@@ -76,18 +108,26 @@ public class CodahaleMetricTypes {
       this.descriptionSuffix = descriptionSuffix;
     }
 
+    @Override
     public String suffix() {
       return metricNameSuffix;
     }
 
+    @Override
     public boolean isCounter() {
-      return metricClass.equals(MetricClass.COUNTER);
+      return metricClass.equals(CodahaleMetricClass.COUNTER);
+    }
+
+    @Override
+    public boolean isRate() {
+      return false;
     }
 
     public String descriptionSuffix() {
       return descriptionSuffix;
     }
 
+    @Override
     public String makeMetricName(String metricName) {
       Preconditions.checkNotNull(metricName);
       return String.format("%s%s", metricName, suffix());
@@ -107,27 +147,27 @@ public class CodahaleMetricTypes {
    * Supported types of metrics generated from a Codahale Timer. 'suffix' will
    * be appended to the base metric name to generate each specific metric.
    */
-  public enum TimerMetricType {
-    MAX("_max", MetricClass.GAUGE,  ": Max"),
-    MIN("_min", MetricClass.GAUGE,  ": Min"),
-    MEAN("_avg", MetricClass.GAUGE,  ": Avg"),
-    COUNT("_count", MetricClass.COUNTER, ": Samples"),
-    STDDEV("_stddev", MetricClass.GAUGE,  ": Standard Deviation"),
-    MEDIAN("_median", MetricClass.GAUGE,  ": 50th Percentile"),
-    PERCENTILE_75("_75th_percentile", MetricClass.GAUGE,  ": 75th Percentile"),
-    PERCENTILE_99("_99th_percentile", MetricClass.GAUGE,  ": 99th Percentile"),
-    PERCENTILE_999("_999th_percentile", MetricClass.GAUGE,  ": 999th Percentile"),
-    ONE_MIN_RATE("_1min_rate", MetricClass.RATE_GAUGE,  ": 1 Min Rate"),
-    FIVE_MIN_RATE("_5min_rate", MetricClass.RATE_GAUGE,  ": 5 Min Rate"),
-    FIFTEEN_MIN_RATE("_15min_rate", MetricClass.RATE_GAUGE,  ": 15 Min Rate");
+  public enum TimerMetricType implements ComplexCodahaleMetric {
+    MAX("_max", CodahaleMetricClass.GAUGE,  ": Max"),
+    MIN("_min", CodahaleMetricClass.GAUGE,  ": Min"),
+    MEAN("_avg", CodahaleMetricClass.GAUGE,  ": Avg"),
+    COUNT("_count", CodahaleMetricClass.COUNTER, ": Samples"),
+    STDDEV("_stddev", CodahaleMetricClass.GAUGE,  ": Standard Deviation"),
+    MEDIAN("_median", CodahaleMetricClass.GAUGE,  ": 50th Percentile"),
+    PERCENTILE_75("_75th_percentile", CodahaleMetricClass.GAUGE,  ": 75th Percentile"),
+    PERCENTILE_99("_99th_percentile", CodahaleMetricClass.GAUGE,  ": 99th Percentile"),
+    PERCENTILE_999("_999th_percentile", CodahaleMetricClass.GAUGE,  ": 999th Percentile"),
+    ONE_MIN_RATE("_1min_rate", CodahaleMetricClass.RATE_GAUGE,  ": 1 Min Rate"),
+    FIVE_MIN_RATE("_5min_rate", CodahaleMetricClass.RATE_GAUGE,  ": 5 Min Rate"),
+    FIFTEEN_MIN_RATE("_15min_rate", CodahaleMetricClass.RATE_GAUGE,  ": 15 Min Rate");
 
     private final String metricNameSuffix;
-    private final MetricClass metricClass;
+    private final CodahaleMetricClass metricClass;
     private final String descriptionSuffix;
 
-    private TimerMetricType(String val,
-                            MetricClass metricClass,
-                            String descriptionSuffix) {
+    TimerMetricType(String val,
+                    CodahaleMetricClass metricClass,
+                    String descriptionSuffix) {
       Preconditions.checkNotNull(val);
       Preconditions.checkNotNull(metricClass);
       Preconditions.checkNotNull(descriptionSuffix);
@@ -136,22 +176,26 @@ public class CodahaleMetricTypes {
       this.descriptionSuffix = descriptionSuffix;
     }
 
+    @Override
     public String suffix() {
       return metricNameSuffix;
     }
 
+    @Override
     public boolean isCounter() {
-      return metricClass.equals(MetricClass.COUNTER);
+      return metricClass.equals(CodahaleMetricClass.COUNTER);
     }
 
+    @Override
     public boolean isRate() {
-      return metricClass.equals(MetricClass.RATE_GAUGE);
+      return metricClass.equals(CodahaleMetricClass.RATE_GAUGE);
     }
 
     public String descriptionSuffix() {
       return descriptionSuffix;
     }
 
+    @Override
     public String makeMetricName(String metricName) {
       Preconditions.checkNotNull(metricName);
       return String.format("%s%s", metricName, suffix());
@@ -171,20 +215,20 @@ public class CodahaleMetricTypes {
    * Supported types of metrics generated from a Codahale Meter. 'suffix' will
    * be append to the base metric name to generate each specific metric.
    */
-  public enum MeterMetricType {
-    COUNT("_count", MetricClass.COUNTER, ""),
-    MEAN_RATE_GAUGE("_avg_rate", MetricClass.RATE_GAUGE, ": Avg Rate"),
-    ONE_MIN_RATE_GAUGE("_1min_rate", MetricClass.RATE_GAUGE, ": 1 Min Rate"),
-    FIVE_MIN_RATE_GAUGE("_5min_rate", MetricClass.RATE_GAUGE, ": 5 Min Rate"),
-    FIFTEEN_MIN_RATE_GAUGE("_15min_rate", MetricClass.RATE_GAUGE, ": 15 Min Rate");
+  public enum MeterMetricType implements ComplexCodahaleMetric {
+    COUNT("_count", CodahaleMetricClass.COUNTER, ""),
+    MEAN_RATE_GAUGE("_avg_rate", CodahaleMetricClass.RATE_GAUGE, ": Avg Rate"),
+    ONE_MIN_RATE_GAUGE("_1min_rate", CodahaleMetricClass.RATE_GAUGE, ": 1 Min Rate"),
+    FIVE_MIN_RATE_GAUGE("_5min_rate", CodahaleMetricClass.RATE_GAUGE, ": 5 Min Rate"),
+    FIFTEEN_MIN_RATE_GAUGE("_15min_rate", CodahaleMetricClass.RATE_GAUGE, ": 15 Min Rate");
 
     private final String metricNameSuffix;
-    private final MetricClass metricClass;
+    private final CodahaleMetricClass metricClass;
     private final String descriptionSuffix;
 
-    private MeterMetricType(String val,
-                            MetricClass metricClass,
-                            String descriptionSuffix) {
+    MeterMetricType(String val,
+                    CodahaleMetricClass metricClass,
+                    String descriptionSuffix) {
       Preconditions.checkNotNull(val);
       Preconditions.checkNotNull(descriptionSuffix);
       this.metricNameSuffix = val;
@@ -192,22 +236,26 @@ public class CodahaleMetricTypes {
       this.descriptionSuffix = descriptionSuffix;
     }
 
+    @Override
     public String suffix() {
       return metricNameSuffix;
     }
 
+    @Override
     public boolean isCounter() {
-      return MetricClass.COUNTER.equals(metricClass);
+      return CodahaleMetricClass.COUNTER.equals(metricClass);
     }
 
+    @Override
     public boolean isRate() {
-      return MetricClass.RATE_GAUGE.equals(metricClass);
+      return CodahaleMetricClass.RATE_GAUGE.equals(metricClass);
     }
 
     public String descriptionSuffix() {
       return descriptionSuffix;
     }
 
+    @Override
     public String makeMetricName(String metricName) {
       Preconditions.checkNotNull(metricName);
       return String.format("%s%s", metricName, suffix());

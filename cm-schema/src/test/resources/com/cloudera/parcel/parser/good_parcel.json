@@ -47,7 +47,21 @@
       "pkg_version": "2.2.0+cdh5.0.0+609"
     }
   ],
-
+  "servicesRestartInfo": {
+    "versionInfo": {
+      "5.0.0-0.cdh5b2.p0.282": {
+        "serviceInfo": {"IMPALA": "DEPENDENTS_ONLY"},
+        "parentVersion": "5.0.0-0.cdh5b2.p0.281"
+      },
+      "5.0.0-0.cdh5b2.p0.281": {
+        "serviceInfo": {"HDFS": "SERVICE_ONLY"},
+        "parentVersion": "5.0.0-0.cdh5b2.p0.280"
+      },
+      "5.0.0-0.cdh5b2.p0.280": {
+        "serviceInfo": {"HBASE": "SERVICE_AND_DEPENDENTS"}
+      }
+    }
+  },
   "users": {
     "hdfs": {
       "longname"    : "Hadoop HDFS",

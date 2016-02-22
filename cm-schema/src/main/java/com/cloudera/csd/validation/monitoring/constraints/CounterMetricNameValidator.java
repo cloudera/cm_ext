@@ -16,11 +16,10 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
 import com.cloudera.csd.validation.monitoring.MonitoringConventions;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
-
 import com.google.common.base.Preconditions;
 
 import java.util.List;
@@ -32,11 +31,6 @@ import javax.validation.ConstraintViolation;
  */
 public class CounterMetricNameValidator
     extends AbstractMonitoringValidator<MetricDescriptor> {
-
-  public CounterMetricNameValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
-    super(serviceDescriptor);
-  }
 
   @Override
   public String getDescription() {
@@ -50,8 +44,10 @@ public class CounterMetricNameValidator
 
   @Override
   public <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       MetricDescriptor metricDescriptor,
       DescriptorPathImpl path) {
+    Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(metricDescriptor);
     if (!metricDescriptor.isCounter()) {
       return noViolations();
@@ -77,7 +73,7 @@ public class CounterMetricNameValidator
       return forViolation(msg, metricDescriptor, metricName, path);
     }
 
-    if (metricsDefined.containsKey(userVisibleName)) {
+    if (context.metricsDefined.containsKey(userVisibleName)) {
        String msg = String.format(
           "User visible name %s for counter metric %s collides with a metric " +
           "defined in the MDL with the same name",

@@ -50,4 +50,6 @@ public interface ParcelInfoDescriptor {
   String getConflicts();
 
   String getReleaseNotes();
+
+  ServicesRestartDescriptor getServicesRestartInfo();
 }

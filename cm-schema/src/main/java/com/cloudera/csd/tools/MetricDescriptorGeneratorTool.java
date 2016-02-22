@@ -16,6 +16,7 @@
 package com.cloudera.csd.tools;
 
 import com.cloudera.csd.components.JsonMdlParser;
+import com.cloudera.csd.components.JsonSdlObjectMapper;
 import com.cloudera.csd.descriptors.MetricEntityTypeDescriptor;
 import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
@@ -40,6 +41,14 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * MetricTool that expands sets of metrics, specified in a "fixture" file, from
+ * an instrumentation format (e.g. codahale), into MDL format using a specified
+ * "adapter". This tool allows the specification of metrics in a more concise
+ * form than the MDL format: for example, the file allows saying "role X has
+ * histograms A, B and C" while the adapter captures that each histogram is
+ * backed by 9 metrics in the MDL. 
+ */
 public class MetricDescriptorGeneratorTool implements MetricTool {
 
   private static final Logger LOG = LoggerFactory.getLogger(
@@ -128,13 +137,14 @@ public class MetricDescriptorGeneratorTool implements MetricTool {
     try {
       mdlInputStream =
           new FileInputStream(config.getString(OPT_INPUT_MDL.getLongOpt()));
-      JsonMdlParser mdlParser = new JsonMdlParser();
+      JsonMdlParser mdlParser = new JsonMdlParser(new JsonSdlObjectMapper());
       ServiceMonitoringDefinitionsDescriptor mdl =
           mdlParser.parse(IOUtils.toByteArray(mdlInputStream));
       ServiceMonitoringDefinitionsDescriptorImpl.Builder mdlBuilder =
           new ServiceMonitoringDefinitionsDescriptorImpl.Builder(mdl);
 
-      MetricFixtureAdapter adapter = newMetricFixtureAdapter(config, out, err);
+      AbstractMetricFixtureAdapter<?> adapter =
+          newMetricFixtureAdapter(config, out, err);
       adapter.init(config.getString(OPT_INPUT_FIXTURE.getLongOpt()),
                    config.getString(OPT_INPUT_CONVENTIONS.getLongOpt()));
 
@@ -162,8 +172,9 @@ public class MetricDescriptorGeneratorTool implements MetricTool {
               adapter.getEntityMetrics(entity.getName()));
           entities.add(entityBuilder.build());
         }
-        mdlBuilder.setMetricEntityTypeDescriptor(entities);
+        mdlBuilder.setMetricEntityTypeDescriptors(entities);
       }
+
       FileUtils.write(new File(config.getString(OPT_GENERATE_OUPTUT.getLongOpt(),
                                                 DEFAULT_OUTPUT_FILE)),
                       mdlParser.valueAsString(mdlBuilder.build(), true));
@@ -176,7 +187,7 @@ public class MetricDescriptorGeneratorTool implements MetricTool {
     }
   }
 
-  private MetricFixtureAdapter newMetricFixtureAdapter(
+  private AbstractMetricFixtureAdapter<?> newMetricFixtureAdapter(
       MapConfiguration config,
       OutputStream out,
       OutputStream err) throws IllegalAccessException, InstantiationException {
@@ -189,7 +200,7 @@ public class MetricDescriptorGeneratorTool implements MetricTool {
              config.getString(OPT_ADAPTER_CLASS.getLongOpt()));
     Class<?> adapterClass = (Class<?>) config.getProperty(ADAPTER_CLASS_CONFIG);
     Preconditions.checkNotNull(adapterClass);
-    return (MetricFixtureAdapter) adapterClass.newInstance();
+    return (AbstractMetricFixtureAdapter<?>) adapterClass.newInstance();
   }
 
   private MapConfiguration generateAndValidateConfig(CommandLine cmdLine)
@@ -251,7 +262,7 @@ public class MetricDescriptorGeneratorTool implements MetricTool {
       try {
         Class<?> adapterClass =
             this.getClass().getClassLoader().loadClass(className);
-        if (!MetricFixtureAdapter.class.isAssignableFrom(adapterClass)) {
+        if (!AbstractMetricFixtureAdapter.class.isAssignableFrom(adapterClass)) {
           throw new ParseException("Adapter class " + className + "is of the " +
                                    "wrong type");
         }

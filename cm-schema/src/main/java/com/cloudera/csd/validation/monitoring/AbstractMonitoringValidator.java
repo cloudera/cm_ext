@@ -15,66 +15,22 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring;
 
-import com.cloudera.csd.descriptors.MetricDescriptor;
-import com.cloudera.csd.descriptors.MetricEntityTypeDescriptor;
-import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.constraints.MonitoringConstraintViolation;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
 import com.cloudera.csd.validation.references.components.ReflectionHelper;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 
 /**
  * An abstract class for service monitoring definitions validators.
  */
 public abstract class AbstractMonitoringValidator<V> {
-
-  protected final ServiceMonitoringDefinitionsDescriptor serviceDescriptor;
-  protected final Map<String, MetricDescriptor> metricsDefined;
-
-  protected AbstractMonitoringValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
-    Preconditions.checkNotNull(serviceDescriptor);
-    this.serviceDescriptor = serviceDescriptor;
-    metricsDefined = Maps.newHashMap();
-    metricsDefined.putAll(
-        extractMetrics(serviceDescriptor.getMetricDefinitions()));
-    if (null != serviceDescriptor.getRoles()) {
-      for (RoleMonitoringDefinitionsDescriptor role :
-           serviceDescriptor.getRoles()) {
-        metricsDefined.putAll(extractMetrics(role.getMetricDefinitions()));
-      }
-    }
-    if (null != serviceDescriptor.getMetricEntityTypeDefinitions()) {
-      for (MetricEntityTypeDescriptor entity :
-          serviceDescriptor.getMetricEntityTypeDefinitions()) {
-        metricsDefined.putAll(extractMetrics(entity.getMetricDefinitions()));
-      }
-    }
-  }
-
-  protected Map<String, MetricDescriptor> extractMetrics(
-      @Nullable List<MetricDescriptor> metrics) {
-    if (null == metrics) {
-      return ImmutableMap.of();
-    }
-    Map<String, MetricDescriptor> ret = Maps.newHashMap();
-    for (MetricDescriptor metric : metrics) {
-      ret.put(metric.getName(), metric);
-    }
-    return ret;
-  }
 
   /**
    * Returns a string describing what the validator validates to be used in
@@ -90,11 +46,13 @@ public abstract class AbstractMonitoringValidator<V> {
    * Implementations can assume that they are called iff all annotation based
    * validations have passed. For example, implementations do not need to check
    * if 'node' is 'null' if 'node' is annotated with @NotNull.
+   * @param context
    * @param node
    * @param path
    * @return
    */
   public abstract <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       V node,
       DescriptorPathImpl path);
 
@@ -168,5 +126,13 @@ public abstract class AbstractMonitoringValidator<V> {
         ReflectionHelper.propertyGetter(node, propertyName);
     Preconditions.checkNotNull(methodOfPropertyValidated);
     return path.addPropertyNode(methodOfPropertyValidated, false);
+  }
+
+  public static <T> void safeAddAllToCollection(Collection<T> target,
+                                                Collection<T> source) {
+    Preconditions.checkNotNull(target);
+    if (null != source) {
+      target.addAll(source);
+    }
   }
 }

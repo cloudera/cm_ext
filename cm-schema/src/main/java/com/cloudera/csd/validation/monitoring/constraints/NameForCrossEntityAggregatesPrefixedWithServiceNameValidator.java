@@ -15,10 +15,9 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -36,10 +35,8 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidator
   private final boolean forServiceNodes;
 
   public NameForCrossEntityAggregatesPrefixedWithServiceNameValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor,
       ImmutableSet<String> builtInNamesForCrossEntityAggregateMetrics,
       boolean forServiceNodes) {
-    super(serviceDescriptor);
     Preconditions.checkNotNull(builtInNamesForCrossEntityAggregateMetrics);
     this.builtInNamesForCrossEntityAggregateMetrics =
         builtInNamesForCrossEntityAggregateMetrics;
@@ -55,8 +52,10 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidator
 
   @Override
   public <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       String nameForCrossEntityAggregateMetrics,
       DescriptorPathImpl path) {
+    Preconditions.checkNotNull(context);
     if (null == nameForCrossEntityAggregateMetrics) {
       // This is valid, we will construct the name ourselves.
       return noViolations();
@@ -71,11 +70,11 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidator
       // The service prefix in the service name for cross-entity aggregate
       // metrics does not need to end with an underscore, e.g., "echos" for the
       // ECHO service.
-      serviceName = serviceDescriptor.getName().toLowerCase();
+      serviceName = context.serviceDescriptor.getName().toLowerCase();
     } else {
       // The service prefix in roles or entities names for cross-entity aggregate
       // metrics must end with an underscore, e.g., "echo_webservers".
-      serviceName = serviceDescriptor.getName().toLowerCase() + "_";
+      serviceName = context.serviceDescriptor.getName().toLowerCase() + "_";
     }
 
     if (!nameForCrossEntityAggregateMetrics.startsWith(serviceName)) {

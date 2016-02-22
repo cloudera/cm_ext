@@ -9,8 +9,7 @@
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          }
        ]
     }

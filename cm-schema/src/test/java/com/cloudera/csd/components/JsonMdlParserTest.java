@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class JsonMdlParserTest {
 
-  private JsonMdlParser parser = new JsonMdlParser();
+  private JsonMdlParser parser = new JsonMdlParser(new JsonSdlObjectMapper());
 
   @Test
   public void testParseFullFile() throws Exception {

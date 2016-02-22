@@ -15,8 +15,12 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
-import com.cloudera.csd.validation.monitoring.MonitoringConventions;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import com.cloudera.csd.validation.monitoring.MonitoringConventions;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -27,33 +31,30 @@ import javax.validation.ConstraintViolation;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class CounterMetricNameValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
 
   private CounterMetricNameValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setUpCounterMetricNameValidatorTest() {
-    validator =
-        new CounterMetricNameValidator(serviceDescriptor);
+    validator = new CounterMetricNameValidator();
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testGoodCounter() {
     setName("bytes_read");
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testCounterWithRateSuffix() {
     setName("bytes_read" + MonitoringConventions.RATE_SUFFIX);
     setIsCounter(true);
-    List<ConstraintViolation<Object>> validations = validator.validate(metric,
-                                                                       root);
+    List<ConstraintViolation<Object>> validations =
+        validator.validate(context, metric, root);
     assertFalse(validations.isEmpty());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         validations);
@@ -68,7 +69,7 @@ public class CounterMetricNameValidatorTest
   public void testNonCounterWithRateSuffix() {
     setName("bytes_read");
     setIsCounter(false);
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
@@ -78,8 +79,8 @@ public class CounterMetricNameValidatorTest
     // read-path metric name.
     setName("total__count");
     setIsCounter(true);
-    List<ConstraintViolation<Object>> validations = validator.validate(metric,
-                                                                       root);
+    List<ConstraintViolation<Object>> validations =
+        validator.validate(context, metric, root);
     assertFalse(validations.isEmpty());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         validations);
@@ -95,10 +96,8 @@ public class CounterMetricNameValidatorTest
     setName("bytes_read");
     setIsCounter(true);
     setServiceMetrics(ImmutableList.of(newMetricWithName("bytes_read_rate")));
-    // We need to create a new validator as the validator generates the list
-    // of metrics on instantiation.
-    validator = new CounterMetricNameValidator(serviceDescriptor);
-    assertFalse(validator.validate(metric, root).isEmpty());
+    context = new MonitoringValidationContext(serviceDescriptor);
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
 }

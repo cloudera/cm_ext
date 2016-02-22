@@ -10,64 +10,56 @@
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "validonewordornounderscore",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "total_starts_with_total_valid",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "valid_name_that_ends_with_num_ops_rate",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "0starts_with_a_number_invalid",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "valid_name_that_ends_with_count_rate",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "_starts_with_an_underscore_invalid",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          },
          {
            "name" : "ends_with_an_underscore_invalid_",
            "label" : "csdMetric1Label",
            "description" : "csdMetric1Description",
            "numeratorUnit" : "bytes",
-           "denominatorUnit" : "seconds",
-           "isCounter" : true
+           "denominatorUnit" : "seconds"
          }
        ]
     }
