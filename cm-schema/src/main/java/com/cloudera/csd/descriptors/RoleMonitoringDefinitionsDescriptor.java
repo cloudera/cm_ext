@@ -70,4 +70,20 @@ public interface RoleMonitoringDefinitionsDescriptor {
   @Valid
   @NameForCrossEntityAggregatesFormat
   String getNameForCrossEntityAggregateMetrics();
+
+  /**
+   * Returns the list of additional immutable attributes for this role. See the
+   * getMutableAttributeNames call in MetricEntityTypeDescriptor for more on
+   * mutable attributes.
+   * @return
+   */
+  List<String> getAdditionalImmutableAttributeNames();
+
+  /**
+   * Returns the list of additional mutable attributes for this role. See the
+   * getMutableAttributeNames call in MetricEntityTypeDescriptor for more on
+   * mutable attributes.
+   * @return
+   */
+  List<String> getAdditionalMutableAttributeNames();
 }

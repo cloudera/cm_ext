@@ -26,7 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class CodahaleMetricAdapterTest {
 
@@ -67,6 +69,21 @@ public class CodahaleMetricAdapterTest {
   }
 
   @Test
+  public void testGaugeAsCounters() throws Exception {
+    String source = this.getClass().getResource(
+        "/com/cloudera/csd/tools/codahale/valid_with_counter_gauges.json").getPath();
+    adapter.init(source, CodahaleMetricAdapter.DEFAULT_CONVENTIONS);
+    assertEquals(2, adapter.getRoleNames().size());
+    List<MetricDescriptor> metrics =
+        getMetricsForRole(adapter, "test_role1_metrics");
+    assertEquals(2, metrics.size());
+    validateSimpleMetric(metrics.get(1),
+                         adapter.getServiceName(),
+                         "test_role1_metric2",
+                         COUNTER);
+  }
+
+  @Test
   public void testCounterMetrics() throws Exception {
     String source = this.getClass().getResource(
         "/com/cloudera/csd/tools/codahale/valid.json").getPath();
@@ -79,6 +96,25 @@ public class CodahaleMetricAdapterTest {
                          adapter.getServiceName(),
                          "test_role1_metric1",
                          COUNTER);
+  }
+
+  @Test
+  public void testCounterAsGaguesMetrics() throws Exception {
+    String source = this.getClass().getResource(
+        "/com/cloudera/csd/tools/codahale/valid_with_gauge_counters.json").getPath();
+    adapter.init(source, CodahaleMetricAdapter.DEFAULT_CONVENTIONS);
+    assertEquals(2, adapter.getRoleNames().size());
+    List<MetricDescriptor> metrics =
+        getMetricsForRole(adapter, "test_role1_metrics");
+    assertEquals(2, metrics.size());
+    MetricDescriptor metric = metrics.get(0);
+    // We do this here and not using the validateSimpleMetric as that function
+    // assumes that if you are not a counter you have a denominator.
+    assertEquals("test_service_test_role1_metric1", metric.getName());
+    assertEquals("test_role1_metric1" + "_label", metric.getLabel());
+    assertEquals("test_role1_metric1" + "_description", metric.getDescription());
+    assertFalse(metric.isCounter());
+    assertEquals("bytes", metric.getNumeratorUnit());
   }
 
   @Test
@@ -152,6 +188,44 @@ public class CodahaleMetricAdapterTest {
               String.format("test_svc_%s_description", metricName)),
           "bytes",
           type.isCounter());
+    }
+  }
+
+  @Test
+  public void testNameForCounterMetricOverride() throws Exception {
+    String source = this.getClass().getResource(
+        "/com/cloudera/csd/tools/codahale/name_for_counter_metrics_overrides.json")
+        .getPath();
+    adapter.init(source, CodahaleMetricAdapter.DEFAULT_CONVENTIONS);
+    List<MetricDescriptor> metrics = adapter.getServiceMetrics();
+    assertEquals(HistogramMetricType.values().length, metrics.size());
+    for (MetricDescriptor metric : metrics) {
+      if (metric.isCounter()) {
+        assertTrue(metric.getName(),
+                   metric.getName().equals(
+                       "test_service_counter_name_override"));
+      }
+    }
+    // This role has a gauge and a counter and the name override should be
+    // ignored.
+    for (MetricDescriptor metric : adapter.getRoleMetrics("test_role1_metrics")) {
+      assertTrue(metric.getName(),
+                 metric.getName().equals("test_service_test_role1_metric1") ||
+                     metric.getName().equals("test_service_test_role1_metric2"));
+    }
+
+    // This entity has a histogram and a timer defined with overrides. Make sure
+    // they were used.
+    for (MetricDescriptor metric :
+         adapter.getEntityMetrics("test_entity1_metrics")) {
+      if (metric.isCounter()) {
+        assertTrue(
+            metric.getName(),
+            metric.getName().equals(
+                "test_service_entity1_metric1_counter_override") ||
+            metric.getName().equals(
+                "test_service_entity1_metric2_counter_override"));
+      }
     }
   }
 

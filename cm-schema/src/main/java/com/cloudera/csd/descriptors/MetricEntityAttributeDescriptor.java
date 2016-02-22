@@ -17,6 +17,7 @@ package com.cloudera.csd.descriptors;
 
 import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
 import com.cloudera.csd.validation.constraints.MetricEntityAttributeNameFormat;
+import com.cloudera.csd.validation.references.annotations.Named;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -24,6 +25,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * Describes an possible attribute of a metric entity type.
  */
 @Unstable
+@Named
 public interface MetricEntityAttributeDescriptor {
 
   /**

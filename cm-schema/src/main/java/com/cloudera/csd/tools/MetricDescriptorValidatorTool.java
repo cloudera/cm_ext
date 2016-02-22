@@ -38,6 +38,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+/**
+ * MetricTool to validate an MDL file. The validations performed by this tool
+ * match those performed by CM when loading the MDL.
+ */
 public class MetricDescriptorValidatorTool implements MetricTool {
 
   private static final Logger LOG = LoggerFactory.getLogger(

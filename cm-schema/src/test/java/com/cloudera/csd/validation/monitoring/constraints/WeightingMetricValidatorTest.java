@@ -16,6 +16,7 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 
 import com.google.common.collect.ImmutableList;
 
@@ -30,50 +31,48 @@ public class WeightingMetricValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
 
   private WeightingMetricValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setUpCounterMetricNameValidatorTest() {
-    validator = new WeightingMetricValidator(serviceDescriptor);
+    validator = new WeightingMetricValidator();
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testNoWeightingMetric() {
     setName("bytes_read");
     setWeightingMetric(null);
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
     setWeightingMetric("");
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testWeightingMetricInDefinedMetrics() {
     setName("bytes_read");
     setServiceMetrics(ImmutableList.of(newWeightingMetric("foobar")));
-    validator = new WeightingMetricValidator(serviceDescriptor);
+    context = new MonitoringValidationContext(serviceDescriptor);
     setWeightingMetric("foobar");
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testNoWeightingMetricInDefinedMetrics() {
     setName("bytes_read");
     setServiceMetrics(ImmutableList.of(newWeightingMetric("foobar_2")));
-    // We need to create a new validator as the validator generates the list
-    // of metrics on instantiation.
-    validator = new WeightingMetricValidator(serviceDescriptor);
+    context = new MonitoringValidationContext(serviceDescriptor);
     setWeightingMetric("foobar");
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testWeightingMetricReferringToSelf() {
     setName("bytes_read");
     setServiceMetrics(ImmutableList.of(metric));
-    // We need to create a new validator as the validator generates the list
-    // of metrics on instantiation.
-    validator = new WeightingMetricValidator(serviceDescriptor);
+    context = new MonitoringValidationContext(serviceDescriptor);
     setWeightingMetric("bytes_read");
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
   private MetricDescriptor newWeightingMetric(String name) {

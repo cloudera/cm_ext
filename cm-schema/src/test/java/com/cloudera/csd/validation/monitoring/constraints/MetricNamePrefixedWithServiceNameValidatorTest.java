@@ -15,6 +15,7 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.google.common.collect.Iterables;
 
 import java.util.List;
@@ -29,25 +30,26 @@ public class MetricNamePrefixedWithServiceNameValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
 
   private MetricNamePrefixedWithServiceNameValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setupMetricNamePrefixedWithServiceNameValidatorTest() {
     // We should do all comparisons in a case insensitive way.
-    validator =
-        new MetricNamePrefixedWithServiceNameValidator(serviceDescriptor);
+    validator = new MetricNamePrefixedWithServiceNameValidator();
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testValidMetric() {
     setName(SERVICE_NAME.toLowerCase() + "_a");
-    Assert.assertTrue(validator.validate(metric, root).isEmpty());
+    Assert.assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testEmptyName() {
     setName("");
-    List<ConstraintViolation<Object>> validations = validator.validate(metric,
-                                                                       root);
+    List<ConstraintViolation<Object>> validations =
+        validator.validate(context, metric, root);
     Assert.assertFalse(validations.isEmpty());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         validations);
@@ -61,8 +63,8 @@ public class MetricNamePrefixedWithServiceNameValidatorTest
   @Test
   public void testInvaidMetricNotPrefixed() {
     setName("foo");
-    List<ConstraintViolation<Object>> validations = validator.validate(metric,
-                                                                       root);
+    List<ConstraintViolation<Object>> validations =
+        validator.validate(context, metric, root);
     Assert.assertFalse(validations.isEmpty());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         validations);

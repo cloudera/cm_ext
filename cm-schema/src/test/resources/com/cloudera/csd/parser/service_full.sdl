@@ -19,6 +19,11 @@
       "max" : 5
     }
   },
+  "authorities" : {
+    "authorityForAddRemove" : "AUTH_BDR_ADMIN",
+    "defaultAuthorityForParameters" : "AUTH_NAVIGATOR",
+    "authorityForPowerState" : "AUTH_AUDITS"
+  },
   "serviceInit" : {
     "preStartSteps" : [
       { "commandName" : "CreateHomeDirCommand" }
@@ -194,6 +199,15 @@
          {
            "key" : "foo.enabled",
            "value" : "true"
+         },
+         {
+           "key" : "auth.to.local.rules",
+           "type" : "authToLocal"
+         },
+         {
+           "key" : "foo.simple",
+           "value" : "simple_value",
+           "type" : "simple"
          }
        ]
     }
@@ -236,7 +250,7 @@
       "name" : "ECHO_MASTER_SERVER",
       "label" : "Master Server",
       "pluralLabel" : "Master Servers",
-      "JvmBased" : true,
+      "jvmBased" : true,
       "startRunner" : {
          "program" : "scripts/control.sh",
          "args" : [
@@ -299,9 +313,14 @@
        ],
        "sslServer" : {
          "keyIdentifier" : "echo_master",
-         "keyPasswordOptionality" : "required"
+         "enabledConfigName": "echo.ssl.enabled",
+         "keyPasswordOptionality" : "required",
+         "keystoreKeyPasswordConfigName" : "echo.ssl.key.password",
+         "keystoreKeyPasswordScriptBased" : "true"
        },
-       "sslClient" : {},
+       "sslClient" : {
+         "truststoreFormat" : "pem"
+       },
        "logging" : {
          "dir" : "/var/log/echo",
          "filename" : "master.log",
@@ -339,6 +358,7 @@
              ],
              "filename" : "sample_xml_file.xml",
              "configFormat" : "hadoop_xml",
+             "refreshable" : "true",
              "additionalConfigs" : [
                {
                  "key" : "ssl.enabled",
@@ -359,10 +379,6 @@
                {
                  "key" : "ssl.client.truststore.path",
                  "value" : "${ssl_client_truststore_location}"
-               },
-               {
-                 "key" : "ssl.server.truststore.password",
-                 "value" : "${ssl_client_truststore_password}"
                }
              ]
            }
@@ -383,6 +399,18 @@
            "TEST_MESSAGE" : "Hello there people",
            "BACKGROUND_COLOR" : "#d2d2d2"
          }
+       },
+       "sslServer" : {
+         "keyIdentifier" : "echo_webserver",
+         "keystorePasswordConfigName" : "echo.ssl.password",
+         "keystorePasswordCredentialProviderCompatible" : "true",
+         "keyPasswordOptionality" : "required",
+         "keystoreKeyPasswordConfigName" : "echo.ssl.key.password",
+         "keystoreKeyPasswordCredentialProviderCompatible" : "true"
+       },
+       "sslClient" : {
+         "truststorePasswordConfigName" : "echo.truststore.password",
+         "truststorePasswordCredentialProviderCompatible" : "true"
        },
        "logging" : {
          "dir" : "/var/log/echo",
@@ -527,6 +555,24 @@
             "default" : "role_var13_default"
           },
           {
+            "name" : "role_var14",
+            "label" : "Role Var14 Label",
+            "description" : "Role Var14 Description",
+            "configName" : "role.var14.config",
+            "type" : "password",
+            "default" : "role_var14_default",
+            "credentialProviderCompatible" : true
+          },
+          {
+            "name" : "role_var15",
+            "label" : "Role Var15 Label",
+            "description" : "Role Var15 Description",
+            "configName" : "role.var15.config",
+            "type" : "password",
+            "default" : "role_var15_default",
+            "alternateScriptParameterName" : "role.var15.altscript"
+          },
+          {
             "name" : "echo_server_heap",
             "label" : "Echo Server heap Label",
             "description" : "Echo Server heap Description",
@@ -594,15 +640,22 @@
              "filename" : "sample_role_props_file.properties",
              "configFormat" : "properties",
              "includedParams" : ["service_var1", "role_var3"]
+           },
+           {
+             "filename" : "sample_gflags_file",
+             "configFormat" : "gflags",
+             "includedParams" : ["service_var1", "role_var3"]
            }
          ],
          "peerConfigGenerators" : [
            {
              "filename" : "sample_role_peer_file.properties",
+             "refreshable" : "true",
              "params" : ["service_var1", "role_var3"]
            },
            {
              "filename" : "sample_master_peer_file.properties",
+             "refreshable" : "false",
              "params" : ["master_server_var1"],
              "roleName" : "ECHO_MASTER_SERVER"
             }
@@ -626,6 +679,54 @@
            "autoConfigured" : true
          }
        }
+    },
+    {
+      "name" : "ECHO_WEBSERVER_BUDDY",
+      "label" : "Web Server Buddy",
+      "pluralLabel" : "Web Server Buddies",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "topology" : {
+        "placementRules" : [
+          {
+            "type" : "alwaysWith",
+            "roleType" : "ECHO_WEBSERVER"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "ECHO_EXILE",
+      "label" : "Web Server Buddy",
+      "pluralLabel" : "Web Server Buddies",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "topology" : {
+        "minInstances" : "0",
+        "maxInstances" : "1",
+        "placementRules" : [
+          {
+            "type" : "neverWith",
+            "roleTypes" : [
+              "ECHO_MASTER_SERVER",
+              "ECHO_WEBSERVER",
+              "ECHO_WEBSERVER_BUDDY"
+            ]
+          }
+        ]
+      }
     }
-  ]
+  ],
+  "rollingRestart" : {
+    "nonWorkerSteps" : [{
+      "roleName" : "ECHO_MASTER_SERVER",
+      "bringUpCommands" : [ "Start", "role_cmd2" ]
+    }],
+    "workerSteps" : {
+      "roleName" : "ECHO_WEBSERVER",
+      "bringDownCommands" : [ "service_cmd1", "Stop" ]
+    }
+  }
 }

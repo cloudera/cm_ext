@@ -76,4 +76,6 @@ public interface ParcelDescriptor {
 
   @NotNull
   Set<String> getGroups();
+
+  ServicesRestartDescriptor getServicesRestartInfo();
 }

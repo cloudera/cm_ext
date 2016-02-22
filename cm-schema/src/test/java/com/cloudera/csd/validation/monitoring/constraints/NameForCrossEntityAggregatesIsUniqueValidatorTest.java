@@ -15,8 +15,10 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.google.common.collect.Iterables;
 
 import java.util.List;
@@ -26,29 +28,27 @@ import javax.validation.ConstraintViolation;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class NameForCrossEntityAggregatesIsUniqueValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
 
   private NameForCrossEntityAggregatesIsUniqueValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setupNameForCrossEntityAggregatesIsUniqueValidatorTest() {
-    validator =
-        new NameForCrossEntityAggregatesIsUniqueValidator(serviceDescriptor);
+    validator = new NameForCrossEntityAggregatesIsUniqueValidator();
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testEmptyMdl() {
-    assertTrue(validator.validate(serviceDescriptor, root).isEmpty());
+    assertTrue(validator.validate(context, serviceDescriptor, root).isEmpty());
   }
 
   @Test
   public void testOnlyServiceHasNameForAggregates() {
     setServiceNameForCrossEntityAggregates("aggregate_for_service");
-    assertTrue(validator.validate(serviceDescriptor, root).isEmpty());
+    assertTrue(validator.validate(context, serviceDescriptor, root).isEmpty());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class NameForCrossEntityAggregatesIsUniqueValidatorTest
     addNameForCrossEntityAggregatesForRole("role2", "aggregate_for_role2");
     addNameForCrossEntityAggregatesForEntity("entity1", "aggregate_for_entity1");
     addNameForCrossEntityAggregatesForEntity("entity2", "aggregate_for_entity2");
-    assertTrue(validator.validate(serviceDescriptor, root).isEmpty());
+    assertTrue(validator.validate(context, serviceDescriptor, root).isEmpty());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class NameForCrossEntityAggregatesIsUniqueValidatorTest
     addNameForCrossEntityAggregatesForEntity("entity1", "aggregate_for_service");
     addNameForCrossEntityAggregatesForEntity("entity2", "aggregate_for_service");
     List<ConstraintViolation<Object>> violations =
-        validator.validate(serviceDescriptor, root);
+        validator.validate(context, serviceDescriptor, root);
     assertEquals(4, violations.size());
   }
 
@@ -81,7 +81,7 @@ public class NameForCrossEntityAggregatesIsUniqueValidatorTest
     addNameForCrossEntityAggregatesForEntity("entity1", "aggregate_for_entity1");
     addNameForCrossEntityAggregatesForEntity("entity2", "aggregate_for_entity2");
     List<ConstraintViolation<Object>> violations =
-        validator.validate(serviceDescriptor, root);
+        validator.validate(context, serviceDescriptor, root);
     assertEquals(1, violations.size());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         violations);
@@ -100,7 +100,7 @@ public class NameForCrossEntityAggregatesIsUniqueValidatorTest
     addNameForCrossEntityAggregatesForEntity("entity1", "aggregate_for_entity1");
     addNameForCrossEntityAggregatesForEntity("entity2", "aggregate_for_entity1");
     List<ConstraintViolation<Object>> violations =
-        validator.validate(serviceDescriptor, root);
+        validator.validate(context, serviceDescriptor, root);
     assertEquals(1, violations.size());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         violations);

@@ -17,8 +17,7 @@
      "label" : "csdMetric1Label",
      "description" : "csdMetric1Description",
      "numeratorUnit" : "bytes",
-     "denominatorUnit" : "seconds",
-     "isCounter" : true
+     "denominatorUnit" : "seconds"
    },
    {
      "name" : "echo_service_metric_2",
@@ -43,8 +42,7 @@
           "description" : "csdMetric1Description",
           "numeratorUnit" : "bytes",
           "denominatorUnit" : "seconds",
-          "weightingMetricName" : "echo_service_metric_2",
-          "isCounter" : true
+          "weightingMetricName" : "echo_service_metric_2"
         },
         {
           "name" : "echo_role_metric_2",

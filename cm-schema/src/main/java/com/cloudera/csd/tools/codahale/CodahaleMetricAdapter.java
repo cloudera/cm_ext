@@ -16,24 +16,22 @@
 package com.cloudera.csd.tools.codahale;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
+import com.cloudera.csd.tools.AbstractMetricFixtureAdapter;
 import com.cloudera.csd.tools.JsonUtil;
 import com.cloudera.csd.tools.JsonUtil.JsonRuntimeException;
 import com.cloudera.csd.tools.MetricDescriptorImpl;
 import com.cloudera.csd.tools.MetricDescriptorImpl.Builder;
-import com.cloudera.csd.tools.MetricFixtureAdapter;
-import com.cloudera.csd.tools.codahale.CodahaleMetricDefinitionFixture.CodahaleMetric;
+import com.cloudera.csd.tools.codahale.CodahaleMetricTypes.ComplexCodahaleMetric;
 import com.cloudera.csd.tools.codahale.CodahaleMetricTypes.HistogramMetricType;
 import com.cloudera.csd.tools.codahale.CodahaleMetricTypes.MeterMetricType;
 import com.cloudera.csd.tools.codahale.CodahaleMetricTypes.TimerMetricType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Collection;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -47,12 +45,12 @@ import org.slf4j.LoggerFactory;
  * codahale metrics and convert them to one or more Cloudera Manager metrics.
  * The fixture file should be a json formatted file (see Fixture class below).
  */
-public class CodahaleMetricAdapter implements MetricFixtureAdapter {
+public class CodahaleMetricAdapter
+  extends AbstractMetricFixtureAdapter<CodahaleMetric> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(CodahaleMetricAdapter.class);
 
-  private CodahaleMetricDefinitionFixture fixture;
   private CodahaleMetricConventions conventions;
 
   @Override
@@ -87,24 +85,9 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
         IOUtils.closeQuietly(in);
       }
     }
-}
-
-  public String getServiceName() {
-    Preconditions.checkNotNull(fixture);
-    return fixture.getServiceName();
   }
 
-  @Override
-  public List<MetricDescriptor> getServiceMetrics() {
-    Preconditions.checkState(null != fixture);
-    List<MetricDescriptor> ret = Lists.newArrayList();
-    for (CodahaleMetric metric : fixture.getServiceMetrics()) {
-      ret.addAll(generateMetricDescriptorsForMetric(metric));
-    }
-    return ret;
-  }
-
-  private Collection<? extends MetricDescriptor>
+  protected Collection<? extends MetricDescriptor>
     generateMetricDescriptorsForMetric(
       CodahaleMetric metric) {
     Preconditions.checkNotNull(metric);
@@ -113,6 +96,11 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
         Preconditions.checkArgument(
             null == metric.getDenominatorForRateMetrics(),
             "The denominator for rate metrics is only used for timers.");
+        Preconditions.checkArgument(
+            !metric.getTreatGaugeAsACounter() ||
+            null == metric.getDenominatorUnit(),
+            "Gauge metrics that are marked as counters cannot have a " +
+            "denominator.");
         return ImmutableList.of(
             new MetricDescriptorImpl.Builder()
                 .setName(fixture.getServiceName(), metric.getName())
@@ -120,7 +108,7 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
                 .setDescription(metric.getDescription())
                 .setNumeratorUnit(metric.getNumeratorUnit())
                 .setDenominatorUnit(metric.getDenominatorUnit())
-                .setIsCounter(false)
+                .setIsCounter(metric.getTreatGaugeAsACounter())
                 .setContext(conventions.makeGaugeContext(metric.getContext()))
                 .build());
       case COUNTER:
@@ -135,7 +123,7 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
                 .setLabel(metric.getLabel())
                 .setDescription(metric.getDescription())
                 .setNumeratorUnit(metric.getNumeratorUnit())
-                .setIsCounter(true)
+                .setIsCounter(!metric.getTreatCounterAsAGauge())
                 .setContext(conventions.makeCounterContext(metric.getContext()))
                 .build());
       case HISTOGRAM:
@@ -145,7 +133,7 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
             "The denominator for rate metrics is only used for timers.");
         ImmutableList.Builder<MetricDescriptorImpl> b = ImmutableList.builder();
         for (HistogramMetricType type : HistogramMetricType.values()) {
-          String metricName = type.makeMetricName(metric.getName());
+          String metricName = getMetricName(metric, type);
           MetricDescriptorImpl.Builder metricBuilder =
               new MetricDescriptorImpl.Builder()
                   .setName(fixture.getServiceName(), metricName)
@@ -164,7 +152,7 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
       {
         ImmutableList.Builder<MetricDescriptorImpl> b = ImmutableList.builder();
         for (TimerMetricType type : TimerMetricType.values()) {
-          String metricName = type.makeMetricName(metric.getName());
+          String metricName = getMetricName(metric, type);
           MetricDescriptorImpl.Builder metricBuilder =
               new MetricDescriptorImpl.Builder()
                   .setName(fixture.getServiceName(), metricName)
@@ -205,6 +193,17 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
         throw new UnsupportedOperationException("Unknown codahale type: " +
                                                 metric.getMetricType());
     }
+  }
+
+  private String getMetricName(CodahaleMetric metric,
+                               ComplexCodahaleMetric type) {
+    Preconditions.checkNotNull(metric);
+    Preconditions.checkNotNull(type);
+    if (type.isCounter() &&
+        null != metric.getMetricNameForCounterMetric()) {
+      return metric.getMetricNameForCounterMetric();
+    }
+    return type.makeMetricName(metric.getName());
   }
 
   private void determineUnitForMeterType(MeterMetricType type,
@@ -265,51 +264,6 @@ public class CodahaleMetricAdapter implements MetricFixtureAdapter {
           .setDenominatorUnit(metric.getDenominatorUnit())
           .setNumeratorUnit(metric.getNumeratorUnit());
     }
-  }
-
-  public Collection<String> getRoleNames() {
-    Preconditions.checkNotNull(fixture);
-    return fixture.getRolesMetrics().keySet();
-  }
-
-  @Override
-  public List<MetricDescriptor> getRoleMetrics(
-      String roleName) {
-    Preconditions.checkNotNull(fixture);
-
-    if (null == fixture.getRolesMetrics().get(roleName)) {
-      return null;
-    }
-
-    List<MetricDescriptor> ret = Lists.newArrayList();
-    for (CodahaleMetric metric : fixture.getRolesMetrics().get(roleName)) {
-      ret.addAll(generateMetricDescriptorsForMetric(metric));
-    }
-    return ret;
-  }
-
-  public Collection<String> getEntityNames() {
-    Preconditions.checkNotNull(fixture);
-    return fixture.getAdditionalServiceEntityTypesMetrics().keySet();
-  }
-
-  @Override
-  public List<MetricDescriptor> getEntityMetrics(
-      String entityName) {
-    Preconditions.checkNotNull(fixture);
-
-    if (null == fixture.getAdditionalServiceEntityTypesMetrics().get(
-          entityName)) {
-      // Not all entities need to have metrics.
-      return null;
-    }
-
-    List<MetricDescriptor> ret = Lists.newArrayList();
-    for (CodahaleMetric metric :
-         fixture.getAdditionalServiceEntityTypesMetrics().get(entityName)) {
-      ret.addAll(generateMetricDescriptorsForMetric(metric));
-    }
-    return ret;
   }
 
   /**

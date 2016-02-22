@@ -34,6 +34,15 @@ public interface PeerConfigGenerator {
   @NotBlank
   String getFilename();
 
+  /**
+   * Optional. Whether this file can be refreshed. If at least one file is
+   * refreshable, the role will have a refresh command automatically created for
+   * it that will refresh all files for the role.
+   * <p>
+   * Defaults to False.
+   */
+  boolean isRefreshable();
+
   /** The parameters to include from each peer **/
   @NotEmpty
   @Referencing(type=ReferenceType.PARAMETER)

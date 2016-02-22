@@ -60,7 +60,23 @@
          }
        ],
        "sslServer" : {
-         "keyIdentifier" : "kms"
+         "keystoreFormat" : "pem",
+         "enabledOptionality" : "required",
+         "privateKeyLocationConfigName" : "kms.ssl.privatekey.location",
+         "privateKeyLocationDefault" : "/var/lib/hadoop-kms/.ssl/privatekey.pem",
+         "certificateLocationConfigName" : "kms.ssl.cert.location",
+         "certificateLocationDefault" : "/var/lib/hadoop-kms/.ssl/cert.pem",
+         "caCertificateLocationConfigName" : "kms.ssl.cacert.location",
+         "caCertificateLocationDefault" : "/var/lib/hadoop-kms/.ssl/cacert.pem",
+         "privateKeyPasswordConfigName" : "kms.ssl.privatekey.password",
+         "privateKeyPasswordScriptBased" : "true"
+       },
+       "sslClient" : {
+         "truststoreFormat" : "jks",
+         "truststoreLocationConfigName" : "kms.ssl.truststore.location",
+         "truststoreLocationDefault" : "/var/lib/hadoop-kms/.ssl/truststore.jceks",
+         "truststorePasswordConfigName" : "kms.ssl.truststore.password",
+         "truststorePasswordScriptBased" : "true"
        },
        "logging" : {
          "dir" : "/var/log/echo",
@@ -112,12 +128,12 @@
              ],
              "additionalConfigs" : [
                {
-                 "key" : "kms.keystore.path",
-                 "value" : "${ssl_server_keystore_location}"
+                 "key" : "kms.privatekey.path",
+                 "value" : "${ssl_server_privatekey_location}"
                },
                {
-                 "key" : "kms.keystore.password",
-                 "value" : "${ssl_server_keystore_password}"
+                 "key" : "kms.privatekey.password",
+                 "value" : "${ssl_server_privatekey_password}"
                }
              ]
            },
@@ -132,6 +148,14 @@
                {
                  "key" : "kms.ssl-server.location",
                  "value" : "{{CONF_DIR}}/ssl-server.xml"
+               },
+               {
+                 "key" : "kms.ssl.server.truststore.location",
+                 "value" : "${ssl_client_truststore_location}"
+               },
+               {
+                 "key" : "kms.ssl.server.truststore.password",
+                 "value" : "${ssl_client_truststore_password}"
                }
              ]
            },

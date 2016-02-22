@@ -26,7 +26,8 @@
       "label": "test_role1_metric2_label",
       "description": "test_role1_metric2_description",
       "numeratorUnit": "bytes",
-      "denominatorUnit": "second"
+      "denominatorUnit": "second",
+      "treatGaugeAsCounter": "false"
     }
     ],
     "test_role2_metrics" : [

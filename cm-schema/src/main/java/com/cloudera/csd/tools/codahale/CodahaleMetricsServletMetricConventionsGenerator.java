@@ -30,8 +30,7 @@ import org.apache.commons.io.FileUtils;
 /**
  * This set of conventions is tightly coupled to the serialization format of
  * the yammer metrics-core 2.2.0 MetricsServlet. This tool is intended to
- * produce the conventions fixture. Since it is fixed, we just check the
- * resulting resource into the source tree.
+ * produce the conventions fixture.
  *
  * If passed an argument, this will write the fixture to a file. If passed no
  * arguments, it simply prints to the console. 
