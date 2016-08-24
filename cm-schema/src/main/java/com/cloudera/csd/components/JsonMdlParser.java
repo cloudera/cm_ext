@@ -67,12 +67,17 @@ public class JsonMdlParser
     PRETTY_OBJECT_WRITER = OBJECT_WRITER.withDefaultPrettyPrinter();
   }
 
+  private final JsonSdlObjectMapper mapper;
+
+  public JsonMdlParser(JsonSdlObjectMapper mapper) {
+    this.mapper = mapper;
+  }
+
   @Override
-  public ServiceMonitoringDefinitionsDescriptor parse(
-      byte[] data) throws IOException {
+  public ServiceMonitoringDefinitionsDescriptor parse(byte[] data)
+      throws IOException {
     Preconditions.checkNotNull(data);
-    return JsonSdlParser.OBJECT_MAPPER.readValue(
-        data, ServiceMonitoringDefinitionsDescriptor.class);
+    return mapper.readValue(data, ServiceMonitoringDefinitionsDescriptor.class);
   }
 
   /**
@@ -80,7 +85,7 @@ public class JsonMdlParser
    * place of JsonUtil since it hides implicit properties introduced by MrBean.
    * @param descriptor
    * @param usePrettyFormat
-   * @return
+   * @return JSON String
    * @throws IOException
    */
   public String valueAsString(

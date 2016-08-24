@@ -194,4 +194,16 @@ public class MonitoringConventions {
     }
     return String.format("%s%ss", normalizedServiceType, entityName);
   }
+
+  /**
+   * Returns the metric entity type name for a role. This name should be used
+   * for roles appearing in the parentMetricEntityTypeNames for an entity.
+   * @param serviceType
+   * @param roleType
+   * @return
+   */
+  public static String getRoleMetricEntityTypeName(String serviceType,
+                                                   String roleType) {
+    return String.format("%s-%s", serviceType, roleType);
+  }
 }

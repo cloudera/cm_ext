@@ -129,6 +129,83 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImplTest {
                 "monitoring/echo_with_only_role_name_for_aggregate.mdl")).size());
   }
 
+  @Test
+  public void testFullMdl() {
+    assertEquals(0,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/service_full.mdl")).size());
+  }
+
+  @Test
+  public void testUnreachableParent() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/service_unreachable_parent.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentMetricLabel() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_metric_label.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentMetricDescription() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_metric_description.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentMetricNumerator() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_metric_numerator.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentMetricDenominator() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_metric_denominator.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentWeightingMetric() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_weighting_metric.mdl")).size());
+  }
+
+  @Test
+  public void testInconsistentCounter() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/inconsistent_metric_counter.mdl")).size());
+  }
+
+  @Test
+  public void testInvalidEntityName() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/service_bad_entity_name.mdl")).size());
+  }
+
+  @Test
+  public void testUnknownParent() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/service_unknown_parent.mdl")).size());
+  }
+
+  @Test
+  public void testUnknownAttributes() {
+    assertEquals(2,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/service_unknown_attributes.mdl")).size());
+  }
+
   private Set<ConstraintViolation<ServiceMonitoringDefinitionsDescriptor>>
       violations(String mdl) {
     return validator.getViolations(SdlTestUtils.getValidatorMdl(mdl));
@@ -136,5 +213,26 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImplTest {
 
   private Set<String> validate(String mdl) {
     return validator.validate(SdlTestUtils.getValidatorMdl(mdl));
+  }
+
+  @Test
+  public void testAttributeNotPrefixedWithServiceName() {
+    Set<String> errors = validate("monitoring/service_badAttributeName.mdl");
+    // See fixture for the metrics we expect to be badly named.
+    assertEquals(2, errors.size());
+  }
+
+  @Test
+  public void testUnknownAdditionalImmutableAttribute() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/unknown_additional_immutable_attribute.mdl")).size());
+  }
+
+  @Test
+  public void testUnknownAdditionalMutableAttribute() {
+    assertEquals(1,
+        validator.validate(SdlTestUtils.getValidatorMdl(
+            "monitoring/unknown_additional_mutable_attribute.mdl")).size());
   }
 }

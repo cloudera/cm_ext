@@ -31,8 +31,11 @@ import com.cloudera.csd.validation.references.components.DescriptorPathImpl.Prop
 import com.cloudera.csd.validation.references.components.DescriptorVisitorImpl.AbstractNodeProcessor;
 import com.cloudera.csd.validation.references.constraints.ReferencedEntityConstraint;
 import com.cloudera.csd.validation.references.constraints.SubstitutionConstraint;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
@@ -113,7 +116,16 @@ public class ReferenceValidatorImpl implements ReferenceValidator {
    * @param <T> The root object type.
    */
   public static class ConstraintViolationCollector<T> extends AbstractNodeProcessor<Set<ConstraintViolation<T>>> {
+    /**
+     * All current active allowed Refs
+     */
     private final SetMultimap<ReferenceType, String> allowedRefs = LinkedHashMultimap.create();
+    /**
+     * Map from path to which refs were added by that path. Used when removing
+     * refs while backtracking.
+     */
+    private final Map<DescriptorPath, SetMultimap<ReferenceType, String>> refsStack = Maps
+        .newHashMap();
     private final SetMultimap<ReferenceType, DescriptorPath> allRefs;
     private final Set<ConstraintViolation<T>> violations = Sets.newHashSet();
     private final List<ReferenceConstraint<T>> constraints;
@@ -131,11 +143,26 @@ public class ReferenceValidatorImpl implements ReferenceValidator {
 
     @Override
     public void beforeNode(Object obj, DescriptorPath path) {
+      Preconditions.checkState(!refsStack.containsKey(path));
+
       SetMultimap<ReferenceType, String> refs = getRelatedPaths(obj, path);
+      SetMultimap<ReferenceType, String> newRefs = LinkedHashMultimap.create();
+
       for (Map.Entry<ReferenceType, Collection<String>> entry : refs.asMap().entrySet()) {
         ReferenceType type = entry.getKey();
-        allowedRefs.get(type).addAll(entry.getValue());
+        for (String reference : entry.getValue()) {
+          if (!allowedRefs.containsEntry(type, reference)) {
+            newRefs.put(type, reference);
+            allowedRefs.put(type, reference);
+          }
+        }
       }
+
+      // consolidate into the singleton if it's empty
+      newRefs = newRefs.size() == 0 ? ImmutableSetMultimap
+          .<ReferenceType, String> of() : newRefs;
+      refsStack.put(path, newRefs);
+
       callReferenceConstraints(obj, path);
     }
 
@@ -201,7 +228,8 @@ public class ReferenceValidatorImpl implements ReferenceValidator {
 
     @Override
     public void afterNode(Object obj, DescriptorPath path) {
-      SetMultimap<ReferenceType, String> refs = getRelatedPaths(obj, path);
+      Preconditions.checkState(refsStack.containsKey(path));
+      SetMultimap<ReferenceType, String> refs = refsStack.remove(path);
       for (Map.Entry<ReferenceType, Collection<String>> entry : refs.asMap().entrySet()) {
         ReferenceType type = entry.getKey();
         allowedRefs.get(type).removeAll(entry.getValue());

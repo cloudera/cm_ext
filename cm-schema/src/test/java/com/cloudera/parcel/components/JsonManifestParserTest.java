@@ -19,10 +19,13 @@ import static org.junit.Assert.*;
 
 import com.cloudera.parcel.descriptors.ManifestDescriptor;
 import com.cloudera.parcel.descriptors.ParcelInfoDescriptor;
+import com.cloudera.parcel.descriptors.VersionServicesRestartDescriptor;
+import com.cloudera.parcel.descriptors.VersionServicesRestartDescriptor.Scope;
 import com.cloudera.parcel.validation.ParcelTestUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.Instant;
 import org.junit.Test;
@@ -37,7 +40,7 @@ public class JsonManifestParserTest {
     assertEquals(new Instant(1392073012), descriptor.getLastUpdated());
 
     List<ParcelInfoDescriptor> parcels = descriptor.getParcels();
-    assertEquals(2, parcels.size());
+    assertEquals(3, parcels.size());
 
     ParcelInfoDescriptor parcelInfo = parcels.get(0);
     assertEquals("CDH-5.0.0-0.cdh5b2.p0.282-wheezy.parcel", parcelInfo.getParcelName());
@@ -50,6 +53,45 @@ public class JsonManifestParserTest {
     assertEquals("d4d5d146e00c2d3ff19e95476f3485be64fd0f71", parcelInfo.getHash());
     assertEquals("IMPALA, SOLR, SPARK", parcelInfo.getReplaces());
     assertEquals(27, parcelInfo.getComponents().size());
+
+    parcelInfo = parcels.get(2);
+    assertEquals("CDH-5.5.0-0.cdh5b2.p0.1-el6.parcel", parcelInfo.getParcelName());
+    assertEquals("f4asdas146e00c2d3ff19e95476f3485be64fd0f", parcelInfo.getHash());
+    assertEquals("IMPALA, SOLR, SPARK", parcelInfo.getReplaces());
+    assertEquals(27, parcelInfo.getComponents().size());
+
+    assertNotNull(parcelInfo.getServicesRestartInfo());
+    assertNotNull(parcelInfo.getServicesRestartInfo().getVersionInfo());
+
+    Map<String, VersionServicesRestartDescriptor> versionServicesRestartDescriptorMap =
+      parcelInfo.getServicesRestartInfo().getVersionInfo();
+    assertEquals(3, versionServicesRestartDescriptorMap.size());
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.5.0-0.cdh5b2.p0.1"));
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.5.0-0.cdh5b2"));
+    assertTrue(versionServicesRestartDescriptorMap.containsKey("5.5.0-0.cdh5b"));
+
+
+    VersionServicesRestartDescriptor p01 =
+      versionServicesRestartDescriptorMap.get("5.5.0-0.cdh5b2.p0.1");
+    VersionServicesRestartDescriptor p00 =
+      versionServicesRestartDescriptorMap.get("5.5.0-0.cdh5b2");
+    VersionServicesRestartDescriptor base =
+      versionServicesRestartDescriptorMap.get("5.5.0-0.cdh5b");
+
+    assertNull(p01.getChildVersion());
+    assertEquals("5.5.0-0.cdh5b2", p01.getParentVersion());
+    assertTrue(p01.getServiceInfo().containsKey("IMPALA"));
+    assertTrue(p01.getServiceInfo().containsValue(Scope.DEPENDENTS_ONLY));
+
+    assertEquals("5.5.0-0.cdh5b2.p0.1", p00.getChildVersion());
+    assertEquals("5.5.0-0.cdh5b", p00.getParentVersion());
+    assertTrue(p00.getServiceInfo().containsKey("HDFS"));
+    assertTrue(p00.getServiceInfo().containsValue(Scope.SERVICE_ONLY));
+
+    assertNull(base.getParentVersion());
+    assertEquals("5.5.0-0.cdh5b2", base.getChildVersion());
+    assertTrue(base.getServiceInfo().containsKey("HBASE"));
+    assertTrue(base.getServiceInfo().containsValue(Scope.SERVICE_AND_DEPENDENTS));
   }
 
   @Test

@@ -154,5 +154,19 @@ public interface ServiceDescriptor {
    * Not intended for use outside of Cloudera, as License Features are not part
    * of any documentation or stable API.
    */
+  @Unstable
   String getLicenseFeature();
+
+  /**
+   * Optional. Configure which users can perform various actions on this
+   * service. Not intended for use outside of Cloudera, as Authorities are not
+   * part of any documentation or stable API.
+   */
+  @Unstable
+  AuthorityDescriptor getAuthorities();
+
+  /**
+   * If service supports rolling restart, the steps can be specified using this.
+   */
+  RollingRestartDescriptor getRollingRestart();
 }

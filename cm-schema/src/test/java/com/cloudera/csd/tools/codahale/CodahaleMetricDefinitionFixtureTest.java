@@ -18,7 +18,6 @@ package com.cloudera.csd.tools.codahale;
 import com.cloudera.csd.tools.JsonUtil;
 import com.cloudera.csd.tools.JsonUtil.JsonRuntimeException;
 import com.cloudera.csd.tools.codahale.CodahaleMetricTypes.CodahaleMetricType;
-import com.cloudera.csd.tools.codahale.CodahaleMetricDefinitionFixture.CodahaleMetric;
 
 import java.io.InputStream;
 

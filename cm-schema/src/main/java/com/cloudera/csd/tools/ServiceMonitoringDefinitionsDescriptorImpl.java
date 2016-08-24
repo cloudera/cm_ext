@@ -118,7 +118,7 @@ public class ServiceMonitoringDefinitionsDescriptorImpl implements
       return this;
     }
 
-    public Builder setMetricEntityAttributeDescriptor(
+    public Builder setMetricEntityAttributeDescriptors(
         List<MetricEntityAttributeDescriptor> metricEntityAttributeDefinitions) {
       Preconditions.checkNotNull(metricEntityAttributeDefinitions);
       this.metricEntityAttributeDefinitions =
@@ -126,7 +126,7 @@ public class ServiceMonitoringDefinitionsDescriptorImpl implements
       return this;
     }
 
-    public Builder setMetricEntityTypeDescriptor(
+    public Builder setMetricEntityTypeDescriptors(
         List<MetricEntityTypeDescriptor> metricEntityTypeDefinition) {
       Preconditions.checkNotNull(metricEntityTypeDefinition);
       this.metricEntityTypeDefinition =

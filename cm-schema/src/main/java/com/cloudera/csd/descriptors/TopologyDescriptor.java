@@ -17,6 +17,9 @@ package com.cloudera.csd.descriptors;
 
 import com.cloudera.csd.validation.constraints.Expression;
 
+import java.util.List;
+
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 /**
@@ -36,4 +39,10 @@ public interface TopologyDescriptor {
   /** Defaults to Integer.MAX_VALUE */
   @Min(1)
   Integer getMaxInstances();
+
+  /**
+   * Optional. Specify rules about where this role can be placed relative to other roles.
+   */
+  @Valid
+  List<PlacementRuleDescriptor> getPlacementRules();
 }
