@@ -1,0 +1,7 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "An ECHO Server",
+  "version" : "1",
+  "unknown" : "value"
+}

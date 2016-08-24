@@ -33,6 +33,7 @@ public class MainTest {
   private String goodSdl = "src/test/resources/service_good.sdl";
   private String badSdl = "src/test/resources/service_bad.sdl";
   private String dependencySdl = "src/test/resources/service_dependency.sdl";
+  private String unknownSdl = "src/test/resources/service_unknown_elements.sdl";
   private String goodParcel = "src/test/resources/good_parcel.json";
   private String badParcel = "src/test/resources/bad_parcel.json";
   private String badParseParcel = "src/test/resources/bad_parse_parcel.json";
@@ -114,6 +115,22 @@ public class MainTest {
     app.run(args);
     assertEquals("", err.toString());
     assertTrue(out.toString().contains("Validation succeeded"));
+  }
+
+  @Test
+  public void testIgnoreUnknownElements() throws IOException {
+    String[] args = {"-s", unknownSdl};
+    app.run(args);
+    assertEquals("", err.toString());
+    assertTrue(out.toString().contains("Validation succeeded"));
+  }
+
+  @Test
+  public void testFailUnknownElements() throws IOException {
+    String[] args = {"-x", "-s", unknownSdl};
+    app.run(args);
+    assertEquals("", err.toString());
+    assertTrue(out.toString().contains("Unrecognized field \"unknown\""));
   }
 
   @Test
@@ -274,7 +291,7 @@ public class MainTest {
 
   @Test
   public void testBadArg() throws Exception {
-    String[] args = {"-x", badSdl};
+    String[] args = {"-w", badSdl};
     app.run(args);
     assertEquals("", out.toString());
     assertTrue(err.toString().contains("Unrecognized"));
