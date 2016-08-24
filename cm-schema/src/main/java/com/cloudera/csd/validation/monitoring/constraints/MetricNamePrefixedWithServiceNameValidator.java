@@ -16,8 +16,8 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
 import com.google.common.base.Preconditions;
 
@@ -31,11 +31,6 @@ import javax.validation.ConstraintViolation;
 public class MetricNamePrefixedWithServiceNameValidator extends
     AbstractMonitoringValidator<MetricDescriptor> {
 
-  public MetricNamePrefixedWithServiceNameValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
-    super(serviceDescriptor);
-  }
-
   @Override
   public String getDescription() {
     return
@@ -48,12 +43,16 @@ public class MetricNamePrefixedWithServiceNameValidator extends
 
   @Override
   public <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       MetricDescriptor metricDescriptor,
       DescriptorPathImpl path) {
+    Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(metricDescriptor);
+    Preconditions.checkNotNull(path);
     path = constructPathFromProperty(metricDescriptor, "name", path);
     String metricName = metricDescriptor.getName();
-    String serviceName = serviceDescriptor.getName().toLowerCase() + "_";
+    String serviceName =
+        context.serviceDescriptor.getName().toLowerCase() + "_";
     if (!metricName.startsWith(serviceName)) {
       String msg = String.format(
           "Metric '%s' does not start with the service name",

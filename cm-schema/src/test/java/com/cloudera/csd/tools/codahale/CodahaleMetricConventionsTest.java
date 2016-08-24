@@ -42,7 +42,26 @@ public class CodahaleMetricConventionsTest {
         throw new RuntimeException("Missing convention for " + type);
       }
     }
+  }
 
-
+  @Test
+  public void testCodahaleJmxConventions() {
+    CodahaleMetricConventions conventions =
+        CodahaleJmxMetricConventionsGenerator.makeConventions();
+    for (MeterMetricType type : MeterMetricType.values()) {
+      if (!conventions.meterContextSuffixes.containsKey(type)) {
+        throw new RuntimeException("Missing convention for " + type);
+      }
+    }
+    for (TimerMetricType type : TimerMetricType.values()) {
+      if (!conventions.timerContextSuffixes.containsKey(type)) {
+        throw new RuntimeException("Missing convention for " + type);
+      }
+    }
+    for (HistogramMetricType type : HistogramMetricType.values()) {
+      if (!conventions.histogramContextSuffixes.containsKey(type)) {
+        throw new RuntimeException("Missing convention for " + type);
+      }
+    }
   }
 }

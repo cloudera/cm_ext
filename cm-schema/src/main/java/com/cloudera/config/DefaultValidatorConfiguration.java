@@ -18,6 +18,7 @@ package com.cloudera.config;
 import com.cloudera.common.Parser;
 import com.cloudera.csd.StringInterpolator;
 import com.cloudera.csd.components.JsonMdlParser;
+import com.cloudera.csd.components.JsonSdlObjectMapper;
 import com.cloudera.csd.components.JsonSdlParser;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
@@ -72,8 +73,6 @@ import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -95,12 +94,18 @@ public class DefaultValidatorConfiguration {
   @Autowired
   protected ConfigurableListableBeanFactory beanFactory;
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      DefaultValidatorConfiguration.class);
+  private final JsonSdlObjectMapper jsonSdlObjectMapper =
+      new JsonSdlObjectMapper();
+
+  public static final String OBJECT_MAPPER_BEAN_NAME = "objectMapper";
   public static final String BUILTIN_SERVICE_TYPES_BEAN_NAME = "builtInServiceTypes";
   public static final String BUILTIN_ROLE_TYPES_BEAN_NAME = "builtInRoleTypes";
   public static final String BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS =
       "builtInNamesForCrossEntityAggregateMetrics";
+  public static final String BUILTIN_METRIC_ENTITY_ATTRIBUTES =
+      "builtInMetricEntityAttributes";
+  public static final String BUILTIN_METRIC_ENTITY_TYPES =
+      "builtInMetricEntityTypes";
   public static final String CMD_EXTRA_SERVICE_TYPE_FILE = "service-type-file";
   public static final String CMD_EXTRA_SERVICE_TYPE_LIST = "service-type-list";
 
@@ -147,6 +152,7 @@ public class DefaultValidatorConfiguration {
       "HOSTMONITOR",
       "HTTPFS",
       "HUE_SERVER",
+      "HUE_LOAD_BALANCER",
       "IMPALAD",
       "JOBHISTORY",
       "JOBSUBD",
@@ -179,9 +185,77 @@ public class DefaultValidatorConfiguration {
   @Bean(name = BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS)
   public Set<String> builtInNamesForCrossEntityAggregateMetrics() {
     return ImmutableSet.of(
+      "cmservers",
       "time_series_tables",
       "servicemonitors",
-      "hostmonitors");
+      "hostmonitors",
+      "activitymonitors",
+      "eventservers",
+      "reportsmanagers",
+      "impalads",
+      "statestores",
+      "catalogservers",
+      "llamas");
+  }
+
+  @Bean(name = BUILTIN_METRIC_ENTITY_ATTRIBUTES)
+  public Set<String> builtInMetricEntityAttributes() {
+    return ImmutableSet.of(
+        "entityName",
+        "category",
+        "version",
+        "active",
+        "roleName",
+        "roleType",
+        "roleState",
+        "roleConfigGroup",
+        "serviceName",
+        "serviceDisplayName",
+        "serviceType",
+        "serviceState",
+        "userName",
+        "groupName",
+        "ownerName",
+        "queueName",
+        "poolName",
+        "path",
+        "expired",
+        "clusterId",
+        "clusterName",
+        "clusterDisplayName",
+        "rackId",
+        "hostId",
+        "hostname",
+        "interface",
+        "device",
+        "logicalPartition",
+        "partition",
+        "mountpoint",
+        "mountOptions",
+        "nameserviceName",
+        "cacheId",
+        "hnamespaceName",
+        "htableName",
+        "systemTable",
+        "hregionName",
+        "hbaseReplicationPeerId",
+        "hbaseReplicationPeerClusterKey",
+        "timeSeriesTableName",
+        "timeSeriesApplicationName",
+        "rollup",
+        "agentName",
+        "componentName",
+        "schedulerType",
+        "solrCollectionName",
+        "solrShardName",
+        "solrReplicaName",
+        "filesystemType");
+  }
+
+  @Bean(name = BUILTIN_METRIC_ENTITY_TYPES)
+  public Set<String> builtInMetricEntityTypes() {
+    return ImmutableSet.of(
+      "TIME_SERIES_TABLE");
   }
 
   @Bean
@@ -260,12 +334,12 @@ public class DefaultValidatorConfiguration {
 
   @Bean
   public Parser<ServiceDescriptor> sdlParser() {
-    return new JsonSdlParser();
+    return new JsonSdlParser(jsonSdlObjectMapper);
   }
 
   @Bean
   public Parser<ServiceMonitoringDefinitionsDescriptor> mdlParser() {
-    return new JsonMdlParser();
+    return new JsonMdlParser(jsonSdlObjectMapper);
   }
 
   @Bean
@@ -321,13 +395,22 @@ public class DefaultValidatorConfiguration {
       serviceMonitoringDefinitionsDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
     ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
+    @SuppressWarnings("unchecked")
+    Set<String> builtInEntityTypes =
+        (Set<String>)ctx.getBean(BUILTIN_METRIC_ENTITY_TYPES);
+    @SuppressWarnings("unchecked")
     Set<String> builtInNamesForCrossEntityAggregateMetrics =
         (Set<String>)ctx.getBean(
             BUILTIN_NAMES_FOR_CROSS_ENTITY_AGGREGATE_METRICS);
+    @SuppressWarnings("unchecked")
+    Set<String> builtInAttributes =
+        (Set<String>)ctx.getBean(BUILTIN_METRIC_ENTITY_ATTRIBUTES);
     return new ServiceMonitoringDefinitionsDescriptorValidatorImpl(
         validator,
         referenceValidator,
-        builtInNamesForCrossEntityAggregateMetrics);
+        builtInNamesForCrossEntityAggregateMetrics,
+        builtInEntityTypes,
+        builtInAttributes);
   }
 
   @Bean
@@ -398,11 +481,15 @@ public class DefaultValidatorConfiguration {
     return new MetricNameFormatValidatorImpl();
   }
 
-  @SuppressWarnings("unchecked")
   @Bean
   @Scope(BeanDefinition.SCOPE_PROTOTYPE)
   public NameForCrossEntityAggregatesFormatValidator
       nameForCrossEntityAggregateFormatValidator() {
     return new NameForCrossEntityAggregatesFormatValidatorImpl();
+  }
+
+  @Bean(name = OBJECT_MAPPER_BEAN_NAME)
+  public JsonSdlObjectMapper jsonSdlObjectMapper() {
+    return jsonSdlObjectMapper;
   }
 }

@@ -15,11 +15,9 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
-import static com.cloudera.csd.validation.references.annotations.SubstitutionType.GROUP;
-import static com.cloudera.csd.validation.references.annotations.SubstitutionType.HOST;
-import static com.cloudera.csd.validation.references.annotations.SubstitutionType.PARAMETERS;
-import static com.cloudera.csd.validation.references.annotations.SubstitutionType.USER;
+import static com.cloudera.csd.validation.references.annotations.SubstitutionType.*;
 
+import com.cloudera.csd.descriptors.CsdConfigEntryType;
 import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -31,7 +29,9 @@ public interface ConfigEntry {
   @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   String getKey();
 
-  @NotBlank
   @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   String getValue();
+
+  /** Type of the entry. If none is specified, it defaults to "simple". */
+  CsdConfigEntryType getType();
 }

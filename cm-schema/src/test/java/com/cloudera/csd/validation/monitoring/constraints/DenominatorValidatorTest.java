@@ -15,34 +15,38 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class DenominatorValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
 
   private DenominatorValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setUpCounterMetricNameValidatorTest() {
-    validator = new DenominatorValidator(serviceDescriptor);
+    validator = new DenominatorValidator();
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testNotEndingWithRateWithDenominator() {
     setName("bytes_read");
     setDenominator("seconds");
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testNotEndingWithRateWithoutDenominator() {
     setName("bytes_read");
     setDenominator(null);
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
@@ -50,7 +54,7 @@ public class DenominatorValidatorTest
     setName("bytes_read");
     setIsCounter(true);
     setDenominator("seconds");
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
@@ -58,21 +62,21 @@ public class DenominatorValidatorTest
     setName("bytes_read");
     setIsCounter(true);
     setDenominator(null);
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testEndingWithRateWithDenominator() {
     setName("bytes_read_rate");
     setDenominator("seconds");
-    assertTrue(validator.validate(metric, root).isEmpty());
+    assertTrue(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
   public void testEndingWithRateWithoutDenominator() {
     setName("bytes_read_rate");
     setDenominator(null);
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
@@ -80,7 +84,7 @@ public class DenominatorValidatorTest
     setName("bytes_read_rate");
     setIsCounter(true);
     setDenominator("seconds");
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
   @Test
@@ -88,7 +92,7 @@ public class DenominatorValidatorTest
     setName("bytes_read_rate");
     setIsCounter(true);
     setDenominator(null);
-    assertFalse(validator.validate(metric, root).isEmpty());
+    assertFalse(validator.validate(context, metric, root).isEmpty());
   }
 
 }

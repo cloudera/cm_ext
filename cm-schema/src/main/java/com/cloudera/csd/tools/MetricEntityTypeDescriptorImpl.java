@@ -42,7 +42,7 @@ public class MetricEntityTypeDescriptorImpl
     private List<String> immutableAttributeNames;
     private List<String> mutableAttributeNames;
     private List<String> entityNameFormat;
-    private String entityLabelForamt;
+    private String entityLabelFormat;
     private List<String> parentMetricEntityTypeNames;
     private List<MetricDescriptor> metricDefinitions;
 
@@ -67,7 +67,7 @@ public class MetricEntityTypeDescriptorImpl
       if (null != source.getEntityNameFormat()) {
         this.entityNameFormat = Lists.newArrayList(source.getEntityNameFormat());
       }
-      this.entityLabelForamt = source.getEntityLabelForamt();
+      this.entityLabelFormat = source.getEntityLabelFormat();
       if (null != source.getParentMetricEntityTypeNames()) {
         this.parentMetricEntityTypeNames =
             Lists.newArrayList(source.getParentMetricEntityTypeNames());
@@ -130,9 +130,9 @@ public class MetricEntityTypeDescriptorImpl
       return this;
     }
 
-    public Builder setEntityLabelFormat(String entityLabelForamt) {
-      Preconditions.checkNotNull(entityLabelForamt);
-      this.entityLabelForamt = entityLabelForamt;
+    public Builder setEntityLabelFormat(String entityLabelFormat) {
+      Preconditions.checkNotNull(entityLabelFormat);
+      this.entityLabelFormat = entityLabelFormat;
       return this;
     }
 
@@ -177,7 +177,7 @@ public class MetricEntityTypeDescriptorImpl
           immutableAttributeNames,
           mutableAttributeNames,
           entityNameFormat,
-          entityLabelForamt,
+          entityLabelFormat,
           parentMetricEntityTypeNames,
           metricDefinitions);
     }
@@ -191,7 +191,7 @@ public class MetricEntityTypeDescriptorImpl
   private final List<String> immutableAttributeNames;
   private final List<String> mutableAttributeNames;
   private final List<String> entityNameFormat;
-  private final String entityLabelForamt;
+  private final String entityLabelFormat;
   private final List<String> parentMetricEntityTypeNames;
   private final List<MetricDescriptor> metricDefinitions;
 
@@ -204,7 +204,7 @@ public class MetricEntityTypeDescriptorImpl
       List<String> immutableAttributeNames,
       @Nullable List<String> mutableAttributeNames,
       List<String> entityNameFormat,
-      @Nullable String entityLabelForamt,
+      @Nullable String entityLabelFormat,
       @Nullable List<String> parentMetricEntityTypeNames,
       @Nullable List<MetricDescriptor> metricDefinitions) {
     Preconditions.checkNotNull(name);
@@ -222,7 +222,7 @@ public class MetricEntityTypeDescriptorImpl
     this.immutableAttributeNames = immutableAttributeNames;
     this.mutableAttributeNames = mutableAttributeNames;
     this.entityNameFormat = entityNameFormat;
-    this.entityLabelForamt = entityLabelForamt;
+    this.entityLabelFormat = entityLabelFormat;
     this.parentMetricEntityTypeNames = parentMetricEntityTypeNames;
     this.metricDefinitions = metricDefinitions;
   }
@@ -268,8 +268,8 @@ public class MetricEntityTypeDescriptorImpl
   }
 
   @Override
-  public String getEntityLabelForamt() {
-    return entityLabelForamt;
+  public String getEntityLabelFormat() {
+    return entityLabelFormat;
   }
 
   @Override

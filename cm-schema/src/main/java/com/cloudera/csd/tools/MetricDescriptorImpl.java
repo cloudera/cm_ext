@@ -50,9 +50,13 @@ public class MetricDescriptorImpl implements MetricDescriptor {
     public Builder setName(String serviceName, String name) {
       Preconditions.checkNotNull(serviceName);
       Preconditions.checkNotNull(name);
-      this.name = String.format("%s_%s",
-                                serviceName.toLowerCase(),
-                                name.toLowerCase());
+      if (name.startsWith(serviceName.toLowerCase() + "_")) {
+        this.name = name.toLowerCase();
+      } else {
+        this.name = String.format("%s_%s",
+                                  serviceName.toLowerCase(),
+                                  name.toLowerCase());
+      }
       return this;
     }
 

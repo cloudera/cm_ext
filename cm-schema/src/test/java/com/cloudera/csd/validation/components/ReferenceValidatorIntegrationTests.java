@@ -107,6 +107,11 @@ public class ReferenceValidatorIntegrationTests {
     runTest("service_scopeServiceCmd.sdl", 2);
   }
 
+  @Test
+  public void testPeerGeneratorAndPlacementRule() {
+    runTest("service_peerGeneratorAndPlacementRule.sdl", 0);
+  }
+
   private void runTest(String filename, int errorsExpected) {
     ServiceDescriptor descriptor = SdlTestUtils.getReferenceValidatorSdl(filename);
 

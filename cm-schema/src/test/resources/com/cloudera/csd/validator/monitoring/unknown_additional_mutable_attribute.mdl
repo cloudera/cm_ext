@@ -1,0 +1,190 @@
+{
+  "name" : "ECHO",
+  "version" : 1,
+  "metricDefinitions" : [
+    {
+      "name" : "echo_service_metric_one",
+      "label" : "Echo Service Metric One",
+      "description" : "This is the Echo Service's first metric.",
+      "numeratorUnit" : "bytes",
+      "counter" : false
+    },
+    {
+      "name" : "echo_service_metric_two",
+      "label" : "Echo Service Metric Two",
+      "description" : "This is the Echo Service's second metric.",
+      "numeratorUnit" : "echos",
+      "counter" : true
+    },
+    {
+      "name" : "echo_common_metric",
+      "label" : "Echo Service Common Metric",
+      "description" : "This is the Echo Service's common metric.",
+      "numeratorUnit" : "seconds",
+      "counter" : false
+    }
+  ],
+  "metricEntityAttributeDefinitions" : [
+    {
+      "name" : "echoServiceAttributeOne",
+      "label" : "Echo Service Attribute One",
+      "description" : "The Echo Service's First Entity Attribute",
+      "valueCaseSensitive": false
+    },
+    {
+      "name" : "echoServiceAttributeTwo",
+      "label" : "Echo Service Attribute Two",
+      "description" : "The Echo Service's Second Entity Attribute",
+      "valueCaseSensitive": true
+    }
+  ],
+  "metricEntityTypeDefinitions" : [
+    {
+      "name" : "ECHO_ENTITY_TYPE_ONE",
+      "nameForCrossEntityAggregateMetrics" : "echo_entity_type_ones",
+      "entityNameFormat" :  [
+         "serviceName",
+         "echoServiceAttributeOne"
+      ],
+      "label" : "Echo Service Entity Type One",
+      "labelPlural" : "Echo Service Entity Type Ones",
+      "description" : "The Echo Service's First Entity Type",
+      "immutableAttributeNames" : [
+         "serviceName",
+         "echoServiceAttributeOne"
+      ],
+      "mutableAttributeNames" : [
+        "echoServiceAttributeTwo"
+      ],
+      "parentMetricEntityTypeNames" : [
+         "ECHO"
+      ],
+      "metricDefinitions" : [
+        {
+          "name" : "echo_entity_type_one_metric_one",
+          "label" : "Echo Service Entity Type One Metric One",
+          "description" : "This is the Echo Service's Entity Type One's first metric.",
+          "numeratorUnit" : "bytes",
+          "counter" : false
+        },
+        {
+          "name" : "echo_entity_type_one_metric_two",
+          "label" : "Echo Service Entity Type One Metric Two",
+          "description" : "This is the Echo Service's Entity Type Two's first metric.",
+          "numeratorUnit" : "echos",
+          "counter" : true
+        },
+        {
+          "name" : "echo_common_metric",
+          "label" : "Echo Service Common Metric",
+          "description" : "This is the Echo Service's common metric.",
+          "numeratorUnit" : "seconds",
+          "counter" : false
+        }
+      ]
+    },
+    {
+      "name" : "ECHO_ENTITY_TYPE_TWO",
+      "nameForCrossEntityAggregateMetrics" : "echo_entity_type_twos",
+      "entityNameFormat" :  [
+         "roleName",
+         "echoServiceAttributeOne"
+      ],
+      "label" : "Echo Service Entity Type Two",
+      "labelPlural" : "Echo Service Entity Type Twos",
+      "description" : "The Echo Service's Second Entity Type",
+      "immutableAttributeNames" : [
+        "serviceName",
+        "roleName",
+        "echoServiceAttributeOne"
+      ],
+      "mutableAttributeNames" : [
+        "echoServiceAttributeTwo"
+      ],
+      "parentMetricEntityTypeNames" : [
+         "ECHO-ECHO_WEBSERVER",
+         "ECHO_ENTITY_TYPE_ONE"
+      ],
+      "metricDefinitions" : [
+        {
+          "name" : "echo_entity_type_two_metric_one",
+          "label" : "Echo Service Entity Type Two Metric One",
+          "description" : "This is the Echo Service's Entity Type Two's first metric.",
+          "numeratorUnit" : "bytes",
+          "counter" : false
+        },
+        {
+          "name" : "echo_entity_type_two_metric_two",
+          "label" : "Echo Service Entity Type Two Metric Two",
+          "description" : "This is the Echo Service's Entity Type Two's second metric.",
+          "numeratorUnit" : "echos",
+          "counter" : true
+        },
+        {
+          "name" : "echo_common_metric",
+          "label" : "Echo Service Common Metric",
+          "description" : "This is the Echo Service's common metric.",
+          "numeratorUnit" : "seconds",
+          "counter" : false
+        }
+      ]
+    }
+  ],
+  "roles" : [
+   {
+      "name" : "ECHO_MASTER_SERVER",
+      "additionalMutableAttributeNames" : [
+        "bogus"
+      ],
+      "metricDefinitions" : [
+        {
+          "name" : "echo_master_server_metric_one",
+          "label" : "Echo Master Server Metric One",
+          "description" : "This is the Echo Service's Master Server's first metric.",
+          "numeratorUnit" : "bytes",
+          "counter" : false
+         },
+         {
+          "name" : "echo_master_server_metric_two",
+          "label" : "Echo Master Server Metric Two",
+          "description" : "This is the Echo Service's Master Server's second metric.",
+          "numeratorUnit" : "echos",
+          "counter" : true
+         },
+         {
+          "name" : "echo_common_metric",
+          "label" : "Echo Service Common Metric",
+          "description" : "This is the Echo Service's common metric.",
+          "numeratorUnit" : "seconds",
+          "counter" : false
+         }
+       ]
+    },
+    {
+       "name" : "ECHO_WEBSERVER",
+       "metricDefinitions" : [
+         {
+          "name" : "echo_web_server_metric_one",
+          "label" : "Echo Web Server Metric One",
+          "description" : "This is the Echo Service's Web Server's first metric.",
+          "numeratorUnit" : "bytes",
+          "counter" : false
+         },
+         {
+          "name" : "echo_web_server_metric_two",
+          "label" : "Echo Web Server Metric Two",
+          "description" : "This is the Echo Service's Web Server's second metric.",
+          "numeratorUnit" : "echos",
+          "counter" : true
+         },
+         {
+          "name" : "echo_common_metric",
+          "label" : "Echo Service Common Metric",
+          "description" : "This is the Echo Service's common metric.",
+          "numeratorUnit" : "seconds",
+          "counter" : false
+         }
+       ]
+    }
+  ]
+}

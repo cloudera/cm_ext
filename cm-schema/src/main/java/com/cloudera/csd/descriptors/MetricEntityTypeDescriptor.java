@@ -34,7 +34,7 @@ public interface MetricEntityTypeDescriptor {
 
   /**
    * Returns the name of the entity type. This name uniquely identifies this
-   * entity type and is used to reference the metric in the Cloudera Manager
+   * entity type and is used to reference the type in the Cloudera Manager
    * API and charting features.
    * @return
    */
@@ -114,7 +114,7 @@ public interface MetricEntityTypeDescriptor {
    * format is "$roleType ($hostname)".
    * @return
    */
-  String getEntityLabelForamt();
+  String getEntityLabelFormat();
 
   /**
    * Returns a list of metric entity type names which are parents of this

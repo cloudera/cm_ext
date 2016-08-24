@@ -17,7 +17,6 @@ package com.cloudera.csd.tools;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
 import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -38,6 +37,8 @@ public class RoleMonitoringDefinitionsDescriptorImpl
     private String name;
     private List<MetricDescriptor> metricDefinitions;
     private String nameForCrossEntityAggregateMetrics;
+    private List<String> additionalImmutableAttributeNames;
+    private List<String> additionalMutableAttributeNames;
 
     public Builder() {
     }
@@ -50,6 +51,10 @@ public class RoleMonitoringDefinitionsDescriptorImpl
       }
       this.nameForCrossEntityAggregateMetrics =
           role.getNameForCrossEntityAggregateMetrics();
+      this.additionalImmutableAttributeNames =
+          role.getAdditionalImmutableAttributeNames();
+      this.additionalMutableAttributeNames =
+          role.getAdditionalMutableAttributeNames();
     }
 
     public Builder setName(String name) {
@@ -84,6 +89,18 @@ public class RoleMonitoringDefinitionsDescriptorImpl
       return this;
     }
 
+    public Builder setAdditionalImmutableAttributeNames(
+        @Nullable List<String> additionalImmutableAttributeNames) {
+      this.additionalImmutableAttributeNames = additionalImmutableAttributeNames;
+      return this;
+    }
+
+    public Builder setAdditionalMutableAttributeNames(
+        @Nullable List<String> additionalMutableAttributeNames) {
+      this.additionalMutableAttributeNames = additionalMutableAttributeNames;
+      return this;
+    }
+
     public RoleMonitoringDefinitionsDescriptor build() {
       if (null != metricDefinitions) {
         Collections.sort(metricDefinitions,
@@ -92,22 +109,30 @@ public class RoleMonitoringDefinitionsDescriptorImpl
       return new RoleMonitoringDefinitionsDescriptorImpl(
           name,
           metricDefinitions,
-          nameForCrossEntityAggregateMetrics);
+          nameForCrossEntityAggregateMetrics,
+          additionalImmutableAttributeNames,
+          additionalMutableAttributeNames);
     }
   }
 
   private final String name;
   private final List<MetricDescriptor> metricDefinitions;
   private String nameForCrossEntityAggregateMetrics;
+  private List<String> additionalImmutableAttributeNames;
+  private List<String> additionalMutableAttributeNames;
 
   private RoleMonitoringDefinitionsDescriptorImpl(
       String name,
       List<MetricDescriptor> metricDefinitions,
-      @Nullable String nameForCrossEntityAggregateMetrics) {
+      @Nullable String nameForCrossEntityAggregateMetrics,
+      @Nullable List<String> additionalImmutableAttributeNames,
+      @Nullable List<String> additionalMutableAttributeNames) {
     Preconditions.checkNotNull(name);
     this.name = name;
     this.metricDefinitions = metricDefinitions;
     this.nameForCrossEntityAggregateMetrics = nameForCrossEntityAggregateMetrics;
+    this.additionalImmutableAttributeNames = additionalImmutableAttributeNames;
+    this.additionalMutableAttributeNames = additionalMutableAttributeNames;
   }
 
   @Override
@@ -123,5 +148,15 @@ public class RoleMonitoringDefinitionsDescriptorImpl
   @Override
   public String getNameForCrossEntityAggregateMetrics() {
     return nameForCrossEntityAggregateMetrics;
+  }
+
+  @Override
+  public List<String> getAdditionalImmutableAttributeNames() {
+    return additionalImmutableAttributeNames;
+  }
+
+  @Override
+  public List<String> getAdditionalMutableAttributeNames() {
+    return additionalMutableAttributeNames;
   }
 }

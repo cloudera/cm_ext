@@ -15,9 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.validation.monitoring.constraints;
 
-import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
-import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
+import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
@@ -28,26 +32,22 @@ import javax.validation.ConstraintViolation;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest
     extends AbstractMonitoringValidatorBaseTest {
   private static final Boolean SERVICE_NODE = true;
   private NameForCrossEntityAggregatesPrefixedWithServiceNameValidator validator;
+  private MonitoringValidationContext context;
 
   @Before
   public void setupNameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest() {
     validator = new NameForCrossEntityAggregatesPrefixedWithServiceNameValidator(
-        serviceDescriptor,
-        ImmutableSet.<String>of(),
-        !SERVICE_NODE);
+        ImmutableSet.<String>of(), !SERVICE_NODE);
+    context = new MonitoringValidationContext(serviceDescriptor);
   }
 
   @Test
   public void testNullName() {
-    assertTrue(validator.validate(null, root).isEmpty());
+    assertTrue(validator.validate(context, null, root).isEmpty());
   }
 
   @Test
@@ -56,8 +56,8 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest
         serviceDescriptor,
         "nameForCrossEntityAggregateMetrics",
         root);
-    List<ConstraintViolation<Object>> validations = validator.validate("",
-                                                                       path);
+    List<ConstraintViolation<Object>> validations =
+        validator.validate(context, "", path);
     assertFalse(validations.isEmpty());
     ConstraintViolation<Object> validation = Iterables.getOnlyElement(
         validations);
@@ -76,6 +76,7 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest
         "nameForCrossEntityAggregateMetrics",
         root);
     List<ConstraintViolation<Object>> validations = validator.validate(
+        context,
         SERVICE_NAME.toLowerCase().substring(1),
         path);
     assertFalse(validations.isEmpty());
@@ -96,6 +97,7 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest
         "nameForCrossEntityAggregateMetrics",
         root);
     List<ConstraintViolation<Object>> validations = validator.validate(
+        context,
         SERVICE_NAME.toLowerCase(),
         path);
     assertFalse(validations.isEmpty());
@@ -112,33 +114,30 @@ public class NameForCrossEntityAggregatesPrefixedWithServiceNameValidatorTest
   @Test
   public void testMissingUnderscoreInServiceMode() {
     validator = new NameForCrossEntityAggregatesPrefixedWithServiceNameValidator(
-        serviceDescriptor,
         ImmutableSet.<String>of(),
         SERVICE_NODE);
-    assertTrue(validator.validate(SERVICE_NAME.toLowerCase(), root)
-                   .isEmpty());
+    assertTrue(validator.validate(
+        context, SERVICE_NAME.toLowerCase(), root).isEmpty());
   }
 
   @Test
   public void testGoodName() {
-    assertTrue(
-        validator.validate(SERVICE_NAME.toLowerCase() + "_", root).isEmpty());
+    assertTrue(validator.validate(
+        context, SERVICE_NAME.toLowerCase() + "_", root).isEmpty());
   }
 
   @Test
   public void testGoodLongName() {
     assertTrue(validator.validate(
-        SERVICE_NAME.toLowerCase() + "_foo_bar",
-        root).isEmpty());
+        context, SERVICE_NAME.toLowerCase() + "_foo_bar", root).isEmpty());
   }
 
   @Test
   public void testBuiltInsNames() {
     validator = new NameForCrossEntityAggregatesPrefixedWithServiceNameValidator(
-        serviceDescriptor,
         ImmutableSet.of(SERVICE_NAME.toLowerCase().substring(1)),
         SERVICE_NODE);
-    assertTrue(validator.validate(SERVICE_NAME.toLowerCase().substring(1), root)
-                   .isEmpty());
+    assertTrue(validator.validate(
+        context, SERVICE_NAME.toLowerCase().substring(1), root).isEmpty());
   }
 }

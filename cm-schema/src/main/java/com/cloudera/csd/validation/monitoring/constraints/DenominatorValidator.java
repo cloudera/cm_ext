@@ -16,11 +16,10 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
-import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
 import com.cloudera.csd.validation.monitoring.MonitoringConventions;
+import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
-
 import com.google.common.base.Preconditions;
 
 import java.util.List;
@@ -33,11 +32,6 @@ import javax.validation.ConstraintViolation;
 public class DenominatorValidator
     extends AbstractMonitoringValidator<MetricDescriptor> {
 
-  public DenominatorValidator(
-      ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
-    super(serviceDescriptor);
-  }
-
   @Override
   public String getDescription() {
     return
@@ -49,8 +43,10 @@ public class DenominatorValidator
 
   @Override
   public <T> List<ConstraintViolation<T>> validate(
+      MonitoringValidationContext context,
       MetricDescriptor metricDescriptor,
       DescriptorPathImpl path) {
+    Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(metricDescriptor);
     Preconditions.checkNotNull(path);
     path = constructPathFromProperty(metricDescriptor, "name", path);

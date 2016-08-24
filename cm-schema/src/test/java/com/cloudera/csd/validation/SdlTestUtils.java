@@ -16,6 +16,7 @@
 package com.cloudera.csd.validation;
 
 import com.cloudera.csd.components.JsonMdlParser;
+import com.cloudera.csd.components.JsonSdlObjectMapper;
 import com.cloudera.csd.components.JsonSdlParser;
 import com.cloudera.csd.descriptors.RoleDescriptor;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
@@ -34,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 
 public class SdlTestUtils {
 
+  public static final JsonSdlObjectMapper OBJECT_MAPPER;
   public static final JsonSdlParser SDL_PARSER;
   public static final JsonMdlParser MDL_PARSER;
   public static final ServiceDescriptor FULL_DESCRIPTOR;
@@ -49,8 +51,9 @@ public class SdlTestUtils {
 
   // Initialize our variables
   static {
-    SDL_PARSER = new JsonSdlParser();
-    MDL_PARSER = new JsonMdlParser();
+    OBJECT_MAPPER = new JsonSdlObjectMapper();
+    SDL_PARSER = new JsonSdlParser(OBJECT_MAPPER);
+    MDL_PARSER = new JsonMdlParser(OBJECT_MAPPER);
     FULL_DESCRIPTOR = getParserSdl("service_full.sdl");
     FAKE_SDL_VALIDATOR = getAlwaysPassingSdlValidator();
     FAKE_MDL_VALIDATOR = getAlwaysPassingMdlValidator();

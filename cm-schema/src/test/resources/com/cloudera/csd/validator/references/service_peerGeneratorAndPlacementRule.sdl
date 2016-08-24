@@ -1,0 +1,56 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice"
+  },
+  "roles" : [
+    {
+      "name" : "ECHO_MASTER_SERVER",
+      "label" : "Master Server",
+      "pluralLabel" : "Master Servers",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "parameters" : [
+        {
+         "name" : "master_server_var1",
+         "label" : "Master server var1 Label",
+         "description" : "Master Server var 1 Description",
+         "required" : "true",
+         "type" : "long",
+         "default" : 20
+        }
+      ]
+    },
+    {
+      "name" : "ECHO_WEBSERVER",
+      "label" : "Web Server",
+      "pluralLabel" : "Web Servers",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "configWriter" : {
+        "peerConfigGenerators" : [
+          {
+            "filename" : "sample_master_peer_file.properties",
+            "params" : ["master_server_var1"],
+            "roleName" : "ECHO_MASTER_SERVER"
+          }
+          /* Processing the above used to remove ECHO_MASTER_SERVER from valid role references */
+        ]
+      },
+      "topology" : {
+        "placementRules" : [
+           {
+            "type" : "alwaysWith",
+            "roleType" : "ECHO_MASTER_SERVER"
+          }
+        ]
+      }
+    }
+  ]
+}
