@@ -5,7 +5,7 @@
   <groupId>com.cloudera.enterprise</groupId>
   <artifactId>schema-validator</artifactId>
   <name>Schema Validator</name>
-  <version>5.5.0</version>
+  <version>5.8.0</version>
 
   <properties>
     <org.springframework.version>3.2.5.RELEASE</org.springframework.version>
@@ -261,11 +261,10 @@
   </dependencies>
 
   <repositories>
-    <!-- For our build of commons-cli -->
     <repository>
       <id>cloudera-external</id>
       <name>Cloudera External Repo</name>
-      <url>https://repository.cloudera.com/artifactory/ext-release-local/</url>
+      <url>https://repository.cloudera.com/cloudera/cloudera-repos</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -275,7 +274,7 @@
   <distributionManagement>
     <repository>
       <id>cdh.releases.repo</id>
-      <url>http://maven.jenkins.cloudera.com:8081/artifactory/libs-release-local</url>
+      <url>http://maven.jenkins.cloudera.com:8081/artifactory/cdh-staging-local</url>
       <name>CDH Releases Repository</name>
     </repository>
     <snapshotRepository>
