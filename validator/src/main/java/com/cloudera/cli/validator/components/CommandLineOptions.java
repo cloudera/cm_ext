@@ -42,8 +42,8 @@ public class CommandLineOptions {
   public static final String BEAN_NAME = "commandLineOptionsBean";
 
   private final CommandLine cmdLine;
-  private final String appName;
 
+  @SuppressWarnings("static-access")
   private static final Option SDL_FILE_OPTION = OptionBuilder.withLongOpt("sdl")
       .withArgName("FILE")
       .hasArg()
@@ -51,6 +51,15 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("s");
 
+  @SuppressWarnings("static-access")
+  private static final Option MDL_FILE_OPTION = OptionBuilder.withLongOpt("mdl")
+      .withArgName("FILE")
+      .hasArg()
+      .withDescription("The MDL to validate")
+      .isRequired(false)
+      .create("z");
+
+  @SuppressWarnings("static-access")
   private static final Option PARCEL_JSON_OPTION = OptionBuilder.withLongOpt("parcel-json")
       .withArgName("FILE")
       .hasArg()
@@ -58,6 +67,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("p");
 
+  @SuppressWarnings("static-access")
   private static final Option ALTERNATIVES_JSON_OPTION = OptionBuilder.withLongOpt("alternatives-json")
       .withArgName("FILE")
       .hasArg()
@@ -65,6 +75,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("a");
 
+  @SuppressWarnings("static-access")
   private static final Option PERMISSIONS_JSON_OPTION = OptionBuilder.withLongOpt("permissions-json")
       .withArgName("FILE")
       .hasArg()
@@ -72,6 +83,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("r");
 
+  @SuppressWarnings("static-access")
   private static final Option MANIFEST_JSON_OPTION = OptionBuilder.withLongOpt("manifest-json")
       .withArgName("FILE")
       .hasArg()
@@ -79,6 +91,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("m");
 
+  @SuppressWarnings("static-access")
   private static final Option PARCEL_DIR_OPTION = OptionBuilder.withLongOpt("parcel-dir")
       .withArgName("DIRECTORY")
       .hasArg()
@@ -86,6 +99,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("d");
 
+  @SuppressWarnings("static-access")
   private static final Option PARCEL_FILE_OPTION = OptionBuilder.withLongOpt("parcel")
       .withArgName("FILE")
       .hasArg()
@@ -93,6 +107,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("f");
 
+  @SuppressWarnings("static-access")
   public static final Option EXTRA_SERVICE_TYPE_FILE = OptionBuilder.withLongOpt("service-type-file")
       .withArgName("FILE")
       .hasArg()
@@ -100,6 +115,7 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("c");
 
+  @SuppressWarnings("static-access")
   public static final Option EXTRA_SERVICE_TYPES = OptionBuilder.withLongOpt("service-type-list")
       .withArgName("STRING")
       .hasArg()
@@ -108,8 +124,17 @@ public class CommandLineOptions {
       .isRequired(false)
       .create("l");
 
+  @SuppressWarnings("static-access")
+  public static final Option STRICT_MODE = OptionBuilder.withLongOpt("strict-mode")
+      .withDescription("Do strict validation of SDL and MDL files that "
+          + "rejects any unrecognized elements. Parcel files are always "
+          + "strictly validated")
+      .isRequired(false)
+      .create("x");
+
   public static enum Mode {
     SDL_FILE(SDL_FILE_OPTION, "sdlRunner"),
+    MDL_FILE(MDL_FILE_OPTION, "mdlRunner"),
     PARCEL_JSON(PARCEL_JSON_OPTION, "parcelRunner"),
     ALTERNATIVES_JSON(ALTERNATIVES_JSON_OPTION, "alternativesRunner"),
     PERMISSIONS_JSON(PERMISSIONS_JSON_OPTION, "permissionsRunner"),
@@ -154,6 +179,7 @@ public class CommandLineOptions {
 
     OPTIONS.addOption(EXTRA_SERVICE_TYPES);
     OPTIONS.addOption(EXTRA_SERVICE_TYPE_FILE);
+    OPTIONS.addOption(STRICT_MODE);
   }
 
   /**
@@ -167,7 +193,6 @@ public class CommandLineOptions {
     Preconditions.checkNotNull(appName);
     Preconditions.checkNotNull(args);
     CommandLineParser cliParser = new DefaultParser();
-    this.appName = appName;
     this.cmdLine = cliParser.parse(OPTIONS, args);
   }
 
@@ -183,6 +208,10 @@ public class CommandLineOptions {
 
   public String getCommandLineOptionActiveTarget() {
     return cmdLine.getOptionValue(getMode().getOpt());
+  }
+
+  public boolean getStrictMode() {
+    return cmdLine.hasOption(STRICT_MODE.getOpt());
   }
 
   public String getOptionValue(Option option) {

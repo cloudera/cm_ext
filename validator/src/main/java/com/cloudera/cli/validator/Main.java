@@ -17,6 +17,8 @@ package com.cloudera.cli.validator;
 
 import com.cloudera.cli.validator.components.CommandLineOptions;
 import com.cloudera.cli.validator.components.Constants;
+import com.cloudera.config.DefaultValidatorConfiguration;
+import com.cloudera.csd.components.JsonSdlObjectMapper;
 import com.cloudera.validation.ValidationRunner;
 
 import java.io.IOException;
@@ -78,6 +80,12 @@ public class Main {
       if (mode == null) {
         throw new ParseException("No valid command line arguments");
       }
+
+      JsonSdlObjectMapper mapper =
+          ctx.getBean(DefaultValidatorConfiguration.OBJECT_MAPPER_BEAN_NAME,
+                      JsonSdlObjectMapper.class);
+      mapper.setFailOnUnknownProperties(cmdOptions.getStrictMode());
+
       ValidationRunner runner = ctx.getBean(mode.runnerName, ValidationRunner.class);
       boolean success = runner.run(cmdOptions.getCommandLineOptionActiveTarget(), writer);
       if (success) {

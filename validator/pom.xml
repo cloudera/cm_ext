@@ -5,7 +5,7 @@
   <groupId>com.cloudera.enterprise</groupId>
   <artifactId>schema-validator</artifactId>
   <name>Schema Validator</name>
-  <version>5.4.0</version>
+  <version>5.7.0</version>
 
   <properties>
     <org.springframework.version>3.2.5.RELEASE</org.springframework.version>
@@ -48,6 +48,36 @@
       <properties>
         <findbugsVersion>2.5.2</findbugsVersion>
       </properties>
+    </profile>
+    <profile>
+      <!-- profile to use with Atlassian Clover for code coverage -->
+      <id>clover</id>
+      <properties>
+        <clover.version>4.0.3</clover.version>
+        <clover.generateHtml>true</clover.generateHtml>
+        <clover.generateXml>true</clover.generateXml>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.atlassian.clover</groupId>
+          <artifactId>clover</artifactId>
+          <version>${clover.version}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- Clover plugin to enable maven to create instantiated jars that will record code coverage -->
+            <groupId>com.atlassian.maven.plugins</groupId>
+            <artifactId>maven-clover2-plugin</artifactId>
+            <version>${clover.version}</version>
+            <configuration>
+              <generateHtml>${clover.generateHtml}</generateHtml>
+              <generateXml>${clover.generateXml}</generateXml>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
@@ -162,45 +192,6 @@
           <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4</version>
-        <configuration>
-          <rules>
-            <requireMavenVersion>
-              <version>[3.0.2,)</version>
-            </requireMavenVersion>
-            <requireJavaVersion>
-              <version>[1.7,)</version>
-            </requireJavaVersion>
-          </rules>
-        </configuration>
-        <executions>
-          <execution>
-            <id>clean</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <phase>pre-clean</phase>
-          </execution>
-          <execution>
-            <id>default</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <phase>validate</phase>
-          </execution>
-          <execution>
-            <id>site</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <phase>pre-site</phase>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
   </build>
   <dependencies>
@@ -270,11 +261,10 @@
   </dependencies>
 
   <repositories>
-    <!-- For our build of commons-cli -->
     <repository>
       <id>cloudera-external</id>
       <name>Cloudera External Repo</name>
-      <url>https://repository.cloudera.com/artifactory/ext-release-local/</url>
+      <url>https://repository.cloudera.com/cloudera/cloudera-repos</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -284,7 +274,7 @@
   <distributionManagement>
     <repository>
       <id>cdh.releases.repo</id>
-      <url>http://maven.jenkins.cloudera.com:8081/artifactory/libs-release-local</url>
+      <url>http://maven.jenkins.cloudera.com:8081/artifactory/cdh-staging-local</url>
       <name>CDH Releases Repository</name>
     </repository>
     <snapshotRepository>
