@@ -20,6 +20,7 @@ import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
 import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -33,6 +34,16 @@ import javax.validation.ConstraintViolation;
  */
 public class EntityParentsReferToExistingEntitiesValidator extends
     AbstractMonitoringValidator<MetricEntityTypeDescriptor> {
+
+  private final ImmutableSet<String> builtInRoleTypes;
+  private final ImmutableSet<String> builtInEntityTypes;
+
+  public EntityParentsReferToExistingEntitiesValidator(
+      ImmutableSet<String> builtInRoleTypes,
+      ImmutableSet<String> builtInEntityTypes) {
+    this.builtInRoleTypes = Preconditions.checkNotNull(builtInRoleTypes);
+    this.builtInEntityTypes = Preconditions.checkNotNull(builtInEntityTypes);
+  }
 
   @Override
   public String getDescription() {
@@ -63,14 +74,16 @@ public class EntityParentsReferToExistingEntitiesValidator extends
                                      path);
     List<ConstraintViolation<T>> ret = Lists.newArrayList();
     for (String parentName : entity.getParentMetricEntityTypeNames()) {
-      if (!entitiesNames.contains(parentName)) {
-          String msg = String.format(
-              "Unknown parent '%s' for metric entity type '%s'.",
-              parentName,
-              entity.getName());
-          ret.addAll(
-              AbstractMonitoringValidator.<T, MetricEntityTypeDescriptor>
-                  forViolation(msg, entity, parentName, path));
+      if (!entitiesNames.contains(parentName) &&
+          !builtInRoleTypes.contains(parentName) &&
+          !builtInEntityTypes.contains(parentName)) {
+        String msg = String.format(
+            "Unknown parent '%s' for metric entity type '%s'.",
+            parentName,
+            entity.getName());
+        ret.addAll(
+            AbstractMonitoringValidator.<T, MetricEntityTypeDescriptor>
+                forViolation(msg, entity, parentName, path));
       }
     }
     return ret;

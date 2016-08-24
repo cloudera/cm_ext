@@ -25,6 +25,7 @@ import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.monitoring.MonitoringConventions;
 import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import java.util.List;
@@ -44,7 +45,9 @@ public class EntityParentsReferToExistingEntitiesValidatorTest
   @Before
   public void setupEntityParentsReferToExistingEntitiesValidatorTest() {
     entity = mockEntity("foobar_entity_one");
-    validator = new EntityParentsReferToExistingEntitiesValidator();
+    validator = new EntityParentsReferToExistingEntitiesValidator(
+        ImmutableSet.of("BUILT_IN_ROLE_TYPE"),
+        ImmutableSet.of("BUILT_IN_ENTITY_TYPE"));
     context = new MonitoringValidationContext(serviceDescriptor);
   }
 
@@ -104,6 +107,22 @@ public class EntityParentsReferToExistingEntitiesValidatorTest
     RoleMonitoringDefinitionsDescriptor role = mockRole("ROLE1");
     addRole(role);
     context = new MonitoringValidationContext(serviceDescriptor);
+    assertTrue(validator.validate(context, entity, root).isEmpty());
+  }
+
+  @Test
+  public void testBuiltInRoleType() {
+    doReturn(ImmutableList.of("BUILT_IN_ROLE_TYPE")).when(entity)
+        .getParentMetricEntityTypeNames();
+    addEntity(entity);
+    assertTrue(validator.validate(context, entity, root).isEmpty());
+  }
+
+  @Test
+  public void testBuiltInEntityType() {
+    doReturn(ImmutableList.of("BUILT_IN_ENTITY_TYPE")).when(entity)
+        .getParentMetricEntityTypeNames();
+    addEntity(entity);
     assertTrue(validator.validate(context, entity, root).isEmpty());
   }
 }

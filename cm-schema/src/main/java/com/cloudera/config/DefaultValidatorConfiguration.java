@@ -255,7 +255,7 @@ public class DefaultValidatorConfiguration {
   @Bean(name = BUILTIN_METRIC_ENTITY_TYPES)
   public Set<String> builtInMetricEntityTypes() {
     return ImmutableSet.of(
-      "TIME_SERIES_TABLE");
+      "TIME_SERIES_TABLE", "IMPALA_POOL");
   }
 
   @Bean
@@ -396,6 +396,9 @@ public class DefaultValidatorConfiguration {
     Validator validator = ctx.getBean(Validator.class);
     ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
     @SuppressWarnings("unchecked")
+    Set<String> builtInRoleTypes =
+        (Set<String>)ctx.getBean(BUILTIN_ROLE_TYPES_BEAN_NAME);
+    @SuppressWarnings("unchecked")
     Set<String> builtInEntityTypes =
         (Set<String>)ctx.getBean(BUILTIN_METRIC_ENTITY_TYPES);
     @SuppressWarnings("unchecked")
@@ -408,6 +411,7 @@ public class DefaultValidatorConfiguration {
     return new ServiceMonitoringDefinitionsDescriptorValidatorImpl(
         validator,
         referenceValidator,
+        builtInRoleTypes,
         builtInNamesForCrossEntityAggregateMetrics,
         builtInEntityTypes,
         builtInAttributes);
