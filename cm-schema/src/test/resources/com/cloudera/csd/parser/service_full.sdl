@@ -705,7 +705,9 @@
       },
       "topology" : {
         "minInstances" : "0",
-        "maxInstances" : "1",
+        "maxInstances" : "3",
+        "softMinInstances" : "1",
+        "softMaxInstances" : "2",
         "placementRules" : [
           {
             "type" : "neverWith",
