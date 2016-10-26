@@ -16,6 +16,7 @@
 package com.cloudera.validation;
 
 import com.cloudera.csd.StringInterpolator;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import javax.validation.MessageInterpolator;
  */
 public class TemplateMessageInterpolator extends DelegatingMessageInterpolator {
 
+  private static final String VALIDATED_VALUE = "validatedValue";
   private final StringInterpolator stringInterpolator;
 
   public TemplateMessageInterpolator(MessageInterpolator delegate,
@@ -49,8 +51,9 @@ public class TemplateMessageInterpolator extends DelegatingMessageInterpolator {
   public String doInterpolate(String messageTemplate, Context context) {
     // This map contains all the attributes that existed in the annotation.
     // Use use these as substitution variables.
-    Map<String, Object> attributes = context.getConstraintDescriptor()
-                                            .getAttributes();
+    Map<String, Object> attributes = Maps.newHashMap(
+        context.getConstraintDescriptor().getAttributes());
+    attributes.put(VALIDATED_VALUE, context.getValidatedValue());
     return stringInterpolator.interpolate(messageTemplate, attributes);
   }
 }

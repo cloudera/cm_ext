@@ -68,19 +68,23 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImpl
   private final ImmutableSet<String> builtInNamesForCrossEntityAggregateMetrics;
   private final ImmutableSet<String> builtInEntityTypes;
   private final ImmutableSet<String> builtInAttributes;
+  private final ImmutableSet<String> builtInRoleTypes;
 
   public ServiceMonitoringDefinitionsDescriptorValidatorImpl(
       Validator validator,
       ReferenceValidator refValidator,
+      Set<String> builtInRoleTypes,
       Set<String> builtInNamesForCrossEntityAggregateMetrics,
       Set<String> builtInEntityTypes,
       Set<String> builtInAttributes) {
     super(validator, "service");
+    Preconditions.checkNotNull(builtInRoleTypes);
     Preconditions.checkNotNull(builtInNamesForCrossEntityAggregateMetrics);
     Preconditions.checkNotNull(builtInEntityTypes);
     Preconditions.checkNotNull(builtInAttributes);
     this.validator = validator;
     this.refValidator = refValidator;
+    this.builtInRoleTypes = ImmutableSet.copyOf(builtInRoleTypes);
     this.builtInNamesForCrossEntityAggregateMetrics =
         ImmutableSet.copyOf(builtInNamesForCrossEntityAggregateMetrics);
     this.builtInAttributes = ImmutableSet.copyOf(builtInAttributes);
@@ -89,9 +93,9 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImpl
 
   @Override
   public Set<ConstraintViolation<ServiceMonitoringDefinitionsDescriptor>>
-      getViolations(ServiceMonitoringDefinitionsDescriptor descriptor) {
+      getViolations(ServiceMonitoringDefinitionsDescriptor descriptor, Class<?>... groups) {
     Set<ConstraintViolation<ServiceMonitoringDefinitionsDescriptor>> violations =
-        validator.validate(descriptor);
+        validator.validate(descriptor, groups);
     if (!violations.isEmpty()) {
       return violations;
     }
@@ -106,8 +110,6 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImpl
    * Validate the service monitoring definitions. If there are no validation
    * errors the returned list is empty. The validator assumes that it is called
    * after the service name has been validated.
-   * @param descriptor
-   * @return
    */
   public Set<ConstraintViolation<ServiceMonitoringDefinitionsDescriptor>>
       validateDescriptor(ServiceMonitoringDefinitionsDescriptor descriptor) {
@@ -269,7 +271,9 @@ public class ServiceMonitoringDefinitionsDescriptorValidatorImpl
     for (AbstractMonitoringValidator<MetricEntityTypeDescriptor> validator :
          ImmutableList.of(
             new EntityNamePrefixedWithServiceNameValidator(builtInEntityTypes),
-            new EntityParentsReferToExistingEntitiesValidator(),
+            new EntityParentsReferToExistingEntitiesValidator(
+                builtInRoleTypes,
+                builtInEntityTypes),
             new ParentsAreReachableUsingAttributesValidator(),
             new AttributesReferToExistingAttributesValidator(
                 builtInAttributes))) {

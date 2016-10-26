@@ -322,6 +322,10 @@ public class JsonSdlParserTest {
     assertNotNull(exile);
     topology = exile.getTopology();
     assertNotNull(topology);
+    assertEquals(Integer.valueOf(0), topology.getMinInstances());
+    assertEquals(Integer.valueOf(3), topology.getMaxInstances());
+    assertEquals(Integer.valueOf(1), topology.getSoftMinInstances());
+    assertEquals(Integer.valueOf(2), topology.getSoftMaxInstances());
     placementRules = topology.getPlacementRules();
     assertNotNull(placementRules);
     assertEquals(1, placementRules.size());

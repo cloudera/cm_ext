@@ -20,6 +20,7 @@ import com.cloudera.csd.descriptors.parameters.BoundedParameter;
 import com.cloudera.csd.validation.SdlTestUtils;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.Expression;
+import com.cloudera.csd.validation.constraints.ServiceDependencyValidationGroup;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
@@ -42,7 +43,6 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ServiceDescriptorValidatorImplTest {
 
-  @Qualifier("serviceDescriptorValidatorWithDependencyCheck")
   @Autowired
   private ServiceDescriptorValidatorImpl validator;
 
@@ -138,8 +138,8 @@ public class ServiceDescriptorValidatorImplTest {
 
   @Test
   public void testBadServiceDependency() {
-    Set<String> errors = validate("service_badDependencyType.sdl");
-    assertEquals("foo must be a valid service type", Iterables.getOnlyElement(errors));
+    Set<String> errors = validate("service_badDependencyType.sdl", ServiceDependencyValidationGroup.class);
+    assertEquals("service.serviceDependencies[0].name \"foo\" must be a valid service type", Iterables.getOnlyElement(errors));
   }
 
   @Test
@@ -229,7 +229,7 @@ public class ServiceDescriptorValidatorImplTest {
     return validator.getViolations(SdlTestUtils.getValidatorSdl(sdl));
   }
 
-  private Set<String> validate(String sdl) {
-    return validator.validate(SdlTestUtils.getValidatorSdl(sdl));
+  private Set<String> validate(String sdl, Class<?>... groups) {
+    return validator.validate(SdlTestUtils.getValidatorSdl(sdl), groups);
   }
 }

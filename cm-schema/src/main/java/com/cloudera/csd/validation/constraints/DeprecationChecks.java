@@ -13,22 +13,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.validation;
-
-import java.util.Set;
+package com.cloudera.csd.validation.constraints;
 
 /**
- * Validates a descriptor.
+ * This is used to group constraints for the validator.
+ *
+ * Intended for checks that advise the developer to create
+ * a CSD compliant with future CSD changes.
  */
-public interface DescriptorValidator<T> {
-
-  /**
-   * Validates and returns a set of violations for
-   * the service descriptor. If valid, an
-   * empty set is returned.
-   *
-   * @param descriptor the descriptor
-   * @return the list of violations, empty if valid.
-   */
-  Set<String> validate(T descriptor, Class<?>... groups);
+public interface DeprecationChecks {
 }

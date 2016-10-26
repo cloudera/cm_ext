@@ -15,36 +15,34 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
-import com.cloudera.csd.descriptors.generators.ConfigEntry;
-import com.cloudera.csd.validation.constraints.DeprecationChecks;
-import com.cloudera.csd.validation.constraints.RequiresSubdir;
+import com.cloudera.csd.descriptors.generators.ConfigGenerator;
 
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
- * Describes the logging context.
+ * Indicates that the service can provide object store capabilities,
+ * and can act as a secondary DFS.
  */
-public interface GatewayLoggingDescriptor {
+@InterfaceStability.Unstable
+public interface ProvidesObjectStore {
 
   /**
-   * Optional. Filename of the logging configuration file. If not specified,
-   * uses a default file name as specified in {@link CsdLoggingType}.
-   *
-   * @return the filename
+   * Used to determine how selection and mapping of the external account
+   * credentials is performed.
+   * TODO make mapping logic account-type agnostic, shift to CSD author
    */
-  @RequiresSubdir(groups = DeprecationChecks.class)
-  String getConfigFilename();
+  @NotEmpty
+  List<CsdExternalAccountType> getAccountTypes();
 
   /**
-   * Logging type used by the entity using this descriptor.
-   */
-  CsdLoggingType getLoggingType();
-
-  /**
-   * Emitted after parameter configs, before safety valves.
+   * This generator allows authors specify configuration that will be
+   * merged into core-site.xml
+   * (Filename and configFormat are irrelevant)
    */
   @Valid
-  List<ConfigEntry> getAdditionalConfigs();
+  ConfigGenerator getCoreSiteGenerator();
 }
