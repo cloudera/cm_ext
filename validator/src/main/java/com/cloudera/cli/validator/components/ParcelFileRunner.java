@@ -70,11 +70,13 @@ public class ParcelFileRunner implements ValidationRunner {
       "el6",
       "el7",
       "sles11",
+      "sles12",
       "lucid",
       "precise",
       "trusty",
       "squeeze",
-      "wheezy");
+      "wheezy",
+      "jessie");
 
   private static final String PARCEL_JSON_PATH = "/meta/parcel.json";
   private static final String ALTERNATIVES_JSON_PATH = "/meta/alternatives.json";
