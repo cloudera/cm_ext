@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
+import com.cloudera.csd.validation.constraints.DeprecationChecks;
+import com.cloudera.csd.validation.constraints.RequiresSubdir;
 import com.cloudera.csd.validation.references.annotations.IncludeAdditionalReferences;
 import com.cloudera.csd.validation.references.annotations.Named;
 import com.cloudera.csd.validation.references.annotations.Referencing;
@@ -32,6 +34,7 @@ public interface PeerConfigGenerator {
 
   /** The file name of the config file that will be written **/
   @NotBlank
+  @RequiresSubdir(groups = DeprecationChecks.class)
   String getFilename();
 
   /**

@@ -13,38 +13,30 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors;
+package com.cloudera.csd.validation.constraints.components;
 
-import com.cloudera.csd.descriptors.generators.ConfigEntry;
-import com.cloudera.csd.validation.constraints.DeprecationChecks;
 import com.cloudera.csd.validation.constraints.RequiresSubdir;
+import com.cloudera.csd.validation.constraints.RequiresSubdirValidator;
+import com.google.common.base.Preconditions;
 
-import java.util.List;
+import javax.annotation.Nullable;
+import javax.validation.ConstraintValidatorContext;
 
-import javax.validation.Valid;
+public class RequiresSubdirValidatorImpl implements RequiresSubdirValidator {
 
-/**
- * Describes the logging context.
- */
-public interface GatewayLoggingDescriptor {
+  @Override
+  public void initialize(RequiresSubdir constraint) {
+  }
 
-  /**
-   * Optional. Filename of the logging configuration file. If not specified,
-   * uses a default file name as specified in {@link CsdLoggingType}.
-   *
-   * @return the filename
-   */
-  @RequiresSubdir(groups = DeprecationChecks.class)
-  String getConfigFilename();
+  private static boolean hasSubdirPrefix(String pathname) {
+    return pathname.contains("/") && !pathname.startsWith("/") && !pathname.endsWith("/");
+  }
 
-  /**
-   * Logging type used by the entity using this descriptor.
-   */
-  CsdLoggingType getLoggingType();
-
-  /**
-   * Emitted after parameter configs, before safety valves.
-   */
-  @Valid
-  List<ConfigEntry> getAdditionalConfigs();
+  @Override
+  public boolean isValid(@Nullable String value, ConstraintValidatorContext context) {
+    if (value == null || value.isEmpty()) {
+      return true;
+    }
+    return hasSubdirPrefix(value);
+  }
 }

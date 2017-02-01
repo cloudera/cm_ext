@@ -127,6 +127,9 @@ public interface ServiceDescriptor {
   @Valid
   ProvidesKms getProvidesKms();
 
+  @Valid
+  ProvidesObjectStore getProvidesObjectStore();
+
   /**
    * Whether kerberos authentication is used.
    * <p>

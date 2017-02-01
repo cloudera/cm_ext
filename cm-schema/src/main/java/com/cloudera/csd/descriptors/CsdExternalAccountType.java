@@ -13,19 +13,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors.parameters;
+package com.cloudera.csd.descriptors;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
-public interface StringEnumParameter extends Parameter<String> {
-
-  /** Set of values this parameter can take. (REQUIRED) */
-  @NotEmpty
-  @JsonDeserialize(as = LinkedHashSet.class)
-  Set<String> getValidValues();
+/**
+ * Defines the supported types of external account.
+ */
+public enum CsdExternalAccountType {
+  /** Amazon access+secret key */
+  AWS_ACCESS_KEY_AUTH,
+  /** Amazon IAM roles */
+  AWS_IAM_ROLES_AUTH
 }

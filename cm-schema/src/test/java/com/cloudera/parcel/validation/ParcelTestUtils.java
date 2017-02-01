@@ -90,7 +90,7 @@ public class ParcelTestUtils {
 
   public static <T> DescriptorValidator<T> getAlwaysPassingValidator() {
     return new DescriptorValidator<T>() {
-      public Set<String> validate(T serviceDescriptor) {
+      public Set<String> validate(T serviceDescriptor, Class<?>... groups) {
         return Sets.newHashSet();
       }
     };
