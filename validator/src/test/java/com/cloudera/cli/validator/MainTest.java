@@ -75,13 +75,14 @@ public class MainTest {
     assertTrue(out.toString().contains("==>"));
   }
 
+  // XXX seems errors are not added in a consistent order so don't use more than 1
   @Test
   public void testBadSdlWithSystemPropertyOption() throws IOException {
     ByteArrayOutputStream expectedOut =  new ByteArrayOutputStream();
     expectedOut.write("Validating: src/test/resources/service_dependency.sdl\n".getBytes());
-    expectedOut.write("==> FOO must be a valid service type\n".getBytes());
-    expectedOut.write("==> SPARK must be a valid service type\n".getBytes());
-    String[] args = {"-s", dependencySdl};
+    expectedOut.write("Invalid service dependencies:\n".getBytes());
+    expectedOut.write("==> service.serviceDependencies[1].name \"SPARK\" must be a valid service type\n".getBytes());
+    String[] args = {"-s", dependencySdl, "-l", "FOO"};
     app.run(args);
     assertEquals("", err.toString());
     assertEquals(expectedOut.toString(), out.toString());
