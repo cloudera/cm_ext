@@ -26,7 +26,7 @@ import com.cloudera.csd.descriptors.SslClientDescriptor;
 import com.cloudera.csd.descriptors.SslServerDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -65,7 +65,7 @@ public class JsonSdlObjectMapper {
    */
   private ObjectMapper createObjectMapper() {
     final Map<Class<?>, Class<?>> mixins = new HashMap<Class<?>, Class<?>>() {{
-      put(Parameter.class, ParameterMixin.class);
+      put(BasicParameter.class, ParameterMixin.class);
       put(ConfigGenerator.class, GeneratorMixin.class);
       put(DependencyExtension.class, DependencyExtensionMixin.class);
       put(PlacementRuleDescriptor.class, PlacementRuleMixin.class);

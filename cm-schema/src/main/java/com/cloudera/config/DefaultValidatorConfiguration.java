@@ -28,6 +28,8 @@ import com.cloudera.csd.validation.constraints.AutoConfigSharesValidValidator;
 import com.cloudera.csd.validation.constraints.ExistingRoleTypeValidator;
 import com.cloudera.csd.validation.constraints.ExistingServiceTypeValidator;
 import com.cloudera.csd.validation.constraints.ExpressionValidator;
+import com.cloudera.csd.validation.constraints.RequiresSubdir;
+import com.cloudera.csd.validation.constraints.RequiresSubdirValidator;
 import com.cloudera.csd.validation.constraints.UniqueFieldValidator;
 import com.cloudera.csd.validation.constraints.UniqueRoleTypeValidator;
 import com.cloudera.csd.validation.constraints.UniqueServiceTypeValidator;
@@ -36,6 +38,7 @@ import com.cloudera.csd.validation.constraints.components.AutoConfigSharesValidV
 import com.cloudera.csd.validation.constraints.components.ExistingRoleTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ExistingServiceTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.ExpressionValidatorImpl;
+import com.cloudera.csd.validation.constraints.components.RequiresSubdirValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueFieldValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueRoleTypeValidatorImpl;
 import com.cloudera.csd.validation.constraints.components.UniqueServiceTypeValidatorImpl;
@@ -178,6 +181,7 @@ public class DefaultValidatorConfiguration {
       "STATESTORE",
       "TASKTRACKER",
       "WEBHCAT",
+      "TELEMETRYPUBLISHER",
       "SENTRY_SERVER"
     );
   }
@@ -255,13 +259,19 @@ public class DefaultValidatorConfiguration {
   @Bean(name = BUILTIN_METRIC_ENTITY_TYPES)
   public Set<String> builtInMetricEntityTypes() {
     return ImmutableSet.of(
-      "TIME_SERIES_TABLE");
+      "TIME_SERIES_TABLE", "IMPALA_POOL");
   }
 
   @Bean
   @Scope(BeanDefinition.SCOPE_PROTOTYPE)
   public UniqueFieldValidator uniqueFieldValidator() {
     return new UniqueFieldValidatorImpl();
+  }
+
+  @Bean
+  @Scope(BeanDefinition.SCOPE_PROTOTYPE)
+  public RequiresSubdirValidator requiresSubdirValidator() {
+    return new RequiresSubdirValidatorImpl();
   }
 
   @SuppressWarnings("unchecked")
@@ -369,25 +379,15 @@ public class DefaultValidatorConfiguration {
 
   @Bean
   public DescriptorValidator<ServiceDescriptor>
-  serviceDescriptorValidatorWithoutDependencyCheck() {
-    return getServiceDescriptorValidator(false);
-  }
-
-  @Bean
-  public DescriptorValidator<ServiceDescriptor>
-  serviceDescriptorValidatorWithDependencyCheck() {
-    return getServiceDescriptorValidator(true);
+  serviceDescriptorValidator() {
+    return getServiceDescriptorValidator();
   }
 
   private DescriptorValidator<ServiceDescriptor> 
-  getServiceDescriptorValidator(boolean enforceDependencyCheck) {
+  getServiceDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
-    ReferenceValidator referenceValidator =
-        ctx.getBean(ReferenceValidator.class);
-    return new ServiceDescriptorValidatorImpl(
-        validator,
-        referenceValidator,
-        enforceDependencyCheck);
+    ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
+    return new ServiceDescriptorValidatorImpl(validator, referenceValidator);
   }
 
   @Bean
@@ -395,6 +395,9 @@ public class DefaultValidatorConfiguration {
       serviceMonitoringDefinitionsDescriptorValidator() {
     Validator validator = ctx.getBean(Validator.class);
     ReferenceValidator referenceValidator = ctx.getBean(ReferenceValidator.class);
+    @SuppressWarnings("unchecked")
+    Set<String> builtInRoleTypes =
+        (Set<String>)ctx.getBean(BUILTIN_ROLE_TYPES_BEAN_NAME);
     @SuppressWarnings("unchecked")
     Set<String> builtInEntityTypes =
         (Set<String>)ctx.getBean(BUILTIN_METRIC_ENTITY_TYPES);
@@ -408,6 +411,7 @@ public class DefaultValidatorConfiguration {
     return new ServiceMonitoringDefinitionsDescriptorValidatorImpl(
         validator,
         referenceValidator,
+        builtInRoleTypes,
         builtInNamesForCrossEntityAggregateMetrics,
         builtInEntityTypes,
         builtInAttributes);

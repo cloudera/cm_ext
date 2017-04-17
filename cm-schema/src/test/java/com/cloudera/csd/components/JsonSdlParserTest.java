@@ -52,6 +52,7 @@ import com.cloudera.csd.descriptors.TopologyDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.dependencyExtension.ExtensionConfigEntry;
+import com.cloudera.csd.descriptors.dependencyExtension.LineageExtension;
 import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
@@ -59,6 +60,7 @@ import com.cloudera.csd.descriptors.generators.ConfigGenerator.GFlagsGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
 import com.cloudera.csd.descriptors.generators.PeerConfigGenerator;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.CsdParamUnits;
 import com.cloudera.csd.descriptors.parameters.CsdPathType;
@@ -70,6 +72,7 @@ import com.cloudera.csd.descriptors.parameters.PasswordParameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
 import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
+import com.cloudera.csd.descriptors.parameters.ProvidedParameter;
 import com.cloudera.csd.descriptors.parameters.StringArrayParameter;
 import com.cloudera.csd.descriptors.parameters.StringEnumParameter;
 import com.cloudera.csd.descriptors.parameters.StringParameter;
@@ -96,6 +99,8 @@ import org.junit.Test;
 
 public class JsonSdlParserTest {
 
+  private final String LINEAGE_EXTENSION_ID = "navigator_lineage_client";
+
   private JsonSdlObjectMapper mapper = new JsonSdlObjectMapper();
   private JsonSdlParser parser = new JsonSdlParser(mapper);
 
@@ -119,8 +124,8 @@ public class JsonSdlParserTest {
     assertEquals("echo-conf", clientCfg.getAlternatives().getName());
     assertEquals(50, clientCfg.getAlternatives().getPriority());
     assertEquals("/etc/echo", clientCfg.getAlternatives().getLinkRoot());
-    assertEquals(2, clientCfg.getParameters().size());
-    assertEquals(2, clientCfg.getConfigWriter().getGenerators().size());
+    assertEquals(3, clientCfg.getParameters().size());
+    assertEquals(3, clientCfg.getConfigWriter().getGenerators().size());
     assertNotNull(clientCfg.getLogging());
     assertEquals(CsdLoggingType.LOG4J, clientCfg.getLogging().getLoggingType());
     assertEquals("gateway-log4j.properties", clientCfg.getLogging().getConfigFilename());
@@ -322,6 +327,10 @@ public class JsonSdlParserTest {
     assertNotNull(exile);
     topology = exile.getTopology();
     assertNotNull(topology);
+    assertEquals(Integer.valueOf(0), topology.getMinInstances());
+    assertEquals(Integer.valueOf(3), topology.getMaxInstances());
+    assertEquals(Integer.valueOf(1), topology.getSoftMinInstances());
+    assertEquals(Integer.valueOf(2), topology.getSoftMaxInstances());
     placementRules = topology.getPlacementRules();
     assertNotNull(placementRules);
     assertEquals(1, placementRules.size());
@@ -405,6 +414,40 @@ public class JsonSdlParserTest {
   }
 
   @Test
+  public void testLineageExtensions() throws Exception {
+    ServiceDescriptor serviceDescriptor = parser.parse(getSdl("service_full.sdl"));
+    int found = 0;
+
+    for (RoleDescriptor roleDescriptor : serviceDescriptor.getRoles()) {
+      if (roleDescriptor.getDependencyExtensions() != null) {
+        for (DependencyExtension roleExt : roleDescriptor.getDependencyExtensions()) {
+          if (roleExt.getExtensionId().equals(LINEAGE_EXTENSION_ID)) {
+            LineageExtension lineageExt = (LineageExtension) roleExt;
+            assertEquals("/var/log/echo_webserver/lineage" , lineageExt.getDefaultDir());
+            assertEquals("0700", lineageExt.getPermissions());
+            assertEquals(true, lineageExt.isSingleUserModeAllowed());
+            found++;
+          }
+        }
+      }
+    }
+
+    assertEquals(1, found);
+    found = 0;
+    GatewayDescriptor gatewayDescriptor  = serviceDescriptor.getGateway();
+    for (DependencyExtension gwExt : gatewayDescriptor.getDependencyExtensions()) {
+      if (gwExt.getExtensionId().equals(LINEAGE_EXTENSION_ID)) {
+        LineageExtension lineageExt = (LineageExtension) gwExt;
+        assertEquals("/var/log/echo/lineage", lineageExt.getDefaultDir());
+        assertEquals("1777", lineageExt.getPermissions());
+        assertEquals(false, lineageExt.isSingleUserModeAllowed());
+        found++;
+      }
+    }
+    assertEquals(1, found);
+  }
+
+  @Test
   public void testDependencyExtensions() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
     int found = 0;
@@ -439,9 +482,17 @@ public class JsonSdlParserTest {
   @Test
   public void testParametersParsing() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
-    assertEquals(4, descriptor.getParameters().size());
+    assertEquals(5, descriptor.getParameters().size());
     int found = 0;
-    for (Parameter<?> p : descriptor.getParameters()) {
+    for (BasicParameter<?> bp : descriptor.getParameters()) {
+      if (!(bp instanceof Parameter)) {
+        // We don't generate PS for a ProvidedParameter, something else will
+        // generate it.
+        assertTrue(bp instanceof ProvidedParameter);
+        found++;
+        continue;
+      }
+      Parameter p = (Parameter) bp;
       // check that parameters are parsed polymorphically
       if (p.getName().equals("service_var1")) {
         assertTrue(p instanceof StringParameter);
@@ -470,7 +521,7 @@ public class JsonSdlParserTest {
         found++;
       }
     }
-    assertEquals(4, found);
+    assertEquals(5, found);
 
     // Check service dependencies
     assertEquals(2, descriptor.getServiceDependencies().size());
@@ -499,7 +550,7 @@ public class JsonSdlParserTest {
     assertEquals(1, rd.getCommands().size());
 
     assertEquals(16, rd.getParameters().size());
-    for (Parameter<?> p : rd.getParameters()) {
+    for (BasicParameter<?> p : rd.getParameters()) {
       // check that parameters are parsed polymorphically
       if (p.getName().equals("role_var1")) {
         assertTrue(p instanceof StringParameter);
@@ -680,6 +731,32 @@ public class JsonSdlParserTest {
         }
       }
     }
+
+    GatewayDescriptor gw = descriptor.getGateway();
+    found = 0;
+
+    assertNotNull(gw);
+    assertEquals(3, gw.getParameters().size());
+    for (BasicParameter<?> p : gw.getParameters()) {
+      // check that parameters are parsed polymorphically for Gateway desc
+      if (p.getName().equals("client_var1")) {
+        assertTrue(p instanceof StringParameter);
+        found++;
+      } else if (p.getName().equals("client_var2")) {
+        assertTrue(p instanceof LongParameter);
+        LongParameter lp = (LongParameter) p;
+        assertEquals(1, lp.getDefault().longValue());
+        found++;
+      } else if (p.getName().equals("navigator_lineage_enabled")) {
+        assertTrue(p instanceof ProvidedParameter);
+        found++;
+      } else if (p.getName().equals("lineage_event_log_dir")) {
+        assertTrue(p instanceof ProvidedParameter);
+        found++;
+      }
+    }
+    assertEquals(3, found);
+
   }
 
   @Test

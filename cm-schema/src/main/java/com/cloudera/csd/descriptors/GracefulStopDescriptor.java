@@ -29,7 +29,8 @@ import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Contains all the information needed to execute a custom program for shutting
- * down processes.
+ * down a service.
+ * This should be mutually exclusive with using GracefulStopRoleDescriptor on roles.
  */
 @IncludeAdditionalReferences("masterRole")
 public interface GracefulStopDescriptor {

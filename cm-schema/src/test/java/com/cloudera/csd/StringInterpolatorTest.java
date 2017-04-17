@@ -97,6 +97,13 @@ public class StringInterpolatorTest {
                  "This is a ${var} and ${var2} and ${var}"));
   }
 
+  @Test
+  public void shouldQuoteSpecialChars() {
+    Map<String, String> vars = ImmutableMap.of(
+        "key1", "value$1\\2");
+    assertEquals("value$1\\2", interpolator.interpolate("${key1}", vars));
+  }
+
   private String format(String template) {
     return interpolator.interpolate(template, objects);
   }

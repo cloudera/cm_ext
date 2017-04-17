@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
+import com.cloudera.csd.validation.constraints.DeprecationChecks;
+import com.cloudera.csd.validation.constraints.RequiresSubdir;
 import com.cloudera.csd.validation.references.annotations.Named;
 import com.cloudera.csd.validation.references.annotations.Referencing;
 import com.cloudera.csd.validation.references.annotations.ReferenceType;
@@ -31,6 +33,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public interface ConfigGenerator {
 
   @NotBlank
+  @RequiresSubdir(groups = DeprecationChecks.class)
   String getFilename();
 
   /**

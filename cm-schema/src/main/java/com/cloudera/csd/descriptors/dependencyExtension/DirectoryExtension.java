@@ -13,19 +13,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors.parameters;
+package com.cloudera.csd.descriptors.dependencyExtension;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
+import com.cloudera.validation.constraints.FilePermission;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 
-public interface StringEnumParameter extends Parameter<String> {
+/**
+ * A type of extension that can be describes a directory.
+ */
+@Unstable
+public interface DirectoryExtension extends DependencyExtension {
 
-  /** Set of values this parameter can take. (REQUIRED) */
-  @NotEmpty
-  @JsonDeserialize(as = LinkedHashSet.class)
-  Set<String> getValidValues();
+  /**
+   * Path to the directory.
+   * <p>
+   * CM will auto-create this directory with the specified
+   * permissions.
+   */
+  @NotBlank
+  String getDefaultDir();
+
+  /**
+   * Permission for the directory.
+   */
+  @NotNull
+  @FilePermission
+  String getPermissions();
 }

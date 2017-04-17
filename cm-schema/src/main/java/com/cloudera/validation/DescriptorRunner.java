@@ -16,6 +16,8 @@
 package com.cloudera.validation;
 
 import com.cloudera.common.Parser;
+import com.cloudera.csd.validation.constraints.DeprecationChecks;
+import com.cloudera.csd.validation.constraints.ServiceDependencyValidationGroup;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.base.Joiner;
@@ -24,9 +26,11 @@ import com.google.common.collect.Lists;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -72,13 +76,30 @@ public class DescriptorRunner<T> implements ValidationRunner {
   public boolean run(String name, byte[] data, Writer writer)
         throws IOException {
     try {
-      writer.write("Validating: " + name + "\n");
       T descriptor = parser.parse(data);
       Set<String> errors = validator.validate(descriptor);
+      Set<String> dependencyErrors = validator.validate(descriptor, ServiceDependencyValidationGroup.class);
+      Set<String> deprecationErrors = validator.validate(descriptor, DeprecationChecks.class);
+
+      writer.write("Validating: " + name + "\n");
       for (String error : errors) {
         writer.write(String.format("==> %s\n", error));
       }
-      return errors.isEmpty();
+
+      if (!dependencyErrors.isEmpty()) {
+        writer.write("Invalid service dependencies:\n");
+        for (String error : dependencyErrors) {
+          writer.write(String.format("==> %s\n", error));
+        }
+      }
+
+      if (!deprecationErrors.isEmpty()) {
+        writer.write("Deprecated (might fail in future versions):\n");
+        for (String error : deprecationErrors) {
+          writer.write(String.format("==> %s\n", error));
+        }
+      }
+      return errors.isEmpty() && dependencyErrors.isEmpty();
     } catch (UnrecognizedPropertyException e) {
       List<String> elements = Lists.newArrayList();
       for (Reference r : e.getPath()) {
