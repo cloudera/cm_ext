@@ -4,7 +4,7 @@
 
   <groupId>com.cloudera.enterprise</groupId>
   <artifactId>cm_ext_tools</artifactId>
-  <version>5.12.0-SNAPSHOT</version>
+  <version>5.12.0</version>
   <name>Cloudera Manager Extensibility Tools</name>
   <packaging>pom</packaging>
 
