@@ -15,17 +15,23 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.parameters;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.cloudera.csd.validation.references.annotations.Named;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.hibernate.validator.constraints.NotBlank;
 
-import org.hibernate.validator.constraints.NotEmpty;
+/**
+ * Minimal interface to specify ParamSpecs in a CSD descriptor.
+ */
+@Named
+@Referenced(type= ReferenceType.PARAMETER)
+public interface BasicParameter<T> {
 
-public interface StringEnumParameter extends Parameter<String> {
-
-  /** Set of values this parameter can take. (REQUIRED) */
-  @NotEmpty
-  @JsonDeserialize(as = LinkedHashSet.class)
-  Set<String> getValidValues();
+  /**
+   * Key for storing the value of this parameter in database.
+   * Also used for referencing this parameter in config files (REQUIRED).
+   */
+  @NotBlank
+  String getName();
 }

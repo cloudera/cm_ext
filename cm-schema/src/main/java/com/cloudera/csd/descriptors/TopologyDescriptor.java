@@ -29,16 +29,31 @@ import javax.validation.constraints.Min;
  * descriptor is not specified, then min instances are
  * set 1 and max instances are Integer.MAX_VALUE.
  */
-@Expression("minInstances == null or maxInstances == null or minInstances <= maxInstances")
+@Expression.List({
+    @Expression("minInstances == null or softMinInstances == null or minInstances < softMinInstances"),
+    @Expression("minInstances == null or softMaxInstances == null or minInstances <= softMaxInstances"),
+    @Expression("minInstances == null or maxInstances == null or minInstances <= maxInstances"),
+    @Expression("softMinInstances == null or softMaxInstances == null or softMinInstances <= softMaxInstances"),
+    @Expression("softMinInstances == null or maxInstances == null or softMinInstances <= maxInstances"),
+    @Expression("softMaxInstances == null or maxInstances == null or softMaxInstances < maxInstances")
+})
 public interface TopologyDescriptor {
 
-  /** Defaults to 1 */
+  /** Minimum number of roles of this type allowed. Defaults to 1. */
   @Min(0)
   Integer getMinInstances();
 
-  /** Defaults to Integer.MAX_VALUE */
+  /** Maximum number of roles of this type allowed. Defaults to Integer.MAX_VALUE. */
   @Min(1)
   Integer getMaxInstances();
+
+  /** Recommended minimum number of roles of this type. By default there is no recommended minimum. */
+  @Min(1)
+  Integer getSoftMinInstances();
+
+  /** Recommended maximum number of roles of this type. By default there is no recommended maximum. */
+  @Min(1)
+  Integer getSoftMaxInstances();
 
   /**
    * Optional. Specify rules about where this role can be placed relative to other roles.

@@ -13,19 +13,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors.parameters;
+package com.cloudera.csd.descriptors;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
+import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
+import com.cloudera.csd.validation.references.annotations.ReferenceType;
+import com.cloudera.csd.validation.references.annotations.Referenced;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
+import javax.validation.Valid;
 
-import org.hibernate.validator.constraints.NotEmpty;
+/**
+ * Abstract Descriptor to specify shared functionality for both
+ * {@link RoleDescriptor} and {@link GatewayDescriptor}.
+ */
+public interface AbstractRoleDescriptor {
 
-public interface StringEnumParameter extends Parameter<String> {
-
-  /** Set of values this parameter can take. (REQUIRED) */
-  @NotEmpty
-  @JsonDeserialize(as = LinkedHashSet.class)
-  Set<String> getValidValues();
+  /***
+   * Optional. If configured, then indicates that role or gateway
+   * supports extensions.
+   *
+   * @return list of extensions.
+   */
+  @Valid
+  @Unstable
+  List<DependencyExtension> getDependencyExtensions();
 }

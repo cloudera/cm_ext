@@ -99,7 +99,7 @@ public class StringInterpolator {
             "The variable [%s] does not have a corresponding value.", var);
         throw new IllegalArgumentException(msg);
       }
-      result = result.replaceFirst(REGEX, value);
+      result = result.replaceFirst(REGEX, Matcher.quoteReplacement(value));
     }
     return result;
   }

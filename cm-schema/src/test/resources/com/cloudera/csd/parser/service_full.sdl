@@ -107,6 +107,10 @@
       "description" : "Service Kerb Description",
       "type" : "boolean",
       "default" : "false"
+    },
+    {
+      "name": "navigator_lineage_enabled",
+      "type": "provided"
     }
   ],
   "kerberos" : "${service_kerb_var}",
@@ -176,6 +180,10 @@
         "required" : "true",
         "type" : "long",
         "default" : 1
+      },
+      {
+        "name": "lineage_event_log_dir",
+        "type": "provided"
       }
     ],
     "configWriter" : {
@@ -189,9 +197,23 @@
           "filename" : "echo_client.properties",
           "configFormat" : "properties",
           "includedParams" : ["service_var1", "client_var1", "client_var2"]
+        },
+        {
+          "filename" : "echo_provided_client.properties",
+          "configFormat" : "properties",
+          "includedParams" : ["navigator_lineage_enabled", "lineage_event_log_dir"]
         }
       ]
     },
+    "dependencyExtensions": [
+      {
+        "extensionId" : "navigator_lineage_client",
+        "defaultDir" : "/var/log/echo/lineage",
+        "permissions" : "1777",
+        "singleUserModeAllowed": false,
+        "type" : "lineage"
+      }
+    ],
     "logging" : {
       "configFilename" : "gateway-log4j.properties",
       "loggingType" : "log4j",
@@ -316,7 +338,8 @@
          "enabledConfigName": "echo.ssl.enabled",
          "keyPasswordOptionality" : "required",
          "keystoreKeyPasswordConfigName" : "echo.ssl.key.password",
-         "keystoreKeyPasswordScriptBased" : "true"
+         "keystoreKeyPasswordScriptBased" : "true",
+         "autoTlsMode": "auto"
        },
        "sslClient" : {
          "truststoreFormat" : "pem"
@@ -412,6 +435,15 @@
          "truststorePasswordConfigName" : "echo.truststore.password",
          "truststorePasswordCredentialProviderCompatible" : "true"
        },
+      "dependencyExtensions": [
+        {
+          "extensionId" : "navigator_lineage_client",
+          "defaultDir": "/var/log/echo_webserver/lineage",
+          "permissions": "0700",
+          "singleUserModeAllowed" : true,
+          "type" : "lineage"
+        }
+      ],
        "logging" : {
          "dir" : "/var/log/echo",
          "filename" : "webserver.log",
@@ -705,7 +737,9 @@
       },
       "topology" : {
         "minInstances" : "0",
-        "maxInstances" : "1",
+        "maxInstances" : "3",
+        "softMinInstances" : "1",
+        "softMaxInstances" : "2",
         "placementRules" : [
           {
             "type" : "neverWith",

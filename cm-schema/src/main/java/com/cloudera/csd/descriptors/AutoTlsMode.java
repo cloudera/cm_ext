@@ -13,19 +13,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.cloudera.csd.descriptors.parameters;
+package com.cloudera.csd.descriptors;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.CaseFormat;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+public enum AutoTlsMode {
+  /** Auto-TLS is not supported */
+  OFF,
 
-import org.hibernate.validator.constraints.NotEmpty;
+  /** Auto-TLS will be configured for this service if enabled */
+  AUTO;
 
-public interface StringEnumParameter extends Parameter<String> {
-
-  /** Set of values this parameter can take. (REQUIRED) */
-  @NotEmpty
-  @JsonDeserialize(as = LinkedHashSet.class)
-  Set<String> getValidValues();
+  @JsonValue
+  public String toJson() {
+    return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
+  }
 }

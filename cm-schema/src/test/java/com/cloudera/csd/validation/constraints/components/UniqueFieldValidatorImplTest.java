@@ -93,7 +93,7 @@ public class UniqueFieldValidatorImplTest {
   @Test
   public void testPropertyValue() {
     TestBean bean = new TestBean("a", "b");
-    Object value = validator.propertyValue(bean, "field1");
+    Object value = validator.propertyValue(bean, "field1", false);
     assertEquals("a", value);
   }
 

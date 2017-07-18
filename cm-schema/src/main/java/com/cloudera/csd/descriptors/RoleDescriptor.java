@@ -16,7 +16,7 @@
 package com.cloudera.csd.descriptors;
 
 import com.cloudera.csd.descriptors.cgroups.CgroupDescriptor;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.validation.constraints.AutoConfigSharesValid;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
@@ -38,7 +38,8 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Named
 @Referenced(type=ReferenceType.ROLE)
-public interface RoleDescriptor {
+public interface RoleDescriptor
+    extends AbstractRoleDescriptor {
 
   @EntityTypeFormat
   @UniqueRoleType
@@ -76,6 +77,15 @@ public interface RoleDescriptor {
   @Valid
   RunnerDescriptor getStartRunner();
 
+  /**
+   * Allows to override the default stop behavior for a role.
+   * If not specified, the process will receive a TERM signal;
+   * after a hardcoded timeout we send a group sigkill
+   * if the process is still running.
+   */
+  @Valid
+  GracefulStopRoleDescriptor getStopRunner();
+
   @Valid
   TopologyDescriptor getTopology();
 
@@ -85,7 +95,7 @@ public interface RoleDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  List<Parameter<?>> getParameters();
+  List<BasicParameter<?>> getParameters();
 
   @Valid
   RunAs getRunAs();

@@ -15,6 +15,13 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.parameters;
 
+import com.cloudera.csd.validation.constraints.Expression;
+
+@Expression.List({
+    @Expression("max == null"),
+    @Expression("softMax == null"),
+    @Expression("softMin == null")
+})
 public interface PortNumberParameter extends LongParameter {
 
   /** Whether this port is outbound. */
