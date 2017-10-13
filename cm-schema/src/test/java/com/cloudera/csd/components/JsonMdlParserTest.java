@@ -43,7 +43,7 @@ public class JsonMdlParserTest {
     assertEquals(3, descriptor.getMetricDefinitions().size());
     assertEquals(2, descriptor.getRoles().size());
     for (RoleMonitoringDefinitionsDescriptor role : descriptor.getRoles()) {
-      assertEquals(3, role.getMetricDefinitions().size());
+      assertEquals(4, role.getMetricDefinitions().size());
     }
   }
 

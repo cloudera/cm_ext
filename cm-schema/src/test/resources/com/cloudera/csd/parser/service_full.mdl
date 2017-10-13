@@ -152,6 +152,12 @@
           "description" : "This is the Echo Service's common metric.",
           "numeratorUnit" : "seconds",
           "counter" : false
+         },
+         {
+          "name" : "echo_master_server_status_one",
+          "label" : "Echo Master Server Status One",
+          "description" : "This is the Echo Service's Master Server's first status.",
+          "type" : "status"
          }
        ]
     },
@@ -178,6 +184,12 @@
           "description" : "This is the Echo Service's common metric.",
           "numeratorUnit" : "seconds",
           "counter" : false
+         },
+         {
+          "name" : "echo_web_server_status_one",
+          "label" : "Echo Web Server Status One",
+          "description" : "This is the Echo Service's Web Server's first status.",
+          "type" : "status"
          }
        ]
     }

@@ -97,7 +97,7 @@ public class SdlTestUtils {
   public static DescriptorValidator<ServiceDescriptor>
       getAlwaysPassingSdlValidator() {
     return new DescriptorValidator<ServiceDescriptor>() {
-      public Set<String> validate(ServiceDescriptor serviceDescriptor) {
+      public Set<String> validate(ServiceDescriptor serviceDescriptor, Class<?>... groups) {
         return Sets.newHashSet();
       }
     };
@@ -107,7 +107,7 @@ public class SdlTestUtils {
       getAlwaysPassingMdlValidator() {
     return new DescriptorValidator<ServiceMonitoringDefinitionsDescriptor>() {
       public Set<String> validate(
-          ServiceMonitoringDefinitionsDescriptor serviceDescriptor) {
+          ServiceMonitoringDefinitionsDescriptor serviceDescriptor, Class<?>... groups) {
         return Sets.newHashSet();
       }
     };

@@ -38,14 +38,14 @@ public class DescriptorValidatorImpl<T> implements DescriptorValidator<T> {
   }
 
   @VisibleForTesting
-  public Set<ConstraintViolation<T>> getViolations(T descriptor) {
-    return validator.validate(descriptor);
+  public Set<ConstraintViolation<T>> getViolations(T descriptor, Class<?>... groups) {
+    return validator.validate(descriptor, groups);
   }
 
   @Override
-  public Set<String> validate(T descriptor) {
+  public Set<String> validate(T descriptor, Class<?>... groups) {
     Set<ConstraintViolation<T>> constraintViolations;
-    constraintViolations = getViolations(descriptor);
+    constraintViolations = getViolations(descriptor, groups);
 
     ImmutableSet.Builder<String> violations = ImmutableSet.builder();
     for (ConstraintViolation<T> violation : constraintViolations) {

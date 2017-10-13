@@ -15,6 +15,9 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.parameters;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -23,5 +26,6 @@ public interface StringEnumParameter extends Parameter<String> {
 
   /** Set of values this parameter can take. (REQUIRED) */
   @NotEmpty
+  @JsonDeserialize(as = LinkedHashSet.class)
   Set<String> getValidValues();
 }

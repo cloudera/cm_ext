@@ -55,7 +55,6 @@ public interface MetricDescriptor {
    * Returns the numerator unit for the metric, for example, 'bytes'.
    * @return
    */
-  @NotEmpty
   String getNumeratorUnit();
 
   /**
@@ -68,6 +67,7 @@ public interface MetricDescriptor {
    * Returns true if the metric is a counter. Counter-based metrics are treated
    * specially within Cloudera Manager. They are in general converted to rates
    * and exposed as rates.
+   * @deprecated use {@link #getType()}
    * @return
    */
   boolean isCounter();
@@ -96,4 +96,10 @@ public interface MetricDescriptor {
    * @return
    */
   String getContext();
+
+  /**
+   * Type of metric.
+   * @return metric type, currently nullable for backward compatibility
+   */
+  MetricType getType();
 }

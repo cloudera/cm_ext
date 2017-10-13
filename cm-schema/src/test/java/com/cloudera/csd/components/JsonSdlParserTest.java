@@ -18,6 +18,7 @@ package com.cloudera.csd.components;
 import static org.junit.Assert.*;
 
 import com.cloudera.csd.descriptors.AuthorityDescriptor;
+import com.cloudera.csd.descriptors.AutoTlsMode;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor;
 import com.cloudera.csd.descriptors.CompatibilityDescriptor.VersionRange;
 import com.cloudera.csd.descriptors.ConfigWriter;
@@ -38,6 +39,7 @@ import com.cloudera.csd.descriptors.RoleExternalLink;
 import com.cloudera.csd.descriptors.RollingRestartDescriptor;
 import com.cloudera.csd.descriptors.RollingRestartNonWorkerStepDescriptor;
 import com.cloudera.csd.descriptors.RollingRestartWorkerStepDescriptor;
+import com.cloudera.csd.descriptors.RunnerDescriptor;
 import com.cloudera.csd.descriptors.ServiceCommandDescriptor;
 import com.cloudera.csd.descriptors.ServiceCommandDescriptor.RunMode;
 import com.cloudera.csd.descriptors.SslClientDescriptor.JksSslClientDescriptor;
@@ -52,6 +54,7 @@ import com.cloudera.csd.descriptors.TopologyDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.dependencyExtension.ExtensionConfigEntry;
+import com.cloudera.csd.descriptors.dependencyExtension.LineageExtension;
 import com.cloudera.csd.descriptors.generators.AuxConfigGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigEntry;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
@@ -59,6 +62,9 @@ import com.cloudera.csd.descriptors.generators.ConfigGenerator.GFlagsGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
 import com.cloudera.csd.descriptors.generators.PeerConfigGenerator;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor.NonSingletonAggregationDescriptor;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor.SingletonAggregationDescriptor;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.CsdParamUnits;
 import com.cloudera.csd.descriptors.parameters.CsdPathType;
@@ -70,12 +76,14 @@ import com.cloudera.csd.descriptors.parameters.PasswordParameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
 import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
+import com.cloudera.csd.descriptors.parameters.ProvidedParameter;
 import com.cloudera.csd.descriptors.parameters.StringArrayParameter;
 import com.cloudera.csd.descriptors.parameters.StringEnumParameter;
 import com.cloudera.csd.descriptors.parameters.StringParameter;
 import com.cloudera.csd.descriptors.parameters.StringParameter.InitType;
 import com.cloudera.csd.descriptors.parameters.URIArrayParameter;
 import com.cloudera.csd.descriptors.parameters.URIParameter;
+import com.cloudera.csd.descriptors.supportBundle.SupportBundleDescriptor;
 import com.cloudera.csd.validation.SdlTestUtils;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.collect.ImmutableList;
@@ -95,6 +103,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class JsonSdlParserTest {
+
+  private final String LINEAGE_EXTENSION_ID = "navigator_lineage_client";
 
   private JsonSdlObjectMapper mapper = new JsonSdlObjectMapper();
   private JsonSdlParser parser = new JsonSdlParser(mapper);
@@ -119,8 +129,8 @@ public class JsonSdlParserTest {
     assertEquals("echo-conf", clientCfg.getAlternatives().getName());
     assertEquals(50, clientCfg.getAlternatives().getPriority());
     assertEquals("/etc/echo", clientCfg.getAlternatives().getLinkRoot());
-    assertEquals(2, clientCfg.getParameters().size());
-    assertEquals(2, clientCfg.getConfigWriter().getGenerators().size());
+    assertEquals(3, clientCfg.getParameters().size());
+    assertEquals(3, clientCfg.getConfigWriter().getGenerators().size());
     assertNotNull(clientCfg.getLogging());
     assertEquals(CsdLoggingType.LOG4J, clientCfg.getLogging().getLoggingType());
     assertEquals("gateway-log4j.properties", clientCfg.getLogging().getConfigFilename());
@@ -149,7 +159,7 @@ public class JsonSdlParserTest {
     assertEquals(1, initRunner.getPostStartSteps().size());
     assertTrue(Iterables.getOnlyElement(initRunner.getPostStartSteps()).isFailureAllowed());
 
-    assertEquals(4, descriptor.getRoles().size());
+    assertEquals(5, descriptor.getRoles().size());
     Map<String, RoleDescriptor> name2role = Maps.newHashMap();
     for (RoleDescriptor desc : descriptor.getRoles()) {
       name2role.put(desc.getName(), desc);
@@ -163,6 +173,7 @@ public class JsonSdlParserTest {
     RoleDescriptor master = name2role.get("ECHO_MASTER_SERVER");
     assertNotNull(master);
     assertEquals("Master Servers", master.getPluralLabel());
+    assertTrue(master.isServiceMonitorClient());
 
     SslServerDescriptor sslServer = master.getSslServer();
     assertNotNull(sslServer);
@@ -178,6 +189,7 @@ public class JsonSdlParserTest {
     assertEquals("echo.ssl.key.password",
         jksSslServer.getKeystoreKeyPasswordConfigName());
     assertTrue(jksSslServer.isKeystoreKeyPasswordScriptBased());
+    assertEquals(AutoTlsMode.AUTO, sslServer.getAutoTlsMode());
 
     SslClientDescriptor sslClient = master.getSslClient();
     assertNotNull(sslClient);
@@ -210,6 +222,22 @@ public class JsonSdlParserTest {
     assertEquals(Integer.valueOf(1), topology.getMinInstances());
     assertEquals(Integer.valueOf(1), topology.getMaxInstances());
 
+    assertNotNull(master.getHealthAggregation());
+    assertTrue(master.getHealthAggregation() instanceof SingletonAggregationDescriptor);
+
+    SupportBundleDescriptor supportBundleDesc = master.getSupportBundle();
+    assertNotNull(supportBundleDesc);
+    assertEquals("Collects fine grained diagnostics about Master Server.",
+        supportBundleDesc.getDescription());
+    assertEquals(SupportBundleDescriptor.RunMode.ALL, supportBundleDesc.getRunMode());
+    assertEquals(12345L, supportBundleDesc.getTimeout().longValue());
+    assertNotNull(supportBundleDesc.getRunner());
+    RunnerDescriptor runner = supportBundleDesc.getRunner();
+    assertEquals("scripts/control.sh", runner.getProgram());
+    assertEquals(ImmutableList.of("diagnostics"), runner.getArgs());
+    assertEquals(ImmutableMap.of("MESSAGE", "Redact your data"),
+        runner.getEnvironmentVariables());
+
     RoleDescriptor role = name2role.get("ECHO_WEBSERVER");
     assertNotNull(role);
     assertNotNull(role.getLogging());
@@ -226,6 +254,15 @@ public class JsonSdlParserTest {
         role.getLogging().getAdditionalConfigs());
     assertEquals("Web Servers", role.getPluralLabel());
 
+    assertNotNull(role.getHealthAggregation());
+    assertTrue(role.getHealthAggregation() instanceof NonSingletonAggregationDescriptor);
+    NonSingletonAggregationDescriptor aggregation = (NonSingletonAggregationDescriptor)
+        role.getHealthAggregation();
+    assertNotNull(aggregation.getPercentGreenForGreen());
+    assertEquals(95.0, aggregation.getPercentGreenForGreen(), 0.00001);
+    assertNotNull(aggregation.getPercentYellowGreenForYellow());
+    assertEquals(90.0, aggregation.getPercentYellowGreenForYellow(), 0.00001);
+
     sslServer = role.getSslServer();
     assertNotNull(sslServer);
     assertEquals(null, sslServer.getKeystoreFormat());
@@ -240,6 +277,8 @@ public class JsonSdlParserTest {
     assertTrue(sslClient instanceof JksSslClientDescriptor);
     JksSslClientDescriptor jksSslClient = (JksSslClientDescriptor) sslClient;
     assertTrue(jksSslClient.isTruststorePasswordCredentialProviderCompatible());
+
+    assertNull(role.getSupportBundle());
 
     ConfigWriter roleConfigWriter = role.getConfigWriter();
     assertNotNull(roleConfigWriter);
@@ -317,11 +356,17 @@ public class JsonSdlParserTest {
     assertTrue(placementRules.get(0) instanceof AlwaysWithRule);
     assertEquals("ECHO_WEBSERVER",
         ((AlwaysWithRule) placementRules.get(0)).getRoleType());
+    assertNull(webserverBuddy.getHealthAggregation());
+    assertNull(webserverBuddy.getSupportBundle());
 
     RoleDescriptor exile = name2role.get("ECHO_EXILE");
     assertNotNull(exile);
     topology = exile.getTopology();
     assertNotNull(topology);
+    assertEquals(Integer.valueOf(0), topology.getMinInstances());
+    assertEquals(Integer.valueOf(3), topology.getMaxInstances());
+    assertEquals(Integer.valueOf(1), topology.getSoftMinInstances());
+    assertEquals(Integer.valueOf(2), topology.getSoftMaxInstances());
     placementRules = topology.getPlacementRules();
     assertNotNull(placementRules);
     assertEquals(1, placementRules.size());
@@ -330,7 +375,8 @@ public class JsonSdlParserTest {
         ImmutableList.of(
             "ECHO_MASTER_SERVER", "ECHO_WEBSERVER", "ECHO_WEBSERVER_BUDDY"),
         ((NeverWithRule) placementRules.get(0)).getRoleTypes());
-
+    assertNull(exile.getHealthAggregation());
+    assertNull(exile.getSupportBundle());
     RollingRestartDescriptor rrDesc = descriptor.getRollingRestart();
     assertNotNull(rrDesc);
     assertEquals(1, rrDesc.getNonWorkerSteps().size());
@@ -405,6 +451,40 @@ public class JsonSdlParserTest {
   }
 
   @Test
+  public void testLineageExtensions() throws Exception {
+    ServiceDescriptor serviceDescriptor = parser.parse(getSdl("service_full.sdl"));
+    int found = 0;
+
+    for (RoleDescriptor roleDescriptor : serviceDescriptor.getRoles()) {
+      if (roleDescriptor.getDependencyExtensions() != null) {
+        for (DependencyExtension roleExt : roleDescriptor.getDependencyExtensions()) {
+          if (roleExt.getExtensionId().equals(LINEAGE_EXTENSION_ID)) {
+            LineageExtension lineageExt = (LineageExtension) roleExt;
+            assertEquals("/var/log/echo_webserver/lineage" , lineageExt.getDefaultDir());
+            assertEquals("0700", lineageExt.getPermissions());
+            assertEquals(true, lineageExt.isSingleUserModeAllowed());
+            found++;
+          }
+        }
+      }
+    }
+
+    assertEquals(1, found);
+    found = 0;
+    GatewayDescriptor gatewayDescriptor  = serviceDescriptor.getGateway();
+    for (DependencyExtension gwExt : gatewayDescriptor.getDependencyExtensions()) {
+      if (gwExt.getExtensionId().equals(LINEAGE_EXTENSION_ID)) {
+        LineageExtension lineageExt = (LineageExtension) gwExt;
+        assertEquals("/var/log/echo/lineage", lineageExt.getDefaultDir());
+        assertEquals("1777", lineageExt.getPermissions());
+        assertEquals(false, lineageExt.isSingleUserModeAllowed());
+        found++;
+      }
+    }
+    assertEquals(1, found);
+  }
+
+  @Test
   public void testDependencyExtensions() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
     int found = 0;
@@ -439,9 +519,17 @@ public class JsonSdlParserTest {
   @Test
   public void testParametersParsing() throws Exception {
     ServiceDescriptor descriptor = parser.parse(getSdl("service_full.sdl"));
-    assertEquals(4, descriptor.getParameters().size());
+    assertEquals(5, descriptor.getParameters().size());
     int found = 0;
-    for (Parameter<?> p : descriptor.getParameters()) {
+    for (BasicParameter<?> bp : descriptor.getParameters()) {
+      if (!(bp instanceof Parameter)) {
+        // We don't generate PS for a ProvidedParameter, something else will
+        // generate it.
+        assertTrue(bp instanceof ProvidedParameter);
+        found++;
+        continue;
+      }
+      Parameter p = (Parameter) bp;
       // check that parameters are parsed polymorphically
       if (p.getName().equals("service_var1")) {
         assertTrue(p instanceof StringParameter);
@@ -470,7 +558,7 @@ public class JsonSdlParserTest {
         found++;
       }
     }
-    assertEquals(4, found);
+    assertEquals(5, found);
 
     // Check service dependencies
     assertEquals(2, descriptor.getServiceDependencies().size());
@@ -492,14 +580,14 @@ public class JsonSdlParserTest {
     found = 0;
 
     List<RoleDescriptor> roles = descriptor.getRoles();
-    assertEquals(4, roles.size());
+    assertEquals(5, roles.size());
     Map<String, RoleDescriptor> rds = SdlTestUtils.makeRoleMap(roles);
     RoleDescriptor rd = rds.get("ECHO_WEBSERVER");
     // check role command
     assertEquals(1, rd.getCommands().size());
 
     assertEquals(16, rd.getParameters().size());
-    for (Parameter<?> p : rd.getParameters()) {
+    for (BasicParameter<?> p : rd.getParameters()) {
       // check that parameters are parsed polymorphically
       if (p.getName().equals("role_var1")) {
         assertTrue(p instanceof StringParameter);
@@ -680,6 +768,32 @@ public class JsonSdlParserTest {
         }
       }
     }
+
+    GatewayDescriptor gw = descriptor.getGateway();
+    found = 0;
+
+    assertNotNull(gw);
+    assertEquals(3, gw.getParameters().size());
+    for (BasicParameter<?> p : gw.getParameters()) {
+      // check that parameters are parsed polymorphically for Gateway desc
+      if (p.getName().equals("client_var1")) {
+        assertTrue(p instanceof StringParameter);
+        found++;
+      } else if (p.getName().equals("client_var2")) {
+        assertTrue(p instanceof LongParameter);
+        LongParameter lp = (LongParameter) p;
+        assertEquals(1, lp.getDefault().longValue());
+        found++;
+      } else if (p.getName().equals("navigator_lineage_enabled")) {
+        assertTrue(p instanceof ProvidedParameter);
+        found++;
+      } else if (p.getName().equals("lineage_event_log_dir")) {
+        assertTrue(p instanceof ProvidedParameter);
+        found++;
+      }
+    }
+    assertEquals(3, found);
+
   }
 
   @Test
@@ -723,6 +837,7 @@ public class JsonSdlParserTest {
     assertEquals("kms.ssl.privatekey.password",
         pemServer.getPrivateKeyPasswordConfigName());
     assertTrue(pemServer.isPrivateKeyPasswordScriptBased());
+    assertEquals(null, sslServer.getAutoTlsMode());
 
     SslClientDescriptor sslClient = roleDesc.getSslClient();
     assertNotNull(sslClient);

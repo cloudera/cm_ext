@@ -19,7 +19,7 @@ import static com.cloudera.csd.validation.references.annotations.SubstitutionTyp
 
 import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
@@ -101,7 +101,7 @@ public interface ServiceDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  List<Parameter<?>> getParameters();
+  List<BasicParameter<?>> getParameters();
 
   @UniqueField("name")
   @Valid

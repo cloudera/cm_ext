@@ -15,6 +15,8 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors.generators;
 
+import com.cloudera.csd.validation.constraints.DeprecationChecks;
+import com.cloudera.csd.validation.constraints.RequiresSubdir;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -31,6 +33,7 @@ public interface AuxConfigGenerator {
    * The name of the configuration file.
    */
   @NotBlank
+  @RequiresSubdir(groups = DeprecationChecks.class)
   String getFilename();
 
   /**

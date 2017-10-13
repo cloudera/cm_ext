@@ -16,8 +16,8 @@
 package com.cloudera.csd.components;
 
 import com.cloudera.common.Parser;
+import com.cloudera.csd.descriptors.PlacementRuleDescriptor.AlwaysWithAnyRule;
 import com.cloudera.csd.descriptors.PlacementRuleDescriptor.NeverWithRule;
-import com.cloudera.csd.descriptors.CertificateFileFormat;
 import com.cloudera.csd.descriptors.ServiceDescriptor;
 import com.cloudera.csd.descriptors.PlacementRuleDescriptor.AlwaysWithRule;
 import com.cloudera.csd.descriptors.SslClientDescriptor.JksSslClientDescriptor;
@@ -25,9 +25,13 @@ import com.cloudera.csd.descriptors.SslClientDescriptor.PemSslClientDescriptor;
 import com.cloudera.csd.descriptors.SslServerDescriptor.JksSslServerDescriptor;
 import com.cloudera.csd.descriptors.SslServerDescriptor.PemSslServerDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.ClassAndConfigsExtension;
+import com.cloudera.csd.descriptors.dependencyExtension.DirectoryExtension;
+import com.cloudera.csd.descriptors.dependencyExtension.LineageExtension;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.GFlagsGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.HadoopXMLGenerator;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator.PropertiesGenerator;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor.NonSingletonAggregationDescriptor;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor.SingletonAggregationDescriptor;
 import com.cloudera.csd.descriptors.parameters.BooleanParameter;
 import com.cloudera.csd.descriptors.parameters.DoubleParameter;
 import com.cloudera.csd.descriptors.parameters.LongParameter;
@@ -36,6 +40,7 @@ import com.cloudera.csd.descriptors.parameters.PasswordParameter;
 import com.cloudera.csd.descriptors.parameters.PathArrayParameter;
 import com.cloudera.csd.descriptors.parameters.PathParameter;
 import com.cloudera.csd.descriptors.parameters.PortNumberParameter;
+import com.cloudera.csd.descriptors.parameters.ProvidedParameter;
 import com.cloudera.csd.descriptors.parameters.StringArrayParameter;
 import com.cloudera.csd.descriptors.parameters.StringEnumParameter;
 import com.cloudera.csd.descriptors.parameters.StringParameter;
@@ -64,11 +69,11 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
     return mapper.readValue(data, ServiceDescriptor.class);
   }
 
-  @JsonTypeInfo(  
-      use = JsonTypeInfo.Id.NAME,  
+  @JsonTypeInfo(
+      use = JsonTypeInfo.Id.NAME,
       include = JsonTypeInfo.As.PROPERTY,
-      property = "type")  
-  @JsonSubTypes({  
+      property = "type")
+  @JsonSubTypes({
       @JsonSubTypes.Type(value = StringParameter.class, name = "string"),
       @JsonSubTypes.Type(value = MemoryParameter.class, name = "memory"),
       @JsonSubTypes.Type(value = LongParameter.class, name = "long"),
@@ -81,15 +86,16 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       @JsonSubTypes.Type(value = URIParameter.class, name = "uri"),
       @JsonSubTypes.Type(value = PathParameter.class, name = "path"),
       @JsonSubTypes.Type(value = PasswordParameter.class, name = "password"),
-      @JsonSubTypes.Type(value = PortNumberParameter.class, name = "port")})
+      @JsonSubTypes.Type(value = PortNumberParameter.class, name = "port"),
+      @JsonSubTypes.Type(value = ProvidedParameter.class, name = "provided")})
   interface ParameterMixin {
   }
 
-  @JsonTypeInfo(  
-      use = JsonTypeInfo.Id.NAME,  
+  @JsonTypeInfo(
+      use = JsonTypeInfo.Id.NAME,
       include = JsonTypeInfo.As.PROPERTY,
-      property = "configFormat")  
-  @JsonSubTypes({  
+      property = "configFormat")
+  @JsonSubTypes({
       @JsonSubTypes.Type(value = HadoopXMLGenerator.class, name = "hadoop_xml"),
       @JsonSubTypes.Type(value = PropertiesGenerator.class, name = "properties"),
       @JsonSubTypes.Type(value = GFlagsGenerator.class, name = "gflags")})
@@ -101,7 +107,9 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       include = JsonTypeInfo.As.PROPERTY,
       property = "type")
   @JsonSubTypes({
-      @JsonSubTypes.Type(value = ClassAndConfigsExtension.class, name = "classAndConfigs")})
+      @JsonSubTypes.Type(value = ClassAndConfigsExtension.class, name = "classAndConfigs"),
+      @JsonSubTypes.Type(value = DirectoryExtension.class, name = "directory"),
+      @JsonSubTypes.Type(value = LineageExtension.class, name = "lineage")})
   interface DependencyExtensionMixin {
   }
 
@@ -111,6 +119,7 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
       property = "type")
   @JsonSubTypes({
     @JsonSubTypes.Type(value = AlwaysWithRule.class, name = "alwaysWith"),
+    @JsonSubTypes.Type(value = AlwaysWithAnyRule.class, name = "alwaysWithAny"),
     @JsonSubTypes.Type(value = NeverWithRule.class, name = "neverWith")})
   interface PlacementRuleMixin {
   }
@@ -139,5 +148,15 @@ public class JsonSdlParser implements Parser<ServiceDescriptor> {
     @JsonSubTypes.Type(value = PemSslClientDescriptor.class, name="pem")
   })
   interface SslClientDescriptorTypeMixin {
+  }
+
+  @JsonTypeInfo(
+      use = JsonTypeInfo.Id.NAME,
+      include = JsonTypeInfo.As.PROPERTY,
+      property = "type")
+  @JsonSubTypes({
+      @JsonSubTypes.Type(value = SingletonAggregationDescriptor.class, name = "singleton"),
+      @JsonSubTypes.Type(value = NonSingletonAggregationDescriptor.class, name = "nonSingleton")})
+  interface HealthAggregationMixin {
   }
 }

@@ -107,6 +107,10 @@
       "description" : "Service Kerb Description",
       "type" : "boolean",
       "default" : "false"
+    },
+    {
+      "name": "navigator_lineage_enabled",
+      "type": "provided"
     }
   ],
   "kerberos" : "${service_kerb_var}",
@@ -176,6 +180,10 @@
         "required" : "true",
         "type" : "long",
         "default" : 1
+      },
+      {
+        "name": "lineage_event_log_dir",
+        "type": "provided"
       }
     ],
     "configWriter" : {
@@ -189,9 +197,23 @@
           "filename" : "echo_client.properties",
           "configFormat" : "properties",
           "includedParams" : ["service_var1", "client_var1", "client_var2"]
+        },
+        {
+          "filename" : "echo_provided_client.properties",
+          "configFormat" : "properties",
+          "includedParams" : ["navigator_lineage_enabled", "lineage_event_log_dir"]
         }
       ]
     },
+    "dependencyExtensions": [
+      {
+        "extensionId" : "navigator_lineage_client",
+        "defaultDir" : "/var/log/echo/lineage",
+        "permissions" : "1777",
+        "singleUserModeAllowed": false,
+        "type" : "lineage"
+      }
+    ],
     "logging" : {
       "configFilename" : "gateway-log4j.properties",
       "loggingType" : "log4j",
@@ -292,6 +314,10 @@
          "minInstances" : "1",
          "maxInstances" : "1"
        },
+       "healthAggregation" : {
+         "type" : "singleton"
+       },
+       "serviceMonitorClient" : "true",
        "parameters" : [
          {
           "name" : "master_server_var1",
@@ -316,7 +342,8 @@
          "enabledConfigName": "echo.ssl.enabled",
          "keyPasswordOptionality" : "required",
          "keystoreKeyPasswordConfigName" : "echo.ssl.key.password",
-         "keystoreKeyPasswordScriptBased" : "true"
+         "keystoreKeyPasswordScriptBased" : "true",
+         "autoTlsMode": "auto"
        },
        "sslClient" : {
          "truststoreFormat" : "pem"
@@ -341,6 +368,20 @@
            }
          }
        ],
+      "supportBundle" : {
+        "description": "Collects fine grained diagnostics about Master Server.",
+        "runMode" : "all",
+        "timeout" : 12345,
+        "runner" : {
+          "program": "scripts/control.sh",
+          "args": [
+            "diagnostics"
+          ],
+          "environmentVariables": {
+            "MESSAGE" : "Redact your data"
+          }
+        }
+      },
        "configWriter" : {
          "generators" : [
            {
@@ -412,6 +453,20 @@
          "truststorePasswordConfigName" : "echo.truststore.password",
          "truststorePasswordCredentialProviderCompatible" : "true"
        },
+      "dependencyExtensions": [
+        {
+          "extensionId" : "navigator_lineage_client",
+          "defaultDir": "/var/log/echo_webserver/lineage",
+          "permissions": "0700",
+          "singleUserModeAllowed" : true,
+          "type" : "lineage"
+        }
+      ],
+      "healthAggregation" : {
+        "type" : "nonSingleton",
+        "percentGreenForGreen" : 95.0,
+        "percentYellowGreenForYellow" : 90.0
+      },
        "logging" : {
          "dir" : "/var/log/echo",
          "filename" : "webserver.log",
@@ -698,14 +753,16 @@
     },
     {
       "name" : "ECHO_EXILE",
-      "label" : "Web Server Buddy",
-      "pluralLabel" : "Web Server Buddies",
+      "label" : "Exile",
+      "pluralLabel" : "Exiles",
       "startRunner" : {
         "program" : "scripts/control.sh"
       },
       "topology" : {
         "minInstances" : "0",
-        "maxInstances" : "1",
+        "maxInstances" : "3",
+        "softMinInstances" : "1",
+        "softMaxInstances" : "2",
         "placementRules" : [
           {
             "type" : "neverWith",
@@ -713,6 +770,25 @@
               "ECHO_MASTER_SERVER",
               "ECHO_WEBSERVER",
               "ECHO_WEBSERVER_BUDDY"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name" : "ECHO_PREREQUISITE",
+      "label" : "Prerequisite",
+      "pluralLabel" : "Prerequisites",
+      "startRunner" : {
+        "program" : "scripts/control.sh"
+      },
+      "topology" : {
+        "placementRules" : [
+          {
+            "type" : "alwaysWithAny",
+            "roleTypes" : [
+              "ECHO_MASTER_SERVER",
+              "ECHO_WEBSERVER"
             ]
           }
         ]

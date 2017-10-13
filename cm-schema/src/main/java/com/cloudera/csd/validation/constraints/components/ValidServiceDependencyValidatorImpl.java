@@ -28,30 +28,19 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidServiceDependencyValidatorImpl implements ValidServiceDependencyValidator {
 
   private final Set<String> validServiceTypes;
+  private ValidServiceDependency annotation;
 
   public ValidServiceDependencyValidatorImpl(Set<String> validServiceTypes) {
     this.validServiceTypes = validServiceTypes;
   }
 
   @Override
-  public void initialize(ValidServiceDependency constraintAnnotation) {}
+  public void initialize(ValidServiceDependency constraintAnnotation) {
+    annotation = constraintAnnotation;
+  }
 
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    boolean isValid = validServiceTypes.contains(value);
-    if (!isValid) {
-      context.disableDefaultConstraintViolation();
-      // Customizes the validation result message by adding the validation
-      // target value at the end of the violation object path. It will be
-      // something like:
-      // serviceDependencies[1].name.SPARK
-      context.buildConstraintViolationWithTemplate(
-            context.getDefaultConstraintMessageTemplate()
-          )
-          .addPropertyNode(value)
-          .addConstraintViolation();
-    }
-
-    return isValid;
+    return validServiceTypes.contains(value);
   }
 }

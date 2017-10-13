@@ -47,7 +47,7 @@ public class UniqueFieldValidatorImpl implements UniqueFieldValidator {
     if (list != null) {
       Set<Object> seenSoFar = Sets.newHashSet();
       for (Object obj : list) {
-        Object value = propertyValue(obj, uniqueField.value());
+        Object value = propertyValue(obj, uniqueField.value(), this.skipNulls);
         if ((value == null) && this.skipNulls) {
           continue;
         }
@@ -76,12 +76,24 @@ public class UniqueFieldValidatorImpl implements UniqueFieldValidator {
   }
 
   /**
-   * @return return the value of the property
+   * @return return the value of the property, or null if undefined and
+   * skipUndefined is true. Errors if the property is undefined and
+   * skipUndefined is false.
    */
   @VisibleForTesting
-  Object propertyValue(Object obj, String property) {
+  Object propertyValue(Object obj, String property, boolean skipUndefined) {
     try {
       PropertyDescriptor desc = PropertyUtils.getPropertyDescriptor(obj, property);
+      if (desc == null) {
+        if (skipUndefined) {
+          return null;
+        } else {
+          throw new ValidationException(String.format(
+              "Undefined property [%s] in object of type [%s]",
+              property,
+              obj.getClass().getName()));
+        }
+      }
       return desc.getReadMethod().invoke(obj, new Object[]{});
     } catch( Exception e) {
       throw new ValidationException(e);

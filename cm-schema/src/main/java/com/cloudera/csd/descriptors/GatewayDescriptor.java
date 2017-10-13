@@ -15,7 +15,7 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.validation.constraints.UniqueField;
 
 import java.util.List;
@@ -28,7 +28,8 @@ import javax.validation.constraints.NotNull;
  * to package and deploy them. The output configurations are deployed onto
  * the client host using the Linux "alternatives" mechanism.
  */
-public interface GatewayDescriptor {
+public interface GatewayDescriptor
+    extends AbstractRoleDescriptor {
 
   /**
    * Describes how to install the client configuration into the 'alternatives'
@@ -52,7 +53,7 @@ public interface GatewayDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  List<Parameter<?>> getParameters();
+  List<BasicParameter<?>> getParameters();
 
   @NotNull
   @Valid
