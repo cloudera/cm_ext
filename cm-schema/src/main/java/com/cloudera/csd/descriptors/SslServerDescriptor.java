@@ -52,6 +52,12 @@ public interface SslServerDescriptor {
    */
   String getEnabledConfigName();
 
+  /**
+   * Optional. If set to AUTO, this server supports Auto-TLS. Defaults to null
+   * which means no Auto-TLS support.
+   */
+  AutoTlsMode getAutoTlsMode();
+
   @Referenced(type = ReferenceType.PARAMETER, as = {"ssl_enabled",
       "ssl_server_keystore_location", "ssl_server_keystore_password",
       // TODO we should only conditionally allow references to key password

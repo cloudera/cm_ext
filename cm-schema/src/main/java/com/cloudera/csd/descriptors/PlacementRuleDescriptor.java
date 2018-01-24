@@ -21,6 +21,7 @@ import com.cloudera.csd.validation.references.annotations.Referencing;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Describes a rule about where a role can be placed. Only sub-interfaces are
@@ -46,6 +47,24 @@ public interface PlacementRuleDescriptor {
      */
     @NotNull
     @Referencing(type=ReferenceType.ROLE)
+    List<String> getRoleTypes();
+  }
+
+  public interface AlwaysWithAnyRule extends PlacementRuleDescriptor {
+    /**
+     * Role types that determine where this role must always be located.
+     * In wizards, this role will not be visible for manual assignment.
+     * Whenever any of the specified role types is present on a host,
+     * this role will also be assigned to that host. Also, note that there
+     * will be an error if this role is located on a host that has none of
+     * the specified roles.
+     *
+     * Note: The number of role types in this list should at least two or
+     * more.
+     */
+    @NotNull
+    @Referencing(type = ReferenceType.ROLE)
+    @Size(min = 2, message = "{custom.validation.constraints.AlwaysWithAny.size.minimum.message}")
     List<String> getRoleTypes();
   }
 }

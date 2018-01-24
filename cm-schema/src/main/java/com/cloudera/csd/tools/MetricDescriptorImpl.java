@@ -16,7 +16,7 @@
 package com.cloudera.csd.tools;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
-
+import com.cloudera.csd.descriptors.MetricType;
 import com.google.common.base.Preconditions;
 
 /**
@@ -32,6 +32,7 @@ public class MetricDescriptorImpl implements MetricDescriptor {
   private final boolean isCounter;
   private final String weightingMetricName;
   private final String context;
+  private final MetricType type;
 
   /**
    * A simpler builder class to build a MetricDescriptor. No validation is done
@@ -46,6 +47,7 @@ public class MetricDescriptorImpl implements MetricDescriptor {
     private boolean isCounter;
     private String weightingMetricName;
     private String context;
+    private MetricType type;
 
     public Builder setName(String serviceName, String name) {
       Preconditions.checkNotNull(serviceName);
@@ -101,6 +103,11 @@ public class MetricDescriptorImpl implements MetricDescriptor {
       return this;
     }
 
+    public Builder setType(MetricType type) {
+      this.type = type;
+      return this;
+    }
+
     public MetricDescriptorImpl build() {
       return new MetricDescriptorImpl(name,
                                       label,
@@ -109,11 +116,12 @@ public class MetricDescriptorImpl implements MetricDescriptor {
                                       denominatorUnit,
                                       isCounter,
                                       weightingMetricName,
-                                      context);
+                                      context,
+                                      type);
     }
   }
 
-  public MetricDescriptorImpl(
+  private MetricDescriptorImpl(
       String name,
       String label,
       String description,
@@ -121,7 +129,8 @@ public class MetricDescriptorImpl implements MetricDescriptor {
       String denominatorUnit,
       boolean isCounter,
       String weightingMetricName,
-      String context) {
+      String context,
+      MetricType type) {
     Preconditions.checkNotNull(name);
     Preconditions.checkArgument(!name.isEmpty());
     Preconditions.checkNotNull(label);
@@ -138,6 +147,7 @@ public class MetricDescriptorImpl implements MetricDescriptor {
     this.isCounter = isCounter;
     this.weightingMetricName = weightingMetricName;
     this.context = context;
+    this.type = type;
   }
 
   @Override
@@ -178,5 +188,10 @@ public class MetricDescriptorImpl implements MetricDescriptor {
   @Override
   public String getContext() {
     return context;
+  }
+
+  @Override
+  public MetricType getType() {
+    return type;
   }
 }

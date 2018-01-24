@@ -15,8 +15,12 @@
 // limitations under the License.
 package com.cloudera.csd.descriptors;
 
+import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
 import com.cloudera.csd.descriptors.cgroups.CgroupDescriptor;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor;
+import com.cloudera.csd.descriptors.health.HealthTestDescriptor;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
+import com.cloudera.csd.descriptors.supportBundle.SupportBundleDescriptor;
 import com.cloudera.csd.validation.constraints.AutoConfigSharesValid;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
@@ -38,7 +42,8 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 @Named
 @Referenced(type=ReferenceType.ROLE)
-public interface RoleDescriptor {
+public interface RoleDescriptor
+    extends AbstractRoleDescriptor {
 
   @EntityTypeFormat
   @UniqueRoleType
@@ -76,6 +81,15 @@ public interface RoleDescriptor {
   @Valid
   RunnerDescriptor getStartRunner();
 
+  /**
+   * Allows to override the default stop behavior for a role.
+   * If not specified, the process will receive a TERM signal;
+   * after a hardcoded timeout we send a group sigkill
+   * if the process is still running.
+   */
+  @Valid
+  GracefulStopRoleDescriptor getStopRunner();
+
   @Valid
   TopologyDescriptor getTopology();
 
@@ -85,7 +99,7 @@ public interface RoleDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  List<Parameter<?>> getParameters();
+  List<BasicParameter<?>> getParameters();
 
   @Valid
   RunAs getRunAs();
@@ -127,4 +141,35 @@ public interface RoleDescriptor {
    * value at role creation.
    */
   public List<String> getUniqueIdParameters();
+
+  /**
+   * Optional. Indicates that service health is reported based on the health of its
+   * monitored roles.
+   */
+  @Valid
+  HealthAggregationDescriptor getHealthAggregation();
+
+  /**
+   * Indicates whether the role wishes to communicate with service monitor. If so, it
+   * will be provided the connection information via the monitoring properties file.
+   *
+   * @return true if need to act as a service monitor RPC client
+   */
+  @Unstable
+  boolean isServiceMonitorClient();
+
+  /**
+   * Optional. If configured, then indicates that role supports generating diagnostics
+   * that would be collected as a part of the global support bundle.
+   */
+  @Unstable
+  @Valid
+  SupportBundleDescriptor getSupportBundle();
+
+  @UniqueField.List({
+    @UniqueField("name"),
+    @UniqueField("label")
+  })
+  @Valid
+  List<HealthTestDescriptor> getHealthTests();
 }

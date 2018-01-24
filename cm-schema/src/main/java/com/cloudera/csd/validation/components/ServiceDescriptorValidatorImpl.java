@@ -39,41 +39,20 @@ public class ServiceDescriptorValidatorImpl extends
 
   private final Validator validator;
   private final ReferenceValidator refValidator;
-  private final boolean enforceDependencyCheck;
-  private Set<String> dependencyViolationStringSet;
 
   public ServiceDescriptorValidatorImpl(
       Validator validator,
-      ReferenceValidator refValidator,
-      boolean enforceDependencyCheck) {
+      ReferenceValidator refValidator) {
     super(validator, "service");
     this.validator = validator;
     this.refValidator = refValidator;
-    this.enforceDependencyCheck = enforceDependencyCheck;
-    this.dependencyViolationStringSet = Sets.newHashSet();
   }
 
   @VisibleForTesting
   public Set<ConstraintViolation<ServiceDescriptor>> getViolations(
-      ServiceDescriptor descriptor) {
+      ServiceDescriptor descriptor, Class<?>... groups) {
     Set<ConstraintViolation<ServiceDescriptor>> violations =
-        validator.validate(descriptor);
-    if (enforceDependencyCheck) {
-      Set<ConstraintViolation<ServiceDescriptor>> dependencyViolations =
-          validator.validate(
-              descriptor,
-              ServiceDependencyValidationGroup.class);
-      for (ConstraintViolation<ServiceDescriptor> violation : dependencyViolations) {
-        String message = violation.getMessage();
-        String[] propertyPathSections =
-            violation.getPropertyPath().toString().split("\\.");
-        dependencyViolationStringSet.add(
-            String.format("%s %s",
-                propertyPathSections[propertyPathSections.length - 1],
-                message));
-      }
-    }
-
+        validator.validate(descriptor, groups);
     if (!violations.isEmpty()) {
       return violations;
     }
@@ -81,18 +60,16 @@ public class ServiceDescriptorValidatorImpl extends
   }
 
   @Override
-  public Set<String> validate(ServiceDescriptor descriptor) {
+  public Set<String> validate(ServiceDescriptor descriptor, Class<?>... groups) {
     Set<ConstraintViolation<ServiceDescriptor>> constraintViolations;
-    constraintViolations = getViolations(descriptor);
+    constraintViolations = getViolations(descriptor, groups);
 
     ImmutableSet.Builder<String> violations = ImmutableSet.builder();
     for (ConstraintViolation<ServiceDescriptor> violation : constraintViolations) {
       String message = violation.getMessage();
-      String relativePath = violation.getPropertyPath().toString();
+      Object relativePath = violation.getPropertyPath().toString();
       violations.add(String.format("%s.%s %s", "service", relativePath, message));
     }
-    violations.addAll(dependencyViolationStringSet);
-    dependencyViolationStringSet.clear();
     return violations.build();
   }
 }

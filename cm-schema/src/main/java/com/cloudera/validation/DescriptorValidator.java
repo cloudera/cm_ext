@@ -30,5 +30,5 @@ public interface DescriptorValidator<T> {
    * @param descriptor the descriptor
    * @return the list of violations, empty if valid.
    */
-  Set<String> validate(T descriptor);
+  Set<String> validate(T descriptor, Class<?>... groups);
 }

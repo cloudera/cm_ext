@@ -16,6 +16,7 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
+import com.cloudera.csd.descriptors.MetricType;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
 import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
@@ -101,14 +102,18 @@ public class ConsistentMetricDefinitionValidator
             msg, metricDescriptor, metricDescriptor.getDenominatorUnit(), path);
     }
 
-    if (metricDescriptor.isCounter() != definition.isCounter()) {
+    boolean descIsCounter = metricDescriptor.isCounter() ||
+        metricDescriptor.getType() == MetricType.COUNTER;
+    boolean definitionIsCounter = definition.isCounter() ||
+        definition.getType() == MetricType.COUNTER;
+    if (descIsCounter != definitionIsCounter) {
       String msg = String.format(
           "Inconsistent counter definitions for metric '%s': '%s' and '%s'. ",
           metricDescriptor.getName(),
-          metricDescriptor.isCounter(),
-          definition.isCounter());
+          metricDescriptor.getType(),
+          definition.getType());
         return forViolation(
-            msg, metricDescriptor, metricDescriptor.isCounter(), path);
+            msg, metricDescriptor, descIsCounter, path);
     }
 
     if (!StringUtils.equals(

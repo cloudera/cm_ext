@@ -16,6 +16,8 @@
 package com.cloudera.csd.descriptors;
 
 import com.cloudera.csd.descriptors.generators.ConfigEntry;
+import com.cloudera.csd.validation.constraints.DeprecationChecks;
+import com.cloudera.csd.validation.constraints.RequiresSubdir;
 
 import java.util.List;
 
@@ -26,12 +28,13 @@ import javax.validation.Valid;
  */
 public interface GatewayLoggingDescriptor {
 
-   /**
+  /**
    * Optional. Filename of the logging configuration file. If not specified,
    * uses a default file name as specified in {@link CsdLoggingType}.
    *
    * @return the filename
    */
+  @RequiresSubdir(groups = DeprecationChecks.class)
   String getConfigFilename();
 
   /**

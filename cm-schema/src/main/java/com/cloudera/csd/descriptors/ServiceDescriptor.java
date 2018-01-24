@@ -19,7 +19,8 @@ import static com.cloudera.csd.validation.references.annotations.SubstitutionTyp
 
 import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.health.HealthTestDescriptor;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.cloudera.csd.validation.constraints.EntityTypeFormat;
 import com.cloudera.csd.validation.constraints.UniqueField;
 import com.cloudera.csd.validation.constraints.UniqueServiceType;
@@ -53,6 +54,16 @@ public interface ServiceDescriptor {
   @NotBlank
   String getDescription();
 
+  /**
+   * An arbitrary version. Recommended format <em>X.y.z</em>
+   * Parts should be numeric and all but the first are optional.
+   *
+   * All CSDs of the same name (service type) are evaluated, and the
+   * higher version number is determined. Then all CSDs declaring
+   * this version are loaded, discarding older versions.
+   * So the latest CSD version preempts the older ones, even if newer
+   * versions might have a different CDH compatibility range.
+   */
   @NotBlank
   String getVersion();
 
@@ -101,7 +112,7 @@ public interface ServiceDescriptor {
     @UniqueField("configName")
   })
   @Valid
-  List<Parameter<?>> getParameters();
+  List<BasicParameter<?>> getParameters();
 
   @UniqueField("name")
   @Valid
@@ -169,4 +180,11 @@ public interface ServiceDescriptor {
    * If service supports rolling restart, the steps can be specified using this.
    */
   RollingRestartDescriptor getRollingRestart();
+
+  @UniqueField.List({
+    @UniqueField("name"),
+    @UniqueField("label")
+  })
+  @Valid
+  List<HealthTestDescriptor> getHealthTests();
 }

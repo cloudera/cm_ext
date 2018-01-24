@@ -88,7 +88,7 @@ public class SubstitutionConstraint<T> extends AbstractReferenceConstraint<T> {
         if (type == SubstitutionType.PARAMETERS) {
           candidates.addAll(allowedRefs.get(ReferenceType.PARAMETER));
         } else {
-          candidates.add(type.toString().toLowerCase());
+          candidates.addAll(type.getVariables());
         }
       }
       Set<String> badVars = Sets.difference(variables, candidates);

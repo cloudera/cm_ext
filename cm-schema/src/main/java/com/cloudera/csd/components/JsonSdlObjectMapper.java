@@ -17,6 +17,8 @@ package com.cloudera.csd.components;
 
 import com.cloudera.csd.components.JsonSdlParser.DependencyExtensionMixin;
 import com.cloudera.csd.components.JsonSdlParser.GeneratorMixin;
+import com.cloudera.csd.components.JsonSdlParser.HealthAggregationMixin;
+import com.cloudera.csd.components.JsonSdlParser.HealthTestMixin;
 import com.cloudera.csd.components.JsonSdlParser.ParameterMixin;
 import com.cloudera.csd.components.JsonSdlParser.PlacementRuleMixin;
 import com.cloudera.csd.components.JsonSdlParser.SslClientDescriptorTypeMixin;
@@ -26,9 +28,12 @@ import com.cloudera.csd.descriptors.SslClientDescriptor;
 import com.cloudera.csd.descriptors.SslServerDescriptor;
 import com.cloudera.csd.descriptors.dependencyExtension.DependencyExtension;
 import com.cloudera.csd.descriptors.generators.ConfigGenerator;
-import com.cloudera.csd.descriptors.parameters.Parameter;
+import com.cloudera.csd.descriptors.health.HealthAggregationDescriptor;
+import com.cloudera.csd.descriptors.health.HealthTestDescriptor;
+import com.cloudera.csd.descriptors.parameters.BasicParameter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -65,12 +70,14 @@ public class JsonSdlObjectMapper {
    */
   private ObjectMapper createObjectMapper() {
     final Map<Class<?>, Class<?>> mixins = new HashMap<Class<?>, Class<?>>() {{
-      put(Parameter.class, ParameterMixin.class);
+      put(BasicParameter.class, ParameterMixin.class);
       put(ConfigGenerator.class, GeneratorMixin.class);
       put(DependencyExtension.class, DependencyExtensionMixin.class);
       put(PlacementRuleDescriptor.class, PlacementRuleMixin.class);
       put(SslServerDescriptor.class, SslServerDescriptorTypeMixin.class);
       put(SslClientDescriptor.class, SslClientDescriptorTypeMixin.class);
+      put(HealthAggregationDescriptor.class, HealthAggregationMixin.class);
+      put(HealthTestDescriptor.class, HealthTestMixin.class);
     }};
 
     ObjectMapper m = new ObjectMapper();
@@ -102,5 +109,20 @@ public class JsonSdlObjectMapper {
   public <T> T readValue(byte[] src, TypeReference<T> valueTypeRef)
       throws JsonParseException, JsonMappingException, IOException {
     return mapper.readValue(src, valueTypeRef);
+  }
+
+  public <T> T readValue(String src, Class<T> valueType)
+      throws JsonParseException, JsonMappingException, IOException {
+    return mapper.readValue(src, valueType);
+  }
+
+  public <T> String writeValueAsString(T value)
+      throws JsonProcessingException {
+    return mapper.writeValueAsString(value);
+  }
+
+  public <T> byte[] writeValueAsBytes(T value)
+      throws JsonProcessingException {
+    return mapper.writeValueAsBytes(value);
   }
 }

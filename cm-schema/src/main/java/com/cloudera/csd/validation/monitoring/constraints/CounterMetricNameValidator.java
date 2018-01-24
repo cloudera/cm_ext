@@ -16,6 +16,7 @@
 package com.cloudera.csd.validation.monitoring.constraints;
 
 import com.cloudera.csd.descriptors.MetricDescriptor;
+import com.cloudera.csd.descriptors.MetricType;
 import com.cloudera.csd.validation.monitoring.AbstractMonitoringValidator;
 import com.cloudera.csd.validation.monitoring.MonitoringConventions;
 import com.cloudera.csd.validation.monitoring.MonitoringValidationContext;
@@ -49,7 +50,7 @@ public class CounterMetricNameValidator
       DescriptorPathImpl path) {
     Preconditions.checkNotNull(context);
     Preconditions.checkNotNull(metricDescriptor);
-    if (!metricDescriptor.isCounter()) {
+    if (!(metricDescriptor.isCounter() || metricDescriptor.getType() == MetricType.COUNTER)) {
       return noViolations();
     }
     path = constructPathFromProperty(metricDescriptor, "name", path);

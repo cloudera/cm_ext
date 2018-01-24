@@ -1,0 +1,35 @@
+{
+  "name" : "ECHO",
+  "label" : "ECHO Server",
+  "description" : "The echo service",
+  "version" : 1,
+  "runAs" : {
+    "user" : "echoservice",
+    "group" : "echoservice",
+    "principal" : "serviceprinc"
+   },
+  "maxInstances" : 1,
+  "roles" : [
+      {
+         "name" : "ECHO_WEBSERVER",
+         "label" : "Web Server",
+         "pluralLabel" : "Web Servers",
+         "startRunner" : {
+           "program" : "scripts/control.sh",
+           "args" : [
+              "start",
+              "--port 9981"
+            ],
+           "environmentVariables" : {
+             "TEST_MESSAGE" : "Hello there people",
+             "BACKGROUND_COLOR" : "#d2d2d2"
+           }
+         },
+        "healthAggregation" : {
+          "type" : "nonSingleton",
+          "percentGreenForGreen" : 100.0,
+          "percentYellowGreenForYellow" : 100.0
+        }
+      }
+  ]
+}

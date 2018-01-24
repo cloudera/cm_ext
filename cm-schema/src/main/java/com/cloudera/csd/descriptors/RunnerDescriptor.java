@@ -20,6 +20,7 @@ import static com.cloudera.csd.validation.references.annotations.SubstitutionTyp
 import static com.cloudera.csd.validation.references.annotations.SubstitutionType.GROUP;
 import static com.cloudera.csd.validation.references.annotations.SubstitutionType.USER;
 
+import com.cloudera.csd.descriptors.InterfaceStability.Unstable;
 import com.cloudera.csd.validation.references.annotations.AvailableSubstitutions;
 
 import java.util.List;
@@ -41,4 +42,7 @@ public interface RunnerDescriptor {
 
   @AvailableSubstitutions(type={PARAMETERS, HOST, GROUP, USER})
   Map<String, String> getEnvironmentVariables();
+
+  @Unstable
+  Map<String, String> getReferencedEnvironmentVariables();
 }

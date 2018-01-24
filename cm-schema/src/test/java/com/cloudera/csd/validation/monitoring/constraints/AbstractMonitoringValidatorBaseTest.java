@@ -18,6 +18,7 @@ package com.cloudera.csd.validation.monitoring.constraints;
 import com.cloudera.csd.descriptors.MetricDescriptor;
 import com.cloudera.csd.descriptors.MetricEntityAttributeDescriptor;
 import com.cloudera.csd.descriptors.MetricEntityTypeDescriptor;
+import com.cloudera.csd.descriptors.MetricType;
 import com.cloudera.csd.descriptors.RoleMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.descriptors.ServiceMonitoringDefinitionsDescriptor;
 import com.cloudera.csd.validation.references.components.DescriptorPathImpl;
@@ -72,6 +73,9 @@ abstract public class AbstractMonitoringValidatorBaseTest {
 
   protected void setIsCounter(boolean isCounter) {
     doReturn(isCounter).when(metric).isCounter();
+    if (isCounter) {
+      doReturn(MetricType.COUNTER).when(metric).getType();
+    }
   }
 
   protected void setDenominator(String denominator) {
