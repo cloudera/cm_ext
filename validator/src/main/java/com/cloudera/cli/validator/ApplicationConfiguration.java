@@ -94,7 +94,7 @@ public class ApplicationConfiguration extends DefaultValidatorConfiguration {
   public DescriptorRunner<?> sdlRunner() {
     return createValidationRunner(
         "sdlParser",
-        "serviceDescriptorValidatorWithDependencyCheck");
+        "serviceDescriptorValidator");
   }
 
   @Bean
