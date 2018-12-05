@@ -36,5 +36,10 @@ Running make_manifest
 $ python make_manifest/make_manifest.py <path to directory>
 ```
 
+Bugs / Problems
+---------------------
+
+- Hash function in `make_manifest.py` fails with big files. -> SOLVED :white_check_mark:
+
 All source in this repository is [Apache-Licensed](LICENSE.txt).
 
