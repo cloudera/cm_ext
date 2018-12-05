@@ -74,7 +74,8 @@ def make_manifest(path, timestamp=time.time()):
     fullpath = os.path.join(path, f)
 
     with open(fullpath, 'rb') as fp:
-      entry['hash'] = hashlib.sha1(fp.read()).hexdigest()
+      # read in 16MB or so chunks instead
+      entry['hash'] = hashlib.sha1(fp.read(16 * 1024 * 1024)).hexdigest()
 
     with tarfile.open(fullpath, 'r') as tar:
       try:
