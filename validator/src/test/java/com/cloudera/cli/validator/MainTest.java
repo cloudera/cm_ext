@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class MainTest {
     FileWriter fileOutput = null;
     File tempFile = null;
     try {
-      tempFile = File.createTempFile("dependencySdl",".txt");
+      tempFile = Files.createTempFile("dependencySdl", ".txt").toFile();
       fileOutput = new FileWriter(tempFile);
       fileOutput.write("SPARK" + "\n");
       fileOutput.write("FOO" + "\n");
